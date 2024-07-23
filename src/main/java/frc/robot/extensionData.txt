@@ -1,0 +1,21 @@
+double extenderGoals[] = new double[] {
+        190000, 45000, 0
+    };
+    
+    /**
+     * The shoulder command goes up, then the extender command goes, after that the
+     * shoulder command goes down.
+     * Going up is considered: phase 0.
+     * Going down after the extender command is: phase 1.
+     * Those two phases have a target pos that the shoulder encoder needs to
+     * achieve.
+     * Those goals are configured in this array.
+     * phase0: up, middle, floor
+     * phase1: up, middle, floor
+     */
+    double shoulderGoals[][] = new double[][] {
+        // new double[] { 191432 * 1.1, 87133 * 2.08 * 1.1, 73000 * 1.1},   // used to adjust for forward bend
+        // new double[] { 150000 * 1.1, 66133 * 2.08 * 1.1, 73000 * 1.1},
+        new double[] { 250000, 185000, 67000 },   //this is the old one - pre bent
+        new double[] { 215000, 138000, 67000 },
+    };

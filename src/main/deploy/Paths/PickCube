@@ -1,0 +1,4 @@
+X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name
+1.7093780018708304,-3.6030813854104347,-0.1,0.0,true,false,Start
+3.313038342635016,-3.1936361920238343,2.0,0.0,true,false,Midpoint
+4.609614788359252,-3.4324792214993507,0.1,0.0,true,false,Cube
