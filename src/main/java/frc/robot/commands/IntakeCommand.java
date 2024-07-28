@@ -11,7 +11,7 @@ public class IntakeCommand extends Command {
     State state;
     double timeOut;
     double startTime;
-    private final static double THRESHOLD = 2;
+    //private final static double THRESHOLD = 2;
     public enum State {
         IN, OUT, OFF
     }

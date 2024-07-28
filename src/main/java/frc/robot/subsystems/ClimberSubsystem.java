@@ -11,7 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
+//import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,8 +22,8 @@ public class ClimberSubsystem extends SubsystemBase {
     // Defines for Hardware
     private final static int LEFT_CLIMBER_MOTOR_ID = 30;
     private final static int RIGHT_CLIMBER_MOTOR_ID = 31;
-    private final static int LEFT_SOLENOID_ID = 2;
-    private final static int RIGHT_SOLENOID_ID = 3;
+    //private final static int LEFT_SOLENOID_ID = 2;
+    //private final static int RIGHT_SOLENOID_ID = 3;
 
     // Defines for speeds
     // Speed for down left -, right +
@@ -46,11 +46,13 @@ public class ClimberSubsystem extends SubsystemBase {
     // Setup the objects for the hardware
     private TalonFX leftClimber = new TalonFX(LEFT_CLIMBER_MOTOR_ID);
     private TalonFX rightClimber = new TalonFX(RIGHT_CLIMBER_MOTOR_ID);
-    private DigitalOutput leftClimberSolenoid = new DigitalOutput(LEFT_SOLENOID_ID);
-    private DigitalOutput rightClimberSoleniod = new DigitalOutput(RIGHT_SOLENOID_ID);
+    //private DigitalOutput leftClimberSolenoid = new DigitalOutput(LEFT_SOLENOID_ID);
+    //private DigitalOutput rightClimberSoleniod = new DigitalOutput(RIGHT_SOLENOID_ID);
 
     private int lockCounter = -1;
     private PWM climberLock = new PWM(4);
+
+    // TODO Elie and KAG I thought that we had two climber locks one for right and one for left
     
     private final double CURRENT_LIMIT = 60;
 

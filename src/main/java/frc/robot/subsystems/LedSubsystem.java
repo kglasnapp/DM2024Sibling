@@ -2,14 +2,9 @@ package frc.robot.subsystems;
 
 import static frc.robot.Util.logf;
 
-import org.opencv.features2d.FlannBasedMatcher;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 
 //import static frc.robot.utilities.Util.logf;
 
@@ -18,9 +13,9 @@ public class LedSubsystem extends SubsystemBase {
     private AddressableLED m_led;
     private AddressableLEDBuffer m_ledBuffer;    
     private GrabberSubsystem grabberSubsystem;
-    private ShooterSubsystem shooterSubsystem;
+    private ShooterSubsystemOld shooterSubsystem;
 
-    public LedSubsystem(GrabberSubsystem grabberSubsystem, ShooterSubsystem shooterSubsystem) {
+    public LedSubsystem(GrabberSubsystem grabberSubsystem, ShooterSubsystemOld shooterSubsystem) {
         this.grabberSubsystem = grabberSubsystem;
         this.shooterSubsystem = shooterSubsystem;
         initNeoPixel();

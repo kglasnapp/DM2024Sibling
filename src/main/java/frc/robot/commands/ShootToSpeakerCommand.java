@@ -11,12 +11,12 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LimeLightPoseSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ShooterSubsystemOld;
 import edu.wpi.first.math.geometry.Pose2d;
 import static frc.robot.utilities.Util.logf;
 
 public class ShootToSpeakerCommand extends Command {
-    ShooterSubsystem shooterSubsystem;
+    ShooterSubsystemOld shooterSubsystem;
     IntakeSubsystem intakeSubsystem;
     GrabberSubsystem grabberSubsystem;
     LimeLightPoseSubsystem poseEstimatorSubsystem;
@@ -66,15 +66,15 @@ public class ShootToSpeakerCommand extends Command {
 
     public static enum State {
         CHECK_INTAKE_ANGLE_TO_FEED,
-        FEED_NOTE,
+        //FEED_NOTE,
         NOTE_WENT_OUT,
         CHECK_SHOOTER_ANGLE_AND_ROBOT_POSE,
         TRIGGER,
-        TRIGGER_OUT,
+        //TRIGGER_OUT,
         SEE_NOTE_GOING_OUT
     };
 
-    public ShootToSpeakerCommand(ShooterSubsystem shooterSubsystem,
+    public ShootToSpeakerCommand(ShooterSubsystemOld shooterSubsystem,
             IntakeSubsystem intakeSubsystem,
             GrabberSubsystem grabberSubsystem,
             LimeLightPoseSubsystem poseEstimatorSubsystem,
@@ -102,7 +102,7 @@ public class ShootToSpeakerCommand extends Command {
         shooterSubsystem.setShooterPower(1);
         startTime = RobotController.getFPGATime() / 1000;
         // shootSpeakerAlligningCommand.initialize();
-        shooterSubsystem.servo.setAngle(ShooterSubsystem.FLAPPER_RETRACTED_ANGLE);
+        shooterSubsystem.servo.setAngle(ShooterSubsystemOld.FLAPPER_RETRACTED_ANGLE);
         logf("Start Shoot speaker command\n");
     }
 

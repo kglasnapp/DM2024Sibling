@@ -32,7 +32,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -50,7 +49,6 @@ import frc.robot.commands.SetShooterAngleCommand;
 import frc.robot.commands.ShootAmpCommand;
 import frc.robot.commands.ShootToSpeakerCommand;
 import frc.robot.commands.SpeakerAlligningCommand;
-import frc.robot.commands.StraightPathCommand;
 import frc.robot.commands.StraightToAmpCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
@@ -60,7 +58,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.LimeLightPoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.utilities.SwerveModule;
+import frc.robot.subsystems.ShooterSubsystemOld;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -78,11 +76,12 @@ public class RobotContainer {
 
   // private final LimeLightPose limeLightPose = new LimeLightPose();
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(this);
-  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem(this);
-  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+  public final ShooterSubsystemOld shooterSubsystem = (testMode) ? null : new ShooterSubsystemOld(this);
+  public final ShooterSubsystem shooterSubsystem2 = new ShooterSubsystem();
+  public final GrabberSubsystem grabberSubsystem =  (testMode) ? null :new GrabberSubsystem(this);
+  public final ClimberSubsystem climberSubsystem =  (testMode) ? null :new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
-  public final LedSubsystem leds = new LedSubsystem(grabberSubsystem, shooterSubsystem);
+  public final LedSubsystem leds = (testMode)?null: new LedSubsystem(grabberSubsystem, shooterSubsystem);
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
@@ -178,7 +177,7 @@ public static boolean getOperatorRightBumper() {
     configureDriverController(driveController);
     // calibrateShooter(driveController);
     try {
-      configureOperatorController(operatorController);
+      // configureOperatorController(operatorController);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -189,7 +188,7 @@ public static boolean getOperatorRightBumper() {
       @Override
       public void initialize() {
         // double currentAngle = shooterSubsystem.servo.getAngle();
-        shooterSubsystem.servo.setAngle(ShooterSubsystem.FLAPPER_EXPANDED_ANGLE);
+        shooterSubsystem.servo.setAngle(ShooterSubsystemOld.FLAPPER_EXPANDED_ANGLE);
         shooterSubsystem.setTiltAngle(-4.5);
         shooterSubsystem.setShooterPower(0.155);
       }
@@ -216,7 +215,7 @@ public static boolean getOperatorRightBumper() {
       @Override
       public void initialize() {
         // double currentAngle = shooterSubsystem.servo.getAngle();
-        shooterSubsystem.servo.setAngle(ShooterSubsystem.FLAPPER_EXPANDED_ANGLE);
+        shooterSubsystem.servo.setAngle(ShooterSubsystemOld.FLAPPER_EXPANDED_ANGLE);
         logf("servo setting angle to = keith 118\n");
       }
       @Override
@@ -228,7 +227,7 @@ public static boolean getOperatorRightBumper() {
     controller.pov(180).onTrue(new Command() {
       @Override
       public void initialize() {
-        shooterSubsystem.servo.setAngle(ShooterSubsystem.FLAPPER_RETRACTED_ANGLE);  // TODO KAG
+        shooterSubsystem.servo.setAngle(ShooterSubsystemOld.FLAPPER_RETRACTED_ANGLE); 
         logf("Servo setting angle to = 100\n");
       }
       @Override
@@ -279,7 +278,7 @@ public static boolean getOperatorRightBumper() {
       }
     });
 
-    controller.pov(270).onTrue(new Command() {  // TODO KAG
+    controller.pov(270).onTrue(new Command() {  
       @Override
       public void initialize() {
         grabberSubsystem.grabberOut();
@@ -310,11 +309,11 @@ public static boolean getOperatorRightBumper() {
 
   public void configureOperatorController(CommandXboxController controller) {
     //pov(0) set shooter angle to 0
-    controller.pov(0).onTrue(new SetShooterAngleCommand(shooterSubsystem, false, 0)); // Retrack
+    // controller.pov(0).onTrue(new SetShooterAngleCommand(shooterSubsystem, false, 0)); // Retrack
     //pov(90) set shooter to minimum angle
-    controller.pov(180).onTrue(new SetShooterAngleCommand(shooterSubsystem, false, -30));
+    // controller.pov(180).onTrue(new SetShooterAngleCommand(shooterSubsystem, false, -30));
     //pov(270) set shooter to amp shot
-    controller.pov(270).onTrue(new SetShooterAngleCommand(shooterSubsystem, true, -4)); // Up extended
+    // controller.pov(270).onTrue(new SetShooterAngleCommand(shooterSubsystem, true, -4)); // Up extended
     // controller.pov(90).onTrue(Autonomous.grabNoteCommand(this));
     // controller.pov(90).onTrue(new StraightPathCommand(drivetrainSubsystem, limeLightPoseSubsystem,
     //                                 new Pose2d(2.37,5.58, new Rotation2d())));
@@ -333,7 +332,7 @@ public static boolean getOperatorRightBumper() {
     controller.x().whileTrue(new Command() {
       @Override
       public void initialize() {
-        intakeSubsystem.state = IntakeSubsystem.State.GO_HOME;
+        //intakeSubsystem.state = IntakeSubsystem.State.GO_HOME;
       }
       public boolean isFinished() {
         return true;
@@ -352,32 +351,19 @@ public static boolean getOperatorRightBumper() {
         drivetrainSubsystem.zeroGyroscope();
       }
     }));
-    controller.pov(270).whileTrue(new GrabberOutCommand(grabberSubsystem));  
-    controller.pov(90).whileTrue(new GrabberInCommand(grabberSubsystem));
-    controller.pov(0).whileTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = shooterSubsystem.getTiltAngle();
-        shooterSubsystem.setTiltAngle(currentAngle + 0.5);
-       logf("setting tilt angle 1 to:%.2f \n", currentAngle + 0.5);
-      }
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
-    controller.pov(180).whileTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = shooterSubsystem.getTiltAngle();
-        shooterSubsystem.setTiltAngle(currentAngle - 0.5);
-       logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
-      }
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+   
+    // controller.pov(180).whileTrue(new Command() {
+    //   @Override
+    //   public void initialize() {
+    //     double currentAngle = shooterSubsystem.getTiltAngle();
+    //     shooterSubsystem.setTiltAngle(currentAngle - 0.5);
+    //    logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
+    //   }
+    //   @Override
+    //   public boolean isFinished() {
+    //     return true;
+    //   }
+    // });
 
     controller.x().whileTrue(new Command() {
       @Override
@@ -392,79 +378,55 @@ public static boolean getOperatorRightBumper() {
 
     // controller.pov(90).onTrue(new StraightPathCommand(drivetrainSubsystem, limeLightPoseSubsystem,
     //                                 new Pose2d(2.37,5.58, new Rotation2d())));
-    controller.b().onTrue(new Command() {
-      boolean finished = false;
+    // controller.b().onTrue(new Command() {
+    //   boolean finished = false;
 
-      enum State {
-        START, READY, DONE
-      }
+    //   enum State {
+    //     START, READY, DONE
+    //   }
 
-      State state;
+    //   State state;
 
-      @Override
-      public void initialize() {
-        finished = false;
-        state = State.START;
-      }
+    //   @Override
+    //   public void initialize() {
+    //     finished = false;
+    //     state = State.START;
+    //   }
 
-      double timer;
+    //   double timer;
 
-      @Override
-      public void execute() {
-        switch (state) {
-          case START:
-            shooterSubsystem.setShooterPower(1);
-            state = State.READY;
-            break;
-          case READY:
-            if (shooterSubsystem.getShootVelocity() > 6000 &&
-                shooterSubsystem.getShootVelocity2() > 6000) {
-              grabberSubsystem.grabberOut();
-              timer = RobotController.getFPGATime() / 1000;
-              state = State.DONE;
-            }
-            break;
-          case DONE:
-            if (timer + 500 < RobotController.getFPGATime() / 1000) {
-              shooterSubsystem.setShooterPower(0.3);
-              finished = true;
-            }
-            break;
-        }
-      }
+    //   @Override
+    //   public void execute() {
+    //     switch (state) {
+    //       case START:
+    //         shooterSubsystem.setShooterPower(1);
+    //         state = State.READY;
+    //         break;
+    //       case READY:
+    //         if (shooterSubsystem.getShootVelocity() > 6000 &&
+    //             shooterSubsystem.getShootVelocity2() > 6000) {
+    //           grabberSubsystem.grabberOut();
+    //           timer = RobotController.getFPGATime() / 1000;
+    //           state = State.DONE;
+    //         }
+    //         break;
+    //       case DONE:
+    //         if (timer + 500 < RobotController.getFPGATime() / 1000) {
+    //           shooterSubsystem.setShooterPower(0.3);
+    //           finished = true;
+    //         }
+    //         break;
+    //     }
+    //   }
 
-      @Override
-      public boolean isFinished() {
-        return finished;
-      }
+    //   @Override
+    //   public boolean isFinished() {
+    //     return finished;
+    //   }
 
-    });                    
+    // });                    
     
-    driveController.rightBumper().whileTrue(Autonomous.grabNoteCommand(this));
-    driveController.y().onTrue(new ShootToSpeakerCommand(shooterSubsystem,
-        intakeSubsystem,
-        grabberSubsystem,
-        limeLightPoseSubsystem,
-  
-        drivetrainSubsystem).alongWith(new SpeakerAlligningCommand(limeLightPoseSubsystem, drivetrainSubsystem)));
     
-    driveController.a().whileTrue(new ShootAmpCommand(shooterSubsystem, intakeSubsystem, grabberSubsystem, limeLightPoseSubsystem)
-      .andThen(new StraightToAmpCommand(drivetrainSubsystem, limeLightPoseSubsystem))
-      .andThen(new DriveCommand(drivetrainSubsystem, 0.01,0, 0))
-      .andThen(new WaitCommand(0.5))
-      .andThen(new DriveCommand(drivetrainSubsystem, 0,0, 0))
-      .andThen(new GrabberOutCommand(grabberSubsystem, 0.7))
-      .andThen(new WaitCommand(0.2))
-      .andThen(new Command() {
-        @Override
-        public void initialize() {
-          grabberSubsystem.grabberOff();
-        }
-        @Override
-        public boolean isFinished() {
-          return true;
-        }
-      }));
   }
 
   public void testAutonomous() {

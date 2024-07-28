@@ -5,13 +5,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.GrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LimeLightPoseSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ShooterSubsystemOld;
 import static frc.robot.utilities.Util.logf;
 
     
 public class ShootAmpCommand extends Command {
     
-        ShooterSubsystem shooterSubsystem;
+        ShooterSubsystemOld shooterSubsystem;
         IntakeSubsystem intakeSubsystem;
         GrabberSubsystem grabberSubsystem;
         LimeLightPoseSubsystem poseEstimatorSubsystem;
@@ -49,7 +49,7 @@ public class ShootAmpCommand extends Command {
             STARTING_SHOOTER_MOTORS, CHECK_INTAKE_ANGLE, CHECK_SHOOTER_ANGLE, GRABBER_OUT, END
         };
     
-        public ShootAmpCommand(ShooterSubsystem shooterSubsystem,
+        public ShootAmpCommand(ShooterSubsystemOld shooterSubsystem,
                 IntakeSubsystem intakeSubsystem,
                 GrabberSubsystem grabberSubsystem,
                 LimeLightPoseSubsystem poseEstimatorSubsystem) {
@@ -60,7 +60,7 @@ public class ShootAmpCommand extends Command {
     
         @Override
         public void initialize() {        
-            shooterSubsystem.servo.setAngle(ShooterSubsystem.FLAPPER_EXPANDED_ANGLE);  // Extended
+            shooterSubsystem.servo.setAngle(ShooterSubsystemOld.FLAPPER_EXPANDED_ANGLE);  // Extended
 
             logf("####################### set servo 130\n");
             shooterSubsystem.setTiltAngle(-4);

@@ -3,10 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.GrabberSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ShooterSubsystemOld;
 
 public class ShootWithAngleCommand extends Command {
-    ShooterSubsystem shooterSubsystem;
+    ShooterSubsystemOld shooterSubsystem;
     GrabberSubsystem grabberSubsystem;
     boolean finished = false;
     double startTime = 0;
@@ -17,7 +17,7 @@ public class ShootWithAngleCommand extends Command {
     };
     State state;
 
-    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem,
+    public ShootWithAngleCommand(ShooterSubsystemOld shooterSubsystem,
         GrabberSubsystem grabberSubsystem) {
             this.shooterSubsystem = shooterSubsystem;
             this.grabberSubsystem = grabberSubsystem;
