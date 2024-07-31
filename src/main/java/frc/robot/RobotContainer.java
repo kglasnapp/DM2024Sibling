@@ -57,6 +57,7 @@ import frc.robot.subsystems.GrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShooterSubsystemOld;
 
@@ -78,6 +79,7 @@ public class RobotContainer {
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public final ShooterSubsystemOld shooterSubsystem = (testMode) ? null : new ShooterSubsystemOld(this);
   public final ShooterSubsystem shooterSubsystem2 = new ShooterSubsystem();
+  public final IndexerSubsystem shooterSubsystemEly= new IndexerSubsystem();
   public final GrabberSubsystem grabberSubsystem =  (testMode) ? null :new GrabberSubsystem(this);
   public final ClimberSubsystem climberSubsystem =  (testMode) ? null :new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
@@ -86,6 +88,7 @@ public class RobotContainer {
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
   public final static XboxController driveHID = driveController.getHID();
+
 
   private SlewRateLimiter sLX = new SlewRateLimiter(15);
   private SlewRateLimiter sLY = new SlewRateLimiter(15);
@@ -365,16 +368,16 @@ public static boolean getOperatorRightBumper() {
     //   }
     // });
 
-    controller.x().whileTrue(new Command() {
-      @Override
-      public void initialize() {
-        shooterSubsystem.setTiltAngle(-25);       
-      }
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+    // controller.x().whileTrue(new Command() {
+    //   @Override
+    //   public void initialize() {
+    //     shooterSubsystem.setTiltAngle(-25);       
+    //   }
+    //   @Override
+    //   public boolean isFinished() {
+    //     return true;
+    //   }
+    // });
 
     // controller.pov(90).onTrue(new StraightPathCommand(drivetrainSubsystem, limeLightPoseSubsystem,
     //                                 new Pose2d(2.37,5.58, new Rotation2d())));

@@ -122,7 +122,7 @@ public class Robot extends TimedRobot {
   void homeAllSubsystems() {
     if (!hasBeenHomed) {
       robotContainer.intakeSubsystem.state = IntakeSubsystem.State.GO_HOME;
-      robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
+      //robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
       robotContainer.climberSubsystem.homeClimber();
       hasBeenHomed = true;
     }

@@ -1,55 +1,149 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+import static frc.robot.Util.logf;
+
+import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 
-public class ShooterSubsystem  extends SubsystemBase {
+/**
+ * REV Smart Motion Guide
+ * 
+ * The SPARK MAX includes a control mode, REV Smart Motion which is used to
+ * control the position of the motor, and includes a max velocity and max
+ * acceleration parameter to ensure the motor moves in a smooth and predictable
+ * way. This is done by generating a motion profile on the fly in SPARK MAX and
+ * controlling the velocity of the motor to follow this profile.
+ * 
+ * Since REV Smart Motion uses the velocity to track a profile, there are only
+ * two steps required to configure this mode:
+ * 1) Tune a velocity PID loop for the mechanism
+ * 2) Configure the smart motion parameters
+ * 
+ * Tuning the Velocity PID Loop
+ * 
+ * The most important part of tuning any closed loop control such as the
+ * velocity
+ * PID, is to graph the inputs and outputs to understand exactly what is
+ * happening.
+ * For tuning the Velocity PID loop, at a minimum we recommend graphing:
+ *
+ * 1) The velocity of the mechanism (‘Process variable’)
+ * 2) The commanded velocity value (‘Setpoint’)
+ * 3) The applied output
+ *
+ * This example will use ShuffleBoard to graph the above parameters. Make sure
+ * to
+ * load the shuffleboard.json file in the root of this directory to get the full
+ * effect of the GUI layout.
+ */
+public class ShooterSubsystem extends SubsystemBase {
 
-    public static int INDEXER_MOTOR_ID = 11;
-    private double lastSpeed;
-
-    private TalonFX indexerMotor = new TalonFX(INDEXER_MOTOR_ID);
-    private final double CURRENT_LIMIT = 60;
+    private ShootMotor lowerMotor;
+    private ShootMotor upperMotor;
+    private PID_MAX pid = new PID_MAX();
+    private final static int OVER_CURRENT = 30;
+    private int SHOOTER_MOTOR_ID1 = 26;
+    private int SHOOTER_MOTOR_ID3 = 27;
 
     public ShooterSubsystem() {
-        setConfig(indexerMotor);
+        this.upperMotor = new ShootMotor(SHOOTER_MOTOR_ID1, false);
+        this.lowerMotor = new ShootMotor(SHOOTER_MOTOR_ID3, true);
+
     }
 
-    private void setConfig(TalonFX talon) {
-        TalonFXConfiguration configuration = new TalonFXConfiguration();
-        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-        currentLimits = currentLimits
-                .withStatorCurrentLimit(CURRENT_LIMIT)
-                .withStatorCurrentLimitEnable(true)
-                .withSupplyTimeThreshold(100);
-        talon.getConfigurator().apply(configuration.withCurrentLimits(currentLimits));
-        talon.setNeutralMode(NeutralModeValue.Brake);
-        configuration.HardwareLimitSwitch.ForwardLimitType = ForwardLimitTypeValue.NormallyOpen;
-        configuration.HardwareLimitSwitch.ForwardLimitEnable = true;
-        configuration.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
-        configuration.HardwareLimitSwitch.ReverseLimitEnable = true;
+    class ShootMotor {
+        CANSparkFlex motor;
+        SparkPIDController pidController;
+        RelativeEncoder encoder;
+        int id;
+
+        ShootMotor(int id, boolean inverted) {
+            this.id = id;
+            motor = new CANSparkFlex(id, MotorType.kBrushless);
+            motor.restoreFactoryDefaults();
+            motor.setInverted(inverted);
+            setBrakeMode(false);
+
+            motor.setSmartCurrentLimit((int) OVER_CURRENT);
+            encoder = motor.getEncoder();
+
+            pidController = motor.getPIDController();
+            pid.PIDCoefficientsShoot(pidController);
+            pid.PIDToMax();
+
+            setShooterVelocity(0);
+        }
+
+        public void setShooterVelocity(double value) {
+            if (value >= 0) {
+                logf("Set shooter velocity:%.3f\n", value);
+            }
+            pidController.setReference(value * 6500, CANSparkBase.ControlType.kSmartVelocity);
+
+        }
+
+        double getVelocity() {
+            return motor.getEncoder().getVelocity();
+        }
+
+        double getPosition() {
+            return motor.getEncoder().getPosition();
+        }
+
+        void setSpeed(double power) {
+            motor.set(power);
+        }
+
+        void setBrakeMode(boolean mode) {
+            motor.setIdleMode(mode ? IdleMode.kBrake : IdleMode.kCoast);
+            logf("For id:%d Brake mode:%s\n", id, motor.getIdleMode());
+        }
     }
+
+    void setAllShooterPower(double power) {
+        upperMotor.setShooterVelocity(power);
+        lowerMotor.setShooterVelocity(power);
+    }
+
+    int lastPOV = -1;
 
     @Override
     public void periodic() {
-        if (RobotContainer.driveController.getHID().getAButtonPressed()) {
-            indexerMotor.set(0.75);
-        } 
-        if (RobotContainer.driveController.getHID().getBButtonReleased()) {
-            indexerMotor.set(0);
-        }
-        if (RobotContainer.driveController.getHID().getBButtonPressed()) {
-            indexerMotor.set(-0.75);
-        } 
-        if (RobotContainer.driveController.getHID().getAButtonReleased()) {
-            indexerMotor.set(0);
+        // if (robot.count % 5 == 0) {
+        SmartDashboard.putNumber("Motor Up", upperMotor.getVelocity());
+        SmartDashboard.putNumber("Motor Down", lowerMotor.getVelocity());
+        SmartDashboard.putNumber("Motor Diff", upperMotor.getVelocity() - lowerMotor.getVelocity());
+        SmartDashboard.putNumber("Motor Pos", lowerMotor.getPosition());
+        // }
+
+        int pov = RobotContainer.operatorController.getHID().getPOV();
+
+        double value = 0;
+        if ((lastPOV != pov) && (pov >= 0)) {
+            if (pov == 0) {
+                value = 0.0;
+            }
+            if (pov == 90) {
+
+                value = 0.25;
+            }
+            if (pov == 180) {
+                value = 0.65;
+            }
+            if (pov == 270) {
+                value = 0.9;
+            }
+            upperMotor.setSpeed(value);
+            lowerMotor.setSpeed(value);
+            lastPOV = pov;
         }
     }
 }
