@@ -4,7 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.RobotContainer;
+
 import frc.robot.subsystems.LedSubsystem.Leds;
 
 public class LimitSwitch {

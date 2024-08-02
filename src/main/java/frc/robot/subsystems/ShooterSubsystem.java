@@ -11,6 +11,7 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 /**
@@ -108,9 +109,23 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
-    void setAllShooterPower(double power) {
-        upperMotor.setShooterVelocity(power);
-        lowerMotor.setShooterVelocity(power);
+    public void setAllShooterSpeed(double power) {
+        upperMotor.setSpeed(power);
+        lowerMotor.setSpeed(power);
+    }
+
+    public boolean isShooterAtSpeed(double desired) {
+        double upSpeed = Math.abs(upperMotor.getVelocity());
+        double lowSpeed = Math.abs(lowerMotor.getVelocity());
+         logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
+        if (upSpeed > desired && lowSpeed > desired) {
+            return true;
+        }
+        if (Robot.count % 2 == 0) {
+            //logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
+        }
+        return false;
+
     }
 
     int lastPOV = -1;
@@ -125,18 +140,16 @@ public class ShooterSubsystem extends SubsystemBase {
         // }
 
         int pov = RobotContainer.operatorController.getHID().getPOV();
-
         double value = 0;
         if ((lastPOV != pov) && (pov >= 0)) {
             if (pov == 0) {
                 value = 0.0;
             }
             if (pov == 90) {
-
-                value = 0.25;
+                value = 0.1;
             }
             if (pov == 180) {
-                value = 0.65;
+                value = 0.6;
             }
             if (pov == 270) {
                 value = 0.9;

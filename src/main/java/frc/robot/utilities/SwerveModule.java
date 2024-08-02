@@ -59,7 +59,7 @@ public class SwerveModule {
   public static final int driveContinuousCurrentLimit = 60;
 
   /* Angle Motor PID Values */
-  // TODO: test using this config for the drive motors
+
   public static final double angleKP = 0.01;
   public static final double angleKI = 0.0;
   public static final double angleKD = 0.0;

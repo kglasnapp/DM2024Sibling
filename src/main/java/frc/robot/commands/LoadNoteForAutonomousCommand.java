@@ -67,10 +67,10 @@ public class LoadNoteForAutonomousCommand extends Command {
         }
         switch (state) {
             case CHECK_INTAKE_ANGLE:                
-                if (intakeSubsystem.reverseLimit.isPressed()) {
-                    startTime = RobotController.getFPGATime() / 1000;
-                    state = State.TIMER_ON;
-                }
+                // if (intakeSubsystem.reverseLimit.isPressed()) {
+                //     startTime = RobotController.getFPGATime() / 1000;
+                //     state = State.TIMER_ON;
+                // }
                 break;
             case TIMER_ON:
                 if ((RobotController.getFPGATime() / 1000) - startTime > 50) {                                

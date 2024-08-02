@@ -39,6 +39,7 @@ public class DefaultDriveCommand extends Command {
         this.m_translationYSupplier = translationYSupplier;
         this.m_rotationSupplier = rotationSupplier;
         this.precisionActivator = precisionActivator;
+        logf("Default Drive Command started precision:%b\n", this.precisionActivator.getAsBoolean());
         addRequirements(drivetrainSubsystem);
     }
 

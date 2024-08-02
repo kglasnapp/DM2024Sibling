@@ -50,8 +50,8 @@ public class LimeLightPose extends SubsystemBase {
                 pose.getX(),
                 pose.getY(),
                 pose.getRotation().getDegrees());
-        if (Robot.count % 250 == 0) {
-            logf("Pose %s\n", s);
+        if (Robot.count % 500 == 0) {
+           // logf("Pose %s\n", s);
         }
         return s;
     }

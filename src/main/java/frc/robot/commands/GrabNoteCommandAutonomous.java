@@ -6,14 +6,14 @@ import frc.robot.RobotContainer;
 public class GrabNoteCommandAutonomous extends Command {
     
     RobotContainer robotContainer;
-    IntakeCommand intakeCommand;
+    IntakeNoteCommand intakeCommand;
     GrabberInCommand grabberInCommand;
     DriveToObjectCommand driveToObjectCommand;
     boolean useSensorIfNoteInGrabber = false;
 
     public GrabNoteCommandAutonomous(RobotContainer robotContainer) {
         this.robotContainer = robotContainer;
-        intakeCommand = new IntakeCommand(robotContainer.intakeSubsystem, IntakeCommand.State.OUT, 1000);
+        //intakeCommand = new IntakeCommand(robotContainer.intakeSubsystem, IntakeCommand.State.OUT, 1000);
         grabberInCommand = new GrabberInCommand(robotContainer.grabberSubsystem);
         driveToObjectCommand = new DriveToObjectCommand(robotContainer.drivetrainSubsystem, "note",4000); 
     }

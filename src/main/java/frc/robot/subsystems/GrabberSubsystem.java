@@ -12,11 +12,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
+
 
 public class GrabberSubsystem extends SubsystemBase {
     private static final int GRABBER_INTAKE_MOTOR_ID = 14;
@@ -31,14 +30,13 @@ public class GrabberSubsystem extends SubsystemBase {
     private AnalogInput noteFullyInGrabberSensor;
     private final double defaultGrabberPowerIn = 1; // .8;
     private final double defaultGrabberPowerOut = -1; // -.8;
-    private RobotContainer robotContainer;
+
 
     public boolean ignoreSensorToStop = false;
 
     public boolean useNeo = true;
 
-    public GrabberSubsystem(RobotContainer robotContainer) {
-        this.robotContainer = robotContainer;
+    public GrabberSubsystem() {
         // Setup parameters for the intake motor
         if (useNeo) {
             grabberMotorNeo = new CANSparkMax(GRABBER_MOTOR_ID, MotorType.kBrushless);
@@ -184,7 +182,7 @@ public class GrabberSubsystem extends SubsystemBase {
         }
         if (Robot.count % 20 == 0) {
             double sensorVoltage = noteFullyInGrabberSensor.getVoltage();
-           // logf("sensor voltage: %.2f\n", sensorVoltage);
+            logf("sensor voltage: %.2f\n", sensorVoltage);
             // double noteFullyInVoltage = noteFullyInGrabberSensor.getVoltage();
             // logf("note fully in sensor voltage: %.2f\n", noteFullyInVoltage);
         }

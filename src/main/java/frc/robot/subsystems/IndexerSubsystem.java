@@ -7,7 +7,10 @@ import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class IndexerSubsystem  extends SubsystemBase {
@@ -16,6 +19,8 @@ public class IndexerSubsystem  extends SubsystemBase {
 
     private TalonFX indexerMotor = new TalonFX(INDEXER_MOTOR_ID);
     private final double CURRENT_LIMIT = 60;
+
+    private DigitalInput notePresent = new DigitalInput(2);
 
     public IndexerSubsystem() {
         setConfig(indexerMotor);
@@ -36,18 +41,29 @@ public class IndexerSubsystem  extends SubsystemBase {
         configuration.HardwareLimitSwitch.ReverseLimitEnable = true;
     }
 
+    public boolean isNotePresent() {
+        return !notePresent.get();
+    }
+
+    public void setSpeed(double speed) {
+       indexerMotor.set(speed); 
+    }
+
     @Override
     public void periodic() {
-        if (RobotContainer.driveController.getHID().getAButtonPressed()) {
-            indexerMotor.set(0.75);
+        if (Robot.count % 10 == 4) {
+            SmartDashboard.putBoolean("Note", isNotePresent());
+        }
+        if (RobotContainer.operatorController.getHID().getAButtonPressed()) {
+            indexerMotor.set(0.3);
         } 
-        if (RobotContainer.driveController.getHID().getBButtonReleased()) {
+        if (RobotContainer.operatorController.getHID().getBButtonReleased()) {
             indexerMotor.set(0);
         }
-        if (RobotContainer.driveController.getHID().getBButtonPressed()) {
-            indexerMotor.set(-0.75);
+        if (RobotContainer.operatorController.getHID().getBButtonPressed()) {
+            indexerMotor.set(-0.3);
         } 
-        if (RobotContainer.driveController.getHID().getAButtonReleased()) {
+        if (RobotContainer.operatorController.getHID().getAButtonReleased()) {
             indexerMotor.set(0);
         }
     }

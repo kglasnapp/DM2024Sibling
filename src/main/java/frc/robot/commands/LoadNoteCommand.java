@@ -99,13 +99,13 @@ public class LoadNoteCommand extends Command {
                 }
                 break;
             case CHECK_INTAKE_ANGLE:           
-                if (Math.abs(intakeSubsystem.getPosition()) < 3) { 
-                    state = State.WAIT_TO_FEED;            
-                    startTime = RobotController.getFPGATime() / 1000;
-                    if (grabberSubsystem.useNeo) {
-                        grabberSubsystem.grabberOff();
-                    }
-                }
+                // if (Math.abs(intakeSubsystem.getPosition()) < 3) { 
+                //     state = State.WAIT_TO_FEED;            
+                //     startTime = RobotController.getFPGATime() / 1000;
+                //     if (grabberSubsystem.useNeo) {
+                //         grabberSubsystem.grabberOff();
+                //     }
+                // }
                 break;
             case WAIT_TO_FEED:
                 if (startTime + 50 < RobotController.getFPGATime() / 1000) {

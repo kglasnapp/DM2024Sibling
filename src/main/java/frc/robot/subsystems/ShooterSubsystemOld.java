@@ -136,7 +136,7 @@ public class ShooterSubsystemOld extends SubsystemBase {
 
     public void setShooterPower(double value) {
         if (value > 0) {
-            logf("Set shooter Motor power:%.3f\n", value);
+            logf("Set shooter Motor power:%.3f desired speed:%.3f\n", value, desiredSpeed);
         }
         if (DriverStation.isAutonomous()) {
             value = 1;

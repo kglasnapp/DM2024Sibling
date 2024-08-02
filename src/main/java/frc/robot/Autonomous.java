@@ -9,12 +9,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GrabNoteCommandAutonomous;
 import frc.robot.commands.GrabberInCommand;
 import frc.robot.commands.GrabberOutCommand;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LoadNoteCommand;
 import frc.robot.commands.ShootToSpeakerCommand;
 import frc.robot.commands.SpeakerAlligningCommand;
 import frc.robot.commands.StraightPathCommand;
-import frc.robot.commands.WaitUntilIntakeOutCommand;
 import frc.robot.commands.WaitUntilShooterReadyCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -257,13 +255,13 @@ public class Autonomous {
                  * i gets incremented, or decremented.
                  */
                 for (int i = from; i != until;) {
-                        command = command
-                                        .andThen(new IntakeCommand(robotContainer.intakeSubsystem,
-                                                        IntakeCommand.State.OUT, 4000));
+                        //command = command
+                                       // .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
+                                                      //  IntakeCommand.State.OUT, 4000));
                         if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
                                         shootFromPosition[i][1] == noteInitialPosition[i][1]) {
-                        command = command
-                                        .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
+                        //command = command
+                        //               .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
                         }
                         double pickupX = noteInitialPosition[i][0];                                                                                        
                         double pickupY = noteInitialPosition[i][1];
@@ -351,13 +349,13 @@ public class Autonomous {
                  * i gets incremented, or decremented.
                  */
                 for (int i = from; i != until;) {
-                        command = command
-                                        .andThen(new IntakeCommand(robotContainer.intakeSubsystem,
-                                                        IntakeCommand.State.OUT, 4000));
+                       // command = command
+                        //                .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
+                                                        //IntakeCommand.State.OUT, 4000));
                         if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
                                         shootFromPosition[i][1] == noteInitialPosition[i][1]) {
-                        command = command
-                                        .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
+                        //command = command
+                        //              .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
                         }
                         double pickupX = noteInitialPosition[i][0];                                                                                        
                         double pickupY = noteInitialPosition[i][1];

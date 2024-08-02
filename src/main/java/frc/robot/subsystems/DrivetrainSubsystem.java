@@ -303,7 +303,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // drive(m_chassisSpeeds.vyMetersPerSecond, m_chassisSpeeds.vxMetersPerSecond,
     // m_chassisSpeeds.omegaRadiansPerSecond);
 
-    // TODO Disable the Smartdash board
+
     if (Robot.count % 20 == -1) {
       for (SwerveModule mod : swerveModules) {
         SmartDashboard.putNumber(
@@ -322,8 +322,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_frontRightModule.setDesiredState(states[1]);
     m_backLeftModule.setDesiredState(states[2]);
     m_backRightModule.setDesiredState(states[3]);
-    // TODO Disable Smartdash update
-    if (Robot.count % 20 == -7) {
+    if (Robot.count % 20 == -7) { // disable Smartdash board display
       SmartDashboard.putNumber("FL", states[0].angle.getDegrees());
       SmartDashboard.putNumber("FR", states[1].angle.getDegrees());
       SmartDashboard.putNumber("BL", states[2].angle.getDegrees());
