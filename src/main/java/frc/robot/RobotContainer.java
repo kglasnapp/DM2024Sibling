@@ -57,6 +57,7 @@ import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.LimeLightPoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShooterSubsystemOld;
+import frc.robot.subsystems.TiltSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -96,6 +97,7 @@ public class RobotContainer {
   public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
   public LimeLightPoseSubsystem limeLightPoseSubsystem;
   public static CoralSubsystem coralSubsystem = new CoralSubsystem();
+  public static TiltSubsystem tilt = new TiltSubsystem();
 
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
   public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));

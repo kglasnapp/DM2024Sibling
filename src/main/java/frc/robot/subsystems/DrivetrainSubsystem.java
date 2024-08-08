@@ -275,7 +275,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // System.out.println("returning the angle FUSE ZERO from the robot:
       // "+m_navx.getAngle());
       
-      Rotation2d r = Rotation2d.fromDegrees(-(-m_navx.getFusedHeading() + zeroNavx + currentOrientation));
+      Rotation2d r = Rotation2d.fromDegrees((-m_navx.getFusedHeading() + zeroNavx + currentOrientation));
       SmartDashboard.putNumber("Rot Cal", r.getDegrees());
       return r;
     }

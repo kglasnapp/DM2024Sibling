@@ -67,9 +67,20 @@ public class PID_MAX {
     public void PIDCoefficientsShooterTilt(SparkPIDController pidController) {
         kP = 29e-6;
         kI = 1e-6;
-        kD = 0;
+        kD = .005;
         kIz = 0;
         kFF = 0.000158;
+
+        kP = 29e-6;
+        kP = .00005; 
+        kI = .5e-6 ;
+       // kI = 0;
+        kD = .00005;
+        kIz = 0;
+        kFF = 0.000158;
+        kFF = 0;
+
+
         kMaxOutput = 1;
         kMinOutput = -1;
         // Smart Motion Coefficients

@@ -66,8 +66,8 @@ public class DefaultDriveCommand extends Command {
         } else {
             m_drivetrainSubsystem.drive(
                     ChassisSpeeds.fromFieldRelativeSpeeds(
-                            m_translationXSupplier.getAsDouble(),
-                            m_translationYSupplier.getAsDouble(),
+                            -m_translationXSupplier.getAsDouble(),
+                            -m_translationYSupplier.getAsDouble(),
                             m_rotationSupplier.getAsDouble(),
                             m_drivetrainSubsystem.getGyroscopeRotation()));
         }

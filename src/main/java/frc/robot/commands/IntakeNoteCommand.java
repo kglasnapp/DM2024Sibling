@@ -29,18 +29,20 @@ public class IntakeNoteCommand extends Command {
 
     @Override
     public void execute() {
+        
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        long elapsedTime = RobotController.getFPGATime() - startTime;
+        logf("Intake complete saw a note at %.1f seconds\n", elapsedTime / 1000000.0);
+        indexerSubsystem.setSpeed(0);
+        intakeSubsystem.intakeStop();
     }
 
     @Override
     public boolean isFinished() {
         boolean note = indexerSubsystem.isNotePresent();
-        if (note) {
-            long elapsedTime = RobotController.getFPGATime() - startTime;
-            logf("Intake complete saw a note at %.1f seconds\n", elapsedTime / 1000000.0);
-            indexerSubsystem.setSpeed(0);
-            intakeSubsystem.intakeStop();
-
-        }
         return note;
     }
 

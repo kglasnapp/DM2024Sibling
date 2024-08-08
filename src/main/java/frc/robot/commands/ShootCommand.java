@@ -1,6 +1,8 @@
 package frc.robot.commands;
 // Copyright (c) FIRST and other WPILib contributors.
 
+import edu.wpi.first.wpilibj.RobotController;
+
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -14,6 +16,7 @@ public class ShootCommand extends Command {
     ShooterSubsystem shooter;
     long startTime;
     int waitCount = 0;
+    STATE lastState = STATE.IDLE;
 
     public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
         // Use addRequirements() here to declare subsystem dependencies.
@@ -21,23 +24,29 @@ public class ShootCommand extends Command {
         this.shooter = shooter;
     }
 
-    public static enum State {
+    public static enum STATE {
         IDLE,
         WAIT_SHOOT_SPEED,
         WAIT_NOTE_OUT,
         WAIT,
+        FINISHED
     };
 
-    State state = State.IDLE;
+    STATE state = STATE.IDLE;
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        state = State.IDLE;
+        logf("Initializing the shoot\n", null);
+        state = STATE.IDLE;
+        startTime = RobotController.getFPGATime();
         boolean note = indexer.isNotePresent();
+        logf("The note is present: %b\n", note);
         if (note) {
             shooter.setAllShooterSpeed(.95);
-            state = State.WAIT_SHOOT_SPEED;
+            state = STATE.WAIT_SHOOT_SPEED;
+        } else {
+            state = STATE.FINISHED;
         }
     }
 
@@ -54,21 +63,26 @@ public class ShootCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (state == State.WAIT_SHOOT_SPEED) {
+        if (state != lastState) {
+            long elapsedTime = RobotController.getFPGATime() - startTime;
+            logf("ShootCommand new state:%s elasped:%.2f\n", state, elapsedTime / 1000000.0);
+        }
+        if (state == STATE.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(5500)) {
-                state = State.WAIT_NOTE_OUT;
+                state = STATE.WAIT_NOTE_OUT;
                 indexer.setSpeed(.5);
             }
         }
-        if (state == State.WAIT_NOTE_OUT) {
+        if (state == STATE.WAIT_NOTE_OUT) {
             boolean note = indexer.isNotePresent();
+            logf("Shoot Command Note Out: %b\n", note);
             if (!note) {
-                logf("Shoot Command Note Out\n");
-                state = State.WAIT;
+                
+                state = STATE.WAIT;
                 waitCount = 5;
             }
         }
-        if (state == State.WAIT) {
+        if (state == STATE.WAIT) {
             waitCount--;
             if (waitCount < 0) {
                 logf("Shoot Command finished\n");
@@ -78,7 +92,9 @@ public class ShootCommand extends Command {
             }
 
         }
-
+        if (state == STATE.FINISHED) {
+            return true;
+        }
         return false;
     }
 }
