@@ -22,9 +22,11 @@ public class ShootToSpeakerCommand extends Command {
     LimeLightPoseSubsystem poseEstimatorSubsystem;
     //SpeakerAlligningCommand shootSpeakerAlligningCommand;
     DrivetrainSubsystem drivetrainSubsystem;
-
+    double power = .9;
     double startTime;
     boolean finished = false;
+
+
     State state = State.CHECK_INTAKE_ANGLE_TO_FEED;
     /**
      * Time in milliseconds needed to wait to ensure the shooter reached the
@@ -108,14 +110,14 @@ public class ShootToSpeakerCommand extends Command {
 
 
     double angleTable[][] = {
-        { 1.31, -8.05 },
-        { 1.71, -13.39 },
-        { 2.06, -15.50 },
-        { 2.37, -21.0 },
-        { 2.67, -23 },
-        { 2.99, -24 },
-        { 3.25, -25.1 },
-        { 3.70, -26 }
+        { 1.31, -8.05 , .6},
+        { 1.71, -13.39, .6 },
+        { 2.06, -15.50, .7 },
+        { 2.37, -21.0, .7 },
+        { 2.67, -23. , .8 },
+        { 2.99, -24, .8},
+        { 3.25, -25.1 , 9},
+        { 3.70, -26, .9 }
     };
 
 
@@ -124,8 +126,7 @@ public class ShootToSpeakerCommand extends Command {
         Alliance alliance = DriverStation.getAlliance().get();
         Pose2d speakerPose = alliance == Alliance.Blue ? RobotContainer.BLUE_SPEAKER : RobotContainer.RED_SPEAKER;
         double distance = distance(speakerPose, pose);
-        logf("Distance to the target: %s\n", distance);
-
+        // TODO should set angle to a hightr number -- If distance to close set angle 
         if (distance <= 1.31) {
             return 0;
         }
@@ -155,6 +156,7 @@ public class ShootToSpeakerCommand extends Command {
         if (angle > 0) {
             angle = 0;
         }
+logf("Get tilt paraameters for target dist:%.2f angle:%.2f power:%.2f\n", distance, angle, power);
 
         return angle;
     }

@@ -119,11 +119,11 @@ public class TiltSubsystem extends SubsystemBase {
             overCurrentCount = 0;
             //tiltMotor.set(0);
         }
-        int delta = 360;
-        double val = RobotContainer.operatorController.getHID().getRightY();
+        //int delta = 360;
+        //double val = RobotContainer.driveHID.getRightY();
         //tiltMotor.set(val * .15);
-        boolean buttonDown = RobotContainer.operatorController.getHID().getLeftBumperPressed();
-        boolean buttonUp = RobotContainer.operatorController.getHID().getRightBumperPressed();
+        boolean buttonDown = RobotContainer.driveHID.getLeftBumperPressed();
+        boolean buttonUp = RobotContainer.driveHID.getRightBumperPressed();
         if (buttonDown) {
             // setTiltAngle(getTiltAngle() - delta);
             // logf("Tilt Down %.2f\n", getTiltAngle());
@@ -142,11 +142,11 @@ public class TiltSubsystem extends SubsystemBase {
         // tiltMotor.set(val);
         if (Robot.count % 10 == 0) {
             SmartDashboard.putBoolean("Tilt RevL", reverseLimit.get());
-            // SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
-            // SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());
-            SmartDashboard.putString("TiltSts", state.toString());
+            SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
+            SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());
+            SmartDashboard.putString("TiltState", state.toString());
             SmartDashboard.putNumber("TiltCur",tiltCurrent );
-            SmartDashboard.putNumber("ovCnt", overCurrentCount);
+            SmartDashboard.putNumber("TiltovCnt", overCurrentCount);
             SmartDashboard.putNumber("TiltPos", round2(tiltEncoder.getPosition()));
             SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
         }

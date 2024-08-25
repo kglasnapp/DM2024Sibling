@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import static frc.robot.Util.logf;
+//import static frc.robot.Util.logf;
 
 public class LimeLightPose extends SubsystemBase {
 

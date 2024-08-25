@@ -37,7 +37,7 @@ public class ShootCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        logf("Initializing the shoot\n", null);
+        logf("Initializing the shooters\n");
         state = STATE.IDLE;
         startTime = RobotController.getFPGATime();
         boolean note = indexer.isNotePresent();

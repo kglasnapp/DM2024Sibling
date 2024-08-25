@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Util.logf;
+//import static frc.robot.Util.logf;
+
+import static frc.robot.utilities.Util.logf;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -11,19 +13,19 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-//import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+
 import frc.robot.RobotContainer;
 
 public class ClimberSubsystem extends SubsystemBase {
     // Defines for Hardware
     private final static int LEFT_CLIMBER_MOTOR_ID = 30;
     private final static int RIGHT_CLIMBER_MOTOR_ID = 31;
-    //private final static int LEFT_SOLENOID_ID = 2;
-    //private final static int RIGHT_SOLENOID_ID = 3;
+    private final static int LEFT_SERVO_ID = 2;
+    private final static int RIGHT_SERVO_ID = 3;
 
     // Defines for speeds
     // Speed for down left -, right +
@@ -39,6 +41,7 @@ public class ClimberSubsystem extends SubsystemBase {
         IDLE, UNLOCK, HOMING, HOMED, UNLOCK2, OPEERATING
     }
 
+    // private State state = State.IDLE;
     private State state = State.IDLE;
     private State lastState = State.IDLE;
     private int count = 0;
@@ -46,28 +49,29 @@ public class ClimberSubsystem extends SubsystemBase {
     // Setup the objects for the hardware
     private TalonFX leftClimber = new TalonFX(LEFT_CLIMBER_MOTOR_ID);
     private TalonFX rightClimber = new TalonFX(RIGHT_CLIMBER_MOTOR_ID);
-    //private DigitalOutput leftClimberSolenoid = new DigitalOutput(LEFT_SOLENOID_ID);
-    //private DigitalOutput rightClimberSoleniod = new DigitalOutput(RIGHT_SOLENOID_ID);
-
+    private Servo leftClimberServo = new Servo(LEFT_SERVO_ID);
+    private Servo rightClimberServo = new Servo(RIGHT_SERVO_ID);
     private int lockCounter = -1;
-    private PWM climberLock = new PWM(4);
 
-    // TODO Elie and KAG I thought that we had two climber locks one for right and one for left
-    
-    private final double CURRENT_LIMIT = 60;
+    private final double CURRENT_LIMIT = 10;
+    private final double unLockAngle = 0;
+    private final double lockAngle = .12;
+    private final double maxHeight = 380;
 
     // Called when robot is started
     public ClimberSubsystem() {
+        logf("Setup Climber Subsystem");
         setConfig(leftClimber);
         setConfig(rightClimber);
-        // Solenoids will be set true when Robot is enabled
-        controlSolenoids(false);
+        lockServos(6); // Set to locked
+        setEncoderPositions(0);
     }
 
     // Setup parameters for the climber motors
     private void setConfig(TalonFX talon) {
         TalonFXConfiguration configuration = new TalonFXConfiguration();
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
+        // TODO shooter.configFactoryDefault();
         currentLimits = currentLimits
                 .withStatorCurrentLimit(CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true)
@@ -84,7 +88,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public void homeClimber() {
         // Prepare to release the latch
         state = State.UNLOCK;
-        controlSolenoids(true);
+        unlockServos();
         // Move motors down to free latch
         setRightSpeed(releaseLatchSpeed);
         setLeftSpeed(-releaseLatchSpeed);
@@ -92,19 +96,16 @@ public class ClimberSubsystem extends SubsystemBase {
         count = 5;
     }
 
-    // Called when the robot is disabled, shut down motors and release solenoid
+    // Called when the robot is disabled, shut down motors and release SERVO
     public void disableRobot() {
+        logf("Robot is being disabled\n");
         setRightSpeed(0);
         setLeftSpeed(0);
-        controlSolenoids(false);
+        lockServos(5);
     }
 
     @Override
     public void periodic() {
-        // if (true) {
-        // toggleSolenoid(); // For testing only
-        // return;
-        // }
         double rightCurrent = getCurrent(rightClimber);
         double leftCurrent = getCurrent(leftClimber);
         if (Robot.count % 10 == 0) {
@@ -112,10 +113,13 @@ public class ClimberSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("LeftCCur", leftCurrent);
             SmartDashboard.putNumber("RightCPOS", getEncoderPosition(rightClimber));
             SmartDashboard.putNumber("leftCPOS", getEncoderPosition(leftClimber));
+            SmartDashboard.putNumber("lockC", lockCounter);
+            SmartDashboard.putString("CState", state.toString());
         }
         if (lockCounter == 0) {
-            climberLock.setSpeed(0.4);
-            SmartDashboard.putNumber("SelPow",4);
+            // setServoPositions(lockAngle);
+            // SmartDashboard.putNumber("SelPow". .5);
+            unlockServos();
             lockCounter = -1;
         } else if (lockCounter > 0) {
             lockCounter--;
@@ -146,9 +150,9 @@ public class ClimberSubsystem extends SubsystemBase {
             case HOMING:
                 // If after 4 seconds homing not complete stop it
                 if (count < -50 * 2) {
-                    logf("Climber Homing timed out release solenoids and stop motors\n");
+                    logf("Climber Homing timed out release SERVOs and stop motors\n");
                     state = State.HOMED;
-                    controlSolenoids(false);
+                    lockServos(3);
                     setRightSpeed(0);
                     setLeftSpeed(0);
                     setEncoderPositions(0);
@@ -168,17 +172,18 @@ public class ClimberSubsystem extends SubsystemBase {
                 if (leftClimber.get() == 0 && rightClimber.get() == 0) {
                     state = State.HOMED;
                     setEncoderPositions(0);
-                    controlSolenoids(false);
+                    lockServos(2);
                 }
                 break;
             case HOMED:
                 // If driver wants to move either climber up
-                // operated solenoid and move climbers down for 100 ms
+                // operated SERVO and move climbers down for 100 ms
                 if (RobotContainer.operatorHID.getLeftBumper()
                         || RobotContainer.operatorHID.getRightBumper()
                         || RobotContainer.operatorHID.getLeftTriggerAxis() > 0.1
                         || RobotContainer.operatorHID.getRightTriggerAxis() > 0.1) {
-                    controlSolenoids(true);
+                    logf("Climb Button Hit\n");
+                    unlockServos();
                     setRightSpeed(releaseLatchSpeed);
                     setLeftSpeed(-releaseLatchSpeed);
                     count = 5;
@@ -195,8 +200,8 @@ public class ClimberSubsystem extends SubsystemBase {
             case OPEERATING:
                 if (count < 0) {
                     // After 10 seconds of no movement
-                    // Release solenoids, turn off motors and move to home state
-                    controlSolenoids(false);
+                    // Release SERVOs, turn off motors and move to home state
+                    lockServos(1);
                     setRightSpeed(0);
                     setLeftSpeed(0);
                     state = State.HOMED;
@@ -209,6 +214,12 @@ public class ClimberSubsystem extends SubsystemBase {
                 break;
         }
     }
+
+    // private void setServoPositions(double angle) {
+    // logf("Set Servo Position angle:%.2f\n", angle);
+    // leftClimberServo.setPosition(angle);
+    // rightClimberServo.setPosition(angle);
+    // }
 
     private double getCurrent(TalonFX motor) {
         return Math.abs(motor.getTorqueCurrent().getValue());
@@ -225,46 +236,58 @@ public class ClimberSubsystem extends SubsystemBase {
     private boolean controlMotors() {
         double leftSpeed = 0;
         double rightSpeed = 0;
-        if (RobotContainer.operatorController.getLeftTriggerAxis() > 0.1) {
+        if (RobotContainer.operatorHID.getLeftTriggerAxis() > 0.1) {
             leftSpeed = -SPEED; // Move climber down
         }
-        if (RobotContainer.operatorController.getRightTriggerAxis() > 0.1) {
+        if (RobotContainer.operatorHID.getRightTriggerAxis() > 0.1) {
             rightSpeed = SPEED; // Move climber down
         }
-        if (RobotContainer.getOperatorLeftBumper()) {
+        if (RobotContainer.operatorHID.getLeftBumper()) {
             leftSpeed = SPEED; // Move climber up
         }
-        if (RobotContainer.getOperatorRightBumper()) {
+        if (RobotContainer.operatorHID.getRightBumper()) {
             rightSpeed = -SPEED; // Move climber up
         }
-        if (Math.abs(getEncoderPosition(leftClimber)) > 80 && RobotContainer.getOperatorLeftBumper()) {
+        if (Math.abs(getEncoderPosition(leftClimber)) >  maxHeight && RobotContainer.operatorHID.getLeftBumper()) {
             leftSpeed = 0;
 
         }
-        if (Math.abs(getEncoderPosition(rightClimber)) > 80 && RobotContainer.getOperatorRightBumper()) {
+        if (Math.abs(getEncoderPosition(rightClimber)) > maxHeight && RobotContainer.operatorHID.getRightBumper()) {
             rightSpeed = 0;
         }
         setLeftSpeed(leftSpeed);
         setRightSpeed(rightSpeed);
-        return leftSpeed != 0 || rightSpeed != 0;
+        boolean running = leftSpeed != 0 || rightSpeed != 0;
+        if (running) {
+            logf("LeftSpeed:%.2f RightSpeed:%.2f\n", leftSpeed, rightSpeed);
+        }
+        return running;
 
     }
 
-    private void controlSolenoids(boolean action) {
+
+    private void lockServos(int code) {
+        logf("lockServos code:%d\n", code);
+        controlSERVOs(false);
+    }
+
+    private void unlockServos() {
+        controlSERVOs(true);
+    }
+
+    private void controlSERVOs(boolean action) {
         if (action) {
-            climberLock.setSpeed(1);
-            SmartDashboard.putNumber("SelPow",1);
+            leftClimberServo.setPosition(unLockAngle);
+            rightClimberServo.setPosition(lockAngle);
             if (lockCounter == -1) {
                 lockCounter = 100;
             }
         } else {
-            climberLock.setSpeed(0);
-            SmartDashboard.putNumber("SelPow",0);
+            leftClimberServo.setPosition(lockAngle);
+            rightClimberServo.setPosition(unLockAngle);
         }
-        // rightClimberSoleniod.set(action);
-        // leftClimberSolenoid.set(action);
-        SmartDashboard.putBoolean("Solenoids", action);
-        logf("Climber Solenoids:%b\n", action);
+        SmartDashboard.putBoolean("SERVOs", action);
+        logf("Climber SERVOs:%b\n", action);
     }
 
     private void setRightSpeed(double speed) {
@@ -293,15 +316,4 @@ public class ClimberSubsystem extends SubsystemBase {
     double getEncoderPosition(TalonFX motor) {
         return motor.getPosition().getValue();
     }
-
-    // private boolean lastStart = false;
-    // private void toggleSolenoid() {
-    // boolean start = RobotContainer.driveController.getHID().getStartButton();
-    // if (start != lastStart) {
-    // controlSolenoids(start);
-    // // lastSolenoid = !lastSolenoid;
-    // lastStart = start;
-    // }
-    // }
-
 }
