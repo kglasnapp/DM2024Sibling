@@ -13,8 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-
+import frc.robot.subsystems.PDHData;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,9 +29,8 @@ public class Robot extends TimedRobot {
   boolean hasBeenHomed = false;
 
   public static int count = 0;
-  // private final PDHData pdhData = new PDHData();
+  private final PDHData pdhData = new PDHData();
   public static Optional<Alliance> alliance;
-  // public static Leds led = new Leds();
 
   Command cmd;
   RobotContainer robotContainer;
@@ -46,36 +44,33 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     robotContainer = new RobotContainer();
     alliance = DriverStation.getAlliance();
-    
+    pdhData.clearStickyFaults();
     Util.logf("Start Sibling %s\n", alliance.toString());
-    
+
   }
 
   /**
-   * This function is called every robot packet, no matter the mode. Use this for
-   * items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and
-   * test.
-   *
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
+   * This function is called every robot packet, no matter the mode.
+   * Use this for items like diagnostics that you want ran 
+   * during disabled, autonomous, teleoperated and test.
+   * 
+   * This runs after the mode specific periodic 
+   * functions, but before LiveWindow and 
    * SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
     // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled
-    // commands, running already-scheduled commands, removing finished or
-    // interrupted commands,
+    // newly-scheduled commands, running already-scheduled commands,
+    // removing finished or interrupted commands,
     // and running subsystem periodic() methods. This must be called from the
-    // robot's periodic
-    // block in order for anything in the Command-based framework to work.
+    // robot's periodic block in order for
+    // anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     count++;
-    if (count % 1000 == 67) {
-      // pdhData.logPDHData();
+    if (count % 500 == 0) {
+      pdhData.logPDHData();
     }
-    // led.periodic();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -86,7 +81,7 @@ public class Robot extends TimedRobot {
       cmd.cancel();
     }
     hasBeenHomed = false;
-   // robotContainer.climberSubsystem.disableRobot();
+    robotContainer.climberSubsystem.disableRobot();
 
   }
 
@@ -121,7 +116,8 @@ public class Robot extends TimedRobot {
 
   void homeAllSubsystems() {
     if (!hasBeenHomed) {
-      //robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
+      // TODO enable code to home shooter
+      // robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
       robotContainer.climberSubsystem.homeClimber();
       hasBeenHomed = true;
     }
@@ -143,9 +139,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     alliance = DriverStation.getAlliance();
-    
+
     Util.logf("Enable Robot Alliance: %s\n", alliance.toString());
-    
+
     // homeAllSubsystems();
   }
 

@@ -4,6 +4,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.utilities.Util.logf;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -69,6 +70,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // Setup parameters for the climber motors
     private void setConfig(TalonFX talon) {
+        
         TalonFXConfiguration configuration = new TalonFXConfiguration();
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
         // TODO shooter.configFactoryDefault();

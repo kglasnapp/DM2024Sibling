@@ -1,19 +1,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.GrabNoteCommandAutonomous;
-import frc.robot.commands.GrabberInCommand;
-import frc.robot.commands.GrabberOutCommand;
-import frc.robot.commands.LoadNoteCommand;
-import frc.robot.commands.ShootToSpeakerCommand;
-import frc.robot.commands.SpeakerAlligningCommand;
-import frc.robot.commands.StraightPathCommand;
-import frc.robot.commands.WaitUntilShooterReadyCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -210,234 +199,235 @@ public class Autonomous {
 
         public static Command getAutonomousCommand(RobotContainer robotContainer, int from, int until, 
                                                   boolean aimFirst, int delay) {
-                double robotAngle = (from >= 8) ? 0 : 180;
+                //double robotAngle = (from >= 8) ? 0 : 180;
                 
-                double shootFromPosition[][] = (from <= until) ? shootAccendingPosition : shootDescendingPosition;
+                //double shootFromPosition[][] = (from <= until) ? shootAccendingPosition : shootDescendingPosition;
 
-                Command command;
-
-                if (aimFirst) {
-                        command = new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
-                                                robotContainer.intakeSubsystem,
-                                                robotContainer.grabberSubsystem,
-                                                robotContainer.limeLightPoseSubsystem,
-                                                robotContainer.drivetrainSubsystem)
-                        .alongWith(new SpeakerAlligningCommand(
-                                                        robotContainer.limeLightPoseSubsystem, 
-                                                        robotContainer.drivetrainSubsystem));
-                } else {
-                        command =
-                                new Command() {
-                                        @Override
-                                        public void initialize() {
-                                                robotContainer.shooterSubsystem.setTiltAngle(-4);
-                                        }
-                                        @Override
-                                        public boolean isFinished() {
-                                                return true;
-                                        }
-                                };
-                        command = command.andThen(
-                                        new WaitUntilShooterReadyCommand(robotContainer.shooterSubsystem)                                                
-                                                        .andThen(new GrabberOutCommand(robotContainer.grabberSubsystem))
-                                                        .andThen(new WaitCommand(0.3)));
-                }
-                if (delay > 0) {
-                        command = new WaitCommand(delay).andThen(command);
-                }
-                if (from == -1) {
-                        return command;
-                }
-                /**
-                 * from can be higher than until.
-                 * In that case, we go in reverse order
-                 * look at the end of the loop to see how
-                 * i gets incremented, or decremented.
-                 */
-                for (int i = from; i != until;) {
-                        //command = command
-                                       // .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
-                                                      //  IntakeCommand.State.OUT, 4000));
-                        if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
-                                        shootFromPosition[i][1] == noteInitialPosition[i][1]) {
-                        //command = command
-                        //               .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
-                        }
-                        double pickupX = noteInitialPosition[i][0];                                                                                        
-                        double pickupY = noteInitialPosition[i][1];
-                        double pickupAlpha = robotAngle;
-
-                        if (from < until) {
-                                pickupX = accendingNoteInitialPosition[i][0];
-                                pickupY = accendingNoteInitialPosition[i][1];
-                                pickupAlpha = accendingNoteInitialPosition[i][2];
-                        } else if (until < from) {
-                                pickupX = descendingNoteInitialPosition[i][0];
-                                pickupY = descendingNoteInitialPosition[i][1];
-                                pickupAlpha = descendingNoteInitialPosition[i][2];                                
-                        }
-                        
-                        command = command
-                                        .andThen(
-                                                        new StraightPathCommand(robotContainer.drivetrainSubsystem,
-                                                                        robotContainer.limeLightPoseSubsystem,
-                                                                        new Pose2d(pickupX,
-                                                                                        pickupY,
-                                                                                        Rotation2d.fromDegrees(
-                                                                                                        pickupAlpha)))
-                                                                        .alongWith(new GrabberInCommand(
-                                                                                        robotContainer.grabberSubsystem)))
-                                        .andThen(grabNoteCommand(robotContainer));
-                                        //.andThen(new WaitCommand(0.1));
-
-                        if (shootFromPosition[i][0] != noteInitialPosition[i][0] ||
-                                        shootFromPosition[i][1] != noteInitialPosition[i][1]) {
-                                command = command
-                                                .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
-                                                                robotContainer.grabberSubsystem,
-                                                                robotContainer.shooterSubsystem)
-                                                .alongWith(
-                                                                new StraightPathCommand(
-                                                                                robotContainer.drivetrainSubsystem,
-                                                                                robotContainer.limeLightPoseSubsystem,
-                                                                                new Pose2d(shootFromPosition[i][0],
-                                                                                                shootFromPosition[i][1],
-                                                                                                Rotation2d.fromDegrees(
-                                                                                                                robotAngle)))));
-                        } else {
-                                command = command
-                                                .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
-                                                                robotContainer.grabberSubsystem,
-                                                                robotContainer.shooterSubsystem)
-                                                                .alongWith(new SpeakerAlligningCommand(
-                                                                                robotContainer.limeLightPoseSubsystem,
-                                                                                robotContainer.drivetrainSubsystem)));
-                        }
-                        command = command
-                                        .andThen(new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
-                                                        robotContainer.intakeSubsystem,
-                                                        robotContainer.grabberSubsystem,
-                                                        robotContainer.limeLightPoseSubsystem,
-                                                        robotContainer.drivetrainSubsystem));
-                        if (from < until) {
-                                ++i;
-                        } else {
-                                --i;
-                        }
-                }
+                Command command = null;
                 return command;
-        }
 
-        public static Command getAutonomousCommand(RobotContainer robotContainer, int from, int until, boolean accending) {
-                double robotAngle = (from >= 8) ? 0 : 180;
+        //         if (aimFirst) {
+        //                 command = new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
+        //                                         robotContainer.intakeSubsystem,
+        //                                         robotContainer.grabberSubsystem,
+        //                                         robotContainer.limeLightPoseSubsystem,
+        //                                         robotContainer.drivetrainSubsystem)
+        //                 .alongWith(new SpeakerAlligningCommand(
+        //                                                 robotContainer.limeLightPoseSubsystem, 
+        //                                                 robotContainer.drivetrainSubsystem));
+        //         } else {
+        //                 command =
+        //                         new Command() {
+        //                                 @Override
+        //                                 public void initialize() {
+        //                                         robotContainer.shooterSubsystem.setTiltAngle(-4);
+        //                                 }
+        //                                 @Override
+        //                                 public boolean isFinished() {
+        //                                         return true;
+        //                                 }
+        //                         };
+        //                 command = command.andThen(
+        //                                 new WaitUntilShooterReadyCommand(robotContainer.shooterSubsystem)                                                
+        //                                                 .andThen(new GrabberOutCommand(robotContainer.grabberSubsystem))
+        //                                                 .andThen(new WaitCommand(0.3)));
+        //         }
+        //         if (delay > 0) {
+        //                 command = new WaitCommand(delay).andThen(command);
+        //         }
+        //         if (from == -1) {
+        //                 return command;
+        //         }
+        //         /**
+        //          * from can be higher than until.
+        //          * In that case, we go in reverse order
+        //          * look at the end of the loop to see how
+        //          * i gets incremented, or decremented.
+        //          */
+        //         for (int i = from; i != until;) {
+        //                 //command = command
+        //                                // .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
+        //                                               //  IntakeCommand.State.OUT, 4000));
+        //                 if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
+        //                                 shootFromPosition[i][1] == noteInitialPosition[i][1]) {
+        //                 //command = command
+        //                 //               .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
+        //                 }
+        //                 double pickupX = noteInitialPosition[i][0];                                                                                        
+        //                 double pickupY = noteInitialPosition[i][1];
+        //                 double pickupAlpha = robotAngle;
+
+        //                 if (from < until) {
+        //                         pickupX = accendingNoteInitialPosition[i][0];
+        //                         pickupY = accendingNoteInitialPosition[i][1];
+        //                         pickupAlpha = accendingNoteInitialPosition[i][2];
+        //                 } else if (until < from) {
+        //                         pickupX = descendingNoteInitialPosition[i][0];
+        //                         pickupY = descendingNoteInitialPosition[i][1];
+        //                         pickupAlpha = descendingNoteInitialPosition[i][2];                                
+        //                 }
+                        
+        //                 command = command
+        //                                 .andThen(
+        //                                                 new StraightPathCommand(robotContainer.drivetrainSubsystem,
+        //                                                                 robotContainer.limeLightPoseSubsystem,
+        //                                                                 new Pose2d(pickupX,
+        //                                                                                 pickupY,
+        //                                                                                 Rotation2d.fromDegrees(
+        //                                                                                                 pickupAlpha)))
+        //                                                                 .alongWith(new GrabberInCommand(
+        //                                                                                 robotContainer.grabberSubsystem)))
+        //                                 .andThen(grabNoteCommand(robotContainer));
+        //                                 //.andThen(new WaitCommand(0.1));
+
+        //                 if (shootFromPosition[i][0] != noteInitialPosition[i][0] ||
+        //                                 shootFromPosition[i][1] != noteInitialPosition[i][1]) {
+        //                         command = command
+        //                                         .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
+        //                                                         robotContainer.grabberSubsystem,
+        //                                                         robotContainer.shooterSubsystem)
+        //                                         .alongWith(
+        //                                                         new StraightPathCommand(
+        //                                                                         robotContainer.drivetrainSubsystem,
+        //                                                                         robotContainer.limeLightPoseSubsystem,
+        //                                                                         new Pose2d(shootFromPosition[i][0],
+        //                                                                                         shootFromPosition[i][1],
+        //                                                                                         Rotation2d.fromDegrees(
+        //                                                                                                         robotAngle)))));
+        //                 } else {
+        //                         command = command
+        //                                         .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
+        //                                                         robotContainer.grabberSubsystem,
+        //                                                         robotContainer.shooterSubsystem)
+        //                                                         .alongWith(new SpeakerAlligningCommand(
+        //                                                                         robotContainer.limeLightPoseSubsystem,
+        //                                                                         robotContainer.drivetrainSubsystem)));
+        //                 }
+        //                 command = command
+        //                                 .andThen(new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
+        //                                                 robotContainer.intakeSubsystem,
+        //                                                 robotContainer.grabberSubsystem,
+        //                                                 robotContainer.limeLightPoseSubsystem,
+        //                                                 robotContainer.drivetrainSubsystem));
+        //                 if (from < until) {
+        //                         ++i;
+        //                 } else {
+        //                         --i;
+        //                 }
+        //         }
+        //         return command;
+        // }
+
+        // public static Command getAutonomousCommand(RobotContainer robotContainer, int from, int until, boolean accending) {
+        //         double robotAngle = (from >= 8) ? 0 : 180;
                 
-                double shootFromPosition[][] = (accending) ? shootAccendingPosition : shootDescendingPosition;
+        //         double shootFromPosition[][] = (accending) ? shootAccendingPosition : shootDescendingPosition;
 
-                Command command =
-                                // new ResetOdometryWithCameraCommand(robotContainer.limeLightPoseSubsystem)
-                                // .andThen(
-                                new WaitUntilShooterReadyCommand(robotContainer.shooterSubsystem)
-                                                .andThen(new GrabberOutCommand(robotContainer.grabberSubsystem))
-                                                .andThen(new WaitCommand(0.3));
-                if (from == -1) {
-                        return command;
-                }
-                /**
-                 * from can be higher than until.
-                 * In that case, we go in reverse order
-                 * look at the end of the loop to see how
-                 * i gets incremented, or decremented.
-                 */
-                for (int i = from; i != until;) {
-                       // command = command
-                        //                .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
-                                                        //IntakeCommand.State.OUT, 4000));
-                        if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
-                                        shootFromPosition[i][1] == noteInitialPosition[i][1]) {
-                        //command = command
-                        //              .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
-                        }
-                        double pickupX = noteInitialPosition[i][0];                                                                                        
-                        double pickupY = noteInitialPosition[i][1];
-                        double pickupAlpha = robotAngle;
+        //         Command command =
+        //                         // new ResetOdometryWithCameraCommand(robotContainer.limeLightPoseSubsystem)
+        //                         // .andThen(
+        //                         new WaitUntilShooterReadyCommand(robotContainer.shooterSubsystem)
+        //                                         .andThen(new GrabberOutCommand(robotContainer.grabberSubsystem))
+        //                                         .andThen(new WaitCommand(0.3));
+        //         if (from == -1) {
+        //                 return command;
+        //         }
+        //         /**
+        //          * from can be higher than until.
+        //          * In that case, we go in reverse order
+        //          * look at the end of the loop to see how
+        //          * i gets incremented, or decremented.
+        //          */
+        //         for (int i = from; i != until;) {
+        //                // command = command
+        //                 //                .andThen(new IntakeNoteCommand(robotContainer.intakeSubsystem));
+        //                                                 //IntakeCommand.State.OUT, 4000));
+        //                 if (shootFromPosition[i][0] == noteInitialPosition[i][0] &&
+        //                                 shootFromPosition[i][1] == noteInitialPosition[i][1]) {
+        //                 //command = command
+        //                 //              .andThen(new WaitUntilIntakeOutCommand(robotContainer.intakeSubsystem));
+        //                 }
+        //                 double pickupX = noteInitialPosition[i][0];                                                                                        
+        //                 double pickupY = noteInitialPosition[i][1];
+        //                 double pickupAlpha = robotAngle;
 
-                        if (from != until) {
-                                if (accending) {
-                                        pickupX = accendingNoteInitialPosition[i][0];
-                                        pickupY = accendingNoteInitialPosition[i][1];
-                                        pickupAlpha = accendingNoteInitialPosition[i][2];
-                                } else {
-                                        pickupX = descendingNoteInitialPosition[i][0];
-                                        pickupY = descendingNoteInitialPosition[i][1];
-                                        pickupAlpha = descendingNoteInitialPosition[i][2];                                
-                                }
-                        }
+        //                 if (from != until) {
+        //                         if (accending) {
+        //                                 pickupX = accendingNoteInitialPosition[i][0];
+        //                                 pickupY = accendingNoteInitialPosition[i][1];
+        //                                 pickupAlpha = accendingNoteInitialPosition[i][2];
+        //                         } else {
+        //                                 pickupX = descendingNoteInitialPosition[i][0];
+        //                                 pickupY = descendingNoteInitialPosition[i][1];
+        //                                 pickupAlpha = descendingNoteInitialPosition[i][2];                                
+        //                         }
+        //                 }
                         
-                        command = command
-                                        .andThen(
-                                                        new StraightPathCommand(robotContainer.drivetrainSubsystem,
-                                                                        robotContainer.limeLightPoseSubsystem,
-                                                                        new Pose2d(pickupX,
-                                                                                        pickupY,
-                                                                                        Rotation2d.fromDegrees(
-                                                                                                        pickupAlpha)))
-                                                                        .alongWith(new GrabberInCommand(
-                                                                                        robotContainer.grabberSubsystem)))
-                                        .andThen(grabNoteCommand(robotContainer));
+        //                 command = command
+        //                                 .andThen(
+        //                                                 new StraightPathCommand(robotContainer.drivetrainSubsystem,
+        //                                                                 robotContainer.limeLightPoseSubsystem,
+        //                                                                 new Pose2d(pickupX,
+        //                                                                                 pickupY,
+        //                                                                                 Rotation2d.fromDegrees(
+        //                                                                                                 pickupAlpha)))
+        //                                                                 .alongWith(new GrabberInCommand(
+        //                                                                                 robotContainer.grabberSubsystem)))
+        //                                 .andThen(grabNoteCommand(robotContainer));
 
-                        if (shootFromPosition[i][0] != noteInitialPosition[i][0] ||
-                                        shootFromPosition[i][1] != noteInitialPosition[i][1]) {
-                                command = command
-                                                .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
-                                                                robotContainer.grabberSubsystem,
-                                                                robotContainer.shooterSubsystem)
-                                                .alongWith(
-                                                                new StraightPathCommand(
-                                                                                robotContainer.drivetrainSubsystem,
-                                                                                robotContainer.limeLightPoseSubsystem,
-                                                                                new Pose2d(shootFromPosition[i][0],
-                                                                                                shootFromPosition[i][1],
-                                                                                                Rotation2d.fromDegrees(
-                                                                                                                robotAngle)))));
-                        } else {
-                                command = command
-                                                .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
-                                                                robotContainer.grabberSubsystem,
-                                                                robotContainer.shooterSubsystem)
-                                                                .alongWith(new SpeakerAlligningCommand(
-                                                                                robotContainer.limeLightPoseSubsystem,
-                                                                                robotContainer.drivetrainSubsystem)));
-                        }
-                        command = command
-                                        .andThen(new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
-                                                        robotContainer.intakeSubsystem,
-                                                        robotContainer.grabberSubsystem,
-                                                        robotContainer.limeLightPoseSubsystem,
-                                                        robotContainer.drivetrainSubsystem));
-                        if (accending) {
-                                ++i;
-                        } else {
-                                --i;
-                        }
-                        if (from < 8) {
-                                if (i < 0) {
-                                        i = 7;
-                                } else if (i > 7) {
-                                        i = 0;
-                                }                                
-                        } else {
-                                if (i < 8) {
-                                        i = 15;
-                                } else if (i > 15) {
-                                        i = 8;
-                                }
-                        }
-                }
-                return command;
-        }
+        //                 if (shootFromPosition[i][0] != noteInitialPosition[i][0] ||
+        //                                 shootFromPosition[i][1] != noteInitialPosition[i][1]) {
+        //                         command = command
+        //                                         .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
+        //                                                         robotContainer.grabberSubsystem,
+        //                                                         robotContainer.shooterSubsystem)
+        //                                         .alongWith(
+        //                                                         new StraightPathCommand(
+        //                                                                         robotContainer.drivetrainSubsystem,
+        //                                                                         robotContainer.limeLightPoseSubsystem,
+        //                                                                         new Pose2d(shootFromPosition[i][0],
+        //                                                                                         shootFromPosition[i][1],
+        //                                                                                         Rotation2d.fromDegrees(
+        //                                                                                                         robotAngle)))));
+        //                 } else {
+        //                         command = command
+        //                                         .andThen(new LoadNoteCommand(robotContainer.intakeSubsystem,
+        //                                                         robotContainer.grabberSubsystem,
+        //                                                         robotContainer.shooterSubsystem)
+        //                                                         .alongWith(new SpeakerAlligningCommand(
+        //                                                                         robotContainer.limeLightPoseSubsystem,
+        //                                                                         robotContainer.drivetrainSubsystem)));
+        //                 }
+        //                 command = command
+        //                                 .andThen(new ShootToSpeakerCommand(robotContainer.shooterSubsystem,
+        //                                                 robotContainer.intakeSubsystem,
+        //                                                 robotContainer.grabberSubsystem,
+        //                                                 robotContainer.limeLightPoseSubsystem,
+        //                                                 robotContainer.drivetrainSubsystem));
+        //                 if (accending) {
+        //                         ++i;
+        //                 } else {
+        //                         --i;
+        //                 }
+        //                 if (from < 8) {
+        //                         if (i < 0) {
+        //                                 i = 7;
+        //                         } else if (i > 7) {
+        //                                 i = 0;
+        //                         }                                
+        //                 } else {
+        //                         if (i < 8) {
+        //                                 i = 15;
+        //                         } else if (i > 15) {
+        //                                 i = 8;
+        //                         }
+        //                 }
+        //         }
+        //         return command;
+        //}
 
-        public static Command grabNoteCommand(RobotContainer robotContainer) {
-                return new GrabNoteCommandAutonomous(robotContainer, true);
+        //public static Command grabNoteCommand(RobotContainer robotContainer) {
+                //return new GrabNoteCommandAutonomous(robotContainer, true);
                                 // .andThen(new GrabberInCommand(robotContainer.grabberSubsystem))
                                 // .andThen(new WaitCommand(0.1))
                                 // .andThen(new GrabberInCommand(robotContainer.grabberSubsystem))
@@ -448,7 +438,7 @@ public class Autonomous {
                                 // .andThen(new WaitCommand(0.1))
                                 // .andThen(new GrabberInCommand(robotContainer.grabberSubsystem))
                                 // .andThen(new WaitCommand(0.1));
-        }
+        //}
 
         // public Command getAutonomousCommandCase2() {
         // Command command = new DisplayLogCommand("Case 2")
@@ -761,5 +751,5 @@ public class Autonomous {
         // command.setName("case 3");
         // return command;
         // }
-
+        }
 }

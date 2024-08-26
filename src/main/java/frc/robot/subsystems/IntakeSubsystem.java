@@ -24,7 +24,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intakeIn() {
-        motor.setSpeed(.65);
+        motor.setSpeed(.9);
     }
 
     public void intakeStop() {

@@ -1,5 +1,3 @@
-"# DM2024Sibling" 
-
 Driver Game Pad - controller 2
 
 - Left Joystick up - drive forward 
@@ -37,4 +35,16 @@ Right Bumper - Raise right climber
 
 Left Trigger - Lower lrft climber
 Right Bumper - Rasie left climber
+
+
+Motor IDs
+Front Left:  Drive:7 Steer:8 Cancoder:7
+Front Right: Drive:5 Steer:6 Cancoder:5
+Back Left:   Drive:1 Steer:2 Cancoder:1
+Back Right:  Drive:3 Steer:4 Cancoder:3
+
+Shooter Left:30 Right:31
+Indexer:11
+Note Sensor: DIO-2
+Intake:21
 

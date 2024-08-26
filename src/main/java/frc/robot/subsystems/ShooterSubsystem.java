@@ -128,6 +128,19 @@ public class ShooterSubsystem extends SubsystemBase {
 
     }
 
+    public void setTiltAngle(double angle) {
+       // TODO add code
+    }
+
+    public double getTiltAngle() {
+         // TODO add code
+        return 0;
+    }
+
+    public void setShooterPower(double power) {
+ // TODO add code
+    }
+
     int lastPOV = -1;
 
     @Override

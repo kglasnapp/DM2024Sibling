@@ -2,12 +2,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.GrabberSubsystem;
-import frc.robot.subsystems.ShooterSubsystemOld;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShootWithAngleCommand extends Command {
-    ShooterSubsystemOld shooterSubsystem;
-    GrabberSubsystem grabberSubsystem;
+    ShooterSubsystem shooterSubsystem;
+
     boolean finished = false;
     double startTime = 0;
     enum State {
@@ -17,10 +16,8 @@ public class ShootWithAngleCommand extends Command {
     };
     State state;
 
-    public ShootWithAngleCommand(ShooterSubsystemOld shooterSubsystem,
-        GrabberSubsystem grabberSubsystem) {
+    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem) {
             this.shooterSubsystem = shooterSubsystem;
-            this.grabberSubsystem = grabberSubsystem;
         }
 
     @Override
@@ -37,14 +34,12 @@ public class ShootWithAngleCommand extends Command {
         switch (state) {
             case START_MOTORS:
                 if (RobotController.getFPGATime() / 1000 > startTime + 1000) {
-                    grabberSubsystem.grabberOut();
                     startTime = RobotController.getFPGATime() / 1000;
                     state = State.TRIGGER;
                 }        
                 break;
             case TRIGGER:
                 if (RobotController.getFPGATime() / 1000 > startTime + 3000) {
-                    grabberSubsystem.grabberOff();
                     state = State.END;
                 }
                 break;

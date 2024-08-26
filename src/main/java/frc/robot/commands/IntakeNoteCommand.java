@@ -15,7 +15,7 @@ public class IntakeNoteCommand extends Command {
     public IntakeNoteCommand(IntakeSubsystem intakeSubsystem, IndexerSubsystem indexerSubsystem) {
         this.intakeSubsystem = intakeSubsystem;
         this.indexerSubsystem = indexerSubsystem;
-        //addRequirements(intakeSubsystem);
+        // addRequirements(intakeSubsystem);
         // addRequirements(indexerSubsystem);
     }
 
@@ -29,7 +29,7 @@ public class IntakeNoteCommand extends Command {
 
     @Override
     public void execute() {
-        
+
     }
 
     @Override
