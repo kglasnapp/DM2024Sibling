@@ -4,7 +4,6 @@ package frc.robot.subsystems;
 
 import static frc.robot.utilities.Util.logf;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -70,10 +69,9 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // Setup parameters for the climber motors
     private void setConfig(TalonFX talon) {
-        
+        // TODO talon.getConfigurator().apply(new TalonFXConfiguration());
         TalonFXConfiguration configuration = new TalonFXConfiguration();
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-        // TODO shooter.configFactoryDefault();
         currentLimits = currentLimits
                 .withStatorCurrentLimit(CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true)
@@ -110,7 +108,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public void periodic() {
         double rightCurrent = getCurrent(rightClimber);
         double leftCurrent = getCurrent(leftClimber);
-        if (Robot.count % 10 == 0) {
+        if (Robot.count % 10 == 0 && Robot.debug) {
             SmartDashboard.putNumber("RightCCur", rightCurrent);
             SmartDashboard.putNumber("LeftCCur", leftCurrent);
             SmartDashboard.putNumber("RightCPOS", getEncoderPosition(rightClimber));
@@ -250,7 +248,7 @@ public class ClimberSubsystem extends SubsystemBase {
         if (RobotContainer.operatorHID.getRightBumper()) {
             rightSpeed = -SPEED; // Move climber up
         }
-        if (Math.abs(getEncoderPosition(leftClimber)) >  maxHeight && RobotContainer.operatorHID.getLeftBumper()) {
+        if (Math.abs(getEncoderPosition(leftClimber)) > maxHeight && RobotContainer.operatorHID.getLeftBumper()) {
             leftSpeed = 0;
 
         }
@@ -266,7 +264,6 @@ public class ClimberSubsystem extends SubsystemBase {
         return running;
 
     }
-
 
     private void lockServos(int code) {
         logf("lockServos code:%d\n", code);

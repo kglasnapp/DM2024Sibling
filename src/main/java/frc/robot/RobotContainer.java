@@ -40,6 +40,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.IntakeNoteCommand;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.TiltHomeCommand;
+import frc.robot.commands.TiltManualCommand;
+import frc.robot.commands.TiltSetAngleCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -85,7 +88,7 @@ public class RobotContainer {
   public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
   public LimeLightPoseSubsystem limeLightPoseSubsystem;
   public static CoralSubsystem coralSubsystem = new CoralSubsystem();
-  public static TiltSubsystem tilt = new TiltSubsystem();
+  public TiltSubsystem tilt = new TiltSubsystem();
 
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
   public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));
@@ -95,6 +98,7 @@ public class RobotContainer {
 
   public static RobotContainer instance;
   public Autonomous autotonomous;
+  public boolean hasBeenHomed = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -118,6 +122,16 @@ public class RobotContainer {
     configureButtonBindings();
     configureDashboard();
     autotonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
+  }
+
+  void homeAllSubsystems() {
+    if (!hasBeenHomed) {
+      // TODO enable code to home shooter
+      // robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
+      tilt.homeTilt();
+     // climberSubsystem.homeClimber();
+      hasBeenHomed = true;
+    }
   }
 
   public double squareWithSign(double v) {
@@ -164,7 +178,7 @@ public class RobotContainer {
     configureDriverController(driveController);
     // calibrateShooter(driveController);
     try {
-      // configureOperatorController(operatorController);
+      configureOperatorController(operatorController);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -236,9 +250,16 @@ public class RobotContainer {
 
     driveController.x().onTrue(
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
-   
-        driveController.y().onTrue(
+
+    driveController.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem));
+  }
+
+  public void configureOperatorController(CommandXboxController opController) {
+    opController.back().onTrue(new TiltHomeCommand(tilt));
+    opController.x().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
+    opController.leftBumper().onTrue(new TiltManualCommand(tilt, false));
+    opController.rightBumper().onTrue(new TiltManualCommand(tilt, true));
   }
 
   public void testAutonomous() {

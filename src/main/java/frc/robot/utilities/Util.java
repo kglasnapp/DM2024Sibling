@@ -4,10 +4,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
+import frc.robot.Robot;
+
 import java.io.File;
 import static frc.robot.Constants.logging;
 //import static frc.robot.Constants.robotType;
-
 
 public class Util {
     // Logging Methods
@@ -19,6 +21,19 @@ public class Util {
         dateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         Date date = new Date();
         System.out.println(dateFormat.format(date) + s);
+    }
+
+    public static void logd(String pattern, Object... arguments) {
+        if (Robot.debug) {
+            try {
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss-SSS ");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+                System.out.printf((dateFormat.format(new Date()) + pattern), arguments);
+            } catch (Exception e) {
+                System.err.println("\nAn error occurred while logging! Pattern: " + pattern);
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void logf(String pattern, Object... arguments) {
@@ -33,9 +48,9 @@ public class Util {
     }
 
     public static void loginfo(String pattern, Object... arguments) {
-        if(logging) logf(pattern, arguments);
-      }
-  
+        if (logging)
+            logf(pattern, arguments);
+    }
 
     // Rounding Methods
 
@@ -81,7 +96,8 @@ public class Util {
     }
 
     // Convert feet to meters
-    public  static double ftm(double f) {   // Is this correct? there are definately not 12 feet in a meter but this is what was in the old code base
+    public static double ftm(double f) { // Is this correct? there are definately not 12 feet in a meter but this is
+                                         // what was in the old code base
         return itm(f * 12);
     }
 
@@ -94,7 +110,7 @@ public class Util {
     public static void splashScreen(String version) {
         Util.log("**********************************************************************");
         Util.log("");
-        Util.logf("Robot Type %s Started compiled:%s version:%s \n",  Util.showFileTime(), version);
+        Util.logf("Robot Type %s Started compiled:%s version:%s \n", Util.showFileTime(), version);
         Util.log("");
         Util.log("**********************************************************************");
     }

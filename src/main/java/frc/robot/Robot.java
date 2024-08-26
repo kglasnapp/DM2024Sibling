@@ -26,7 +26,8 @@ import frc.robot.subsystems.PDHData;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  boolean hasBeenHomed = false;
+
+  public static boolean debug = true;
 
   public static int count = 0;
   private final PDHData pdhData = new PDHData();
@@ -51,11 +52,11 @@ public class Robot extends TimedRobot {
 
   /**
    * This function is called every robot packet, no matter the mode.
-   * Use this for items like diagnostics that you want ran 
+   * Use this for items like diagnostics that you want ran
    * during disabled, autonomous, teleoperated and test.
    * 
-   * This runs after the mode specific periodic 
-   * functions, but before LiveWindow and 
+   * This runs after the mode specific periodic
+   * functions, but before LiveWindow and
    * SmartDashboard integrated updating.
    */
   @Override
@@ -80,8 +81,8 @@ public class Robot extends TimedRobot {
       logf("Executing disabled init %s\n", cmd.getName());
       cmd.cancel();
     }
-    hasBeenHomed = false;
-    robotContainer.climberSubsystem.disableRobot();
+    robotContainer.hasBeenHomed = false;
+    // TODO turn back on robotContainer.climberSubsystem.disableRobot();
 
   }
 
@@ -110,17 +111,9 @@ public class Robot extends TimedRobot {
       logf("Executing autonomous %s\n", cmd.getName());
       cmd.schedule();
     }
-    if (!RobotContainer.testMode)
-      homeAllSubsystems();
-  }
-
-  void homeAllSubsystems() {
-    if (!hasBeenHomed) {
-      // TODO enable code to home shooter
-      // robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
-      robotContainer.climberSubsystem.homeClimber();
-      hasBeenHomed = true;
+    if (!RobotContainer.testMode) {
     }
+    // homeAllSubsystems();
   }
 
   /** This function is called periodically during autonomous. */
@@ -142,7 +135,7 @@ public class Robot extends TimedRobot {
 
     Util.logf("Enable Robot Alliance: %s\n", alliance.toString());
 
-    // homeAllSubsystems();
+    robotContainer.homeAllSubsystems();
   }
 
   /** This function is called periodically during operator control. */
