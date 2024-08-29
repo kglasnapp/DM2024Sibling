@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   public static Optional<Alliance> alliance;
 
   Command cmd;
-  RobotContainer robotContainer;
+  public RobotContainer robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -82,7 +82,9 @@ public class Robot extends TimedRobot {
       cmd.cancel();
     }
     robotContainer.hasBeenHomed = false;
-    // TODO turn back on robotContainer.climberSubsystem.disableRobot();
+    if (robotContainer.climberSubsystem != null) {
+      robotContainer.climberSubsystem.disableRobot();
+    }
 
   }
 

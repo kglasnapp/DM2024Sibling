@@ -24,6 +24,7 @@ public class TiltHomeCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+         homing = false;
         logd("Initializing the tilt homing\n", true);
     }
 

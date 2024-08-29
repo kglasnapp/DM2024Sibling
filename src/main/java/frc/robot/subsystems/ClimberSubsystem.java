@@ -42,7 +42,7 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     // private State state = State.IDLE;
-    private State state = State.IDLE;
+    private State state = State.HOMED; // TODO state should be idle when Homing works
     private State lastState = State.IDLE;
     private int count = 0;
 
@@ -60,7 +60,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // Called when robot is started
     public ClimberSubsystem() {
-        logf("Setup Climber Subsystem");
+        logf("Climber Subsystem Initialized\n");
         setConfig(leftClimber);
         setConfig(rightClimber);
         lockServos(6); // Set to locked
@@ -102,13 +102,15 @@ public class ClimberSubsystem extends SubsystemBase {
         setRightSpeed(0);
         setLeftSpeed(0);
         lockServos(5);
+        // todo: we need to remove/rethink the state we put the robot when disabled
+        state = State.HOMED;
     }
 
     @Override
     public void periodic() {
         double rightCurrent = getCurrent(rightClimber);
         double leftCurrent = getCurrent(leftClimber);
-        if (Robot.count % 10 == 0 && Robot.debug) {
+        if (Robot.count % 10 == 0) {
             SmartDashboard.putNumber("RightCCur", rightCurrent);
             SmartDashboard.putNumber("LeftCCur", leftCurrent);
             SmartDashboard.putNumber("RightCPOS", getEncoderPosition(rightClimber));
@@ -119,7 +121,7 @@ public class ClimberSubsystem extends SubsystemBase {
         if (lockCounter == 0) {
             // setServoPositions(lockAngle);
             // SmartDashboard.putNumber("SelPow". .5);
-            unlockServos();
+            //unlockServos();
             lockCounter = -1;
         } else if (lockCounter > 0) {
             lockCounter--;
@@ -178,10 +180,9 @@ public class ClimberSubsystem extends SubsystemBase {
             case HOMED:
                 // If driver wants to move either climber up
                 // operated SERVO and move climbers down for 100 ms
-                if (RobotContainer.operatorHID.getLeftBumper()
-                        || RobotContainer.operatorHID.getRightBumper()
-                        || RobotContainer.operatorHID.getLeftTriggerAxis() > 0.1
-                        || RobotContainer.operatorHID.getRightTriggerAxis() > 0.1) {
+                if (Math.abs(RobotContainer.operatorHID.getLeftY()) > .5
+                        || Math.abs(RobotContainer.operatorHID.getRightY()) > .5) {
+
                     logf("Climb Button Hit\n");
                     unlockServos();
                     setRightSpeed(releaseLatchSpeed);
@@ -209,7 +210,7 @@ public class ClimberSubsystem extends SubsystemBase {
                 }
                 // If motor speed changed then reset the time delay
                 if (controlMotors()) {
-                    count = 50 * 10;
+                    count = 50;
                 }
                 break;
         }
@@ -236,30 +237,32 @@ public class ClimberSubsystem extends SubsystemBase {
     private boolean controlMotors() {
         double leftSpeed = 0;
         double rightSpeed = 0;
-        if (RobotContainer.operatorHID.getLeftTriggerAxis() > 0.1) {
+        if (RobotContainer.operatorHID.getLeftY() > 0.5) {
             leftSpeed = -SPEED; // Move climber down
         }
-        if (RobotContainer.operatorHID.getRightTriggerAxis() > 0.1) {
+        if (RobotContainer.operatorHID.getRightY() > 0.5) {
             rightSpeed = SPEED; // Move climber down
         }
-        if (RobotContainer.operatorHID.getLeftBumper()) {
+        if (RobotContainer.operatorHID.getLeftY() < -.5) {
             leftSpeed = SPEED; // Move climber up
         }
-        if (RobotContainer.operatorHID.getRightBumper()) {
+        if (RobotContainer.operatorHID.getRightY() < -.5) {
             rightSpeed = -SPEED; // Move climber up
         }
-        if (Math.abs(getEncoderPosition(leftClimber)) > maxHeight && RobotContainer.operatorHID.getLeftBumper()) {
+        if (Math.abs(getEncoderPosition(leftClimber)) > maxHeight &&
+            RobotContainer.operatorHID.getLeftX() < .5) {
             leftSpeed = 0;
-
         }
-        if (Math.abs(getEncoderPosition(rightClimber)) > maxHeight && RobotContainer.operatorHID.getRightBumper()) {
+        if (Math.abs(getEncoderPosition(rightClimber)) > maxHeight &&
+            RobotContainer.operatorHID.getRightX() < .5) {
             rightSpeed = 0;
         }
         setLeftSpeed(leftSpeed);
         setRightSpeed(rightSpeed);
         boolean running = leftSpeed != 0 || rightSpeed != 0;
         if (running) {
-            logf("LeftSpeed:%.2f RightSpeed:%.2f\n", leftSpeed, rightSpeed);
+            logf("LeftSpeed:%.2f RightSpeed:%.2f leftY:%.2f right:%.2f\n", leftSpeed, rightSpeed, RobotContainer.operatorHID.getLeftY(),
+                    RobotContainer.operatorHID.getRightY());
         }
         return running;
 

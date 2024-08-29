@@ -26,7 +26,7 @@ public class TiltSetAngleCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        logd("Initializing the tilt set angle\n", true);
+        logd("Initializing the tilt set angle:\n", true);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

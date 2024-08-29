@@ -3,9 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TiltSubsystem;
 
 public class ShootWithAngleCommand extends Command {
     ShooterSubsystem shooterSubsystem;
+    TiltSubsystem tiltSubsystem;
 
     boolean finished = false;
     double startTime = 0;
@@ -16,16 +18,17 @@ public class ShootWithAngleCommand extends Command {
     };
     State state;
 
-    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem) {
+    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem,TiltSubsystem tiltSubsystem) {
             this.shooterSubsystem = shooterSubsystem;
+            this.tiltSubsystem = tiltSubsystem;
         }
 
     @Override
     public void initialize() {
         state = State.START_MOTORS;
         finished = false;
-        shooterSubsystem.setTiltAngle(0);        
-        shooterSubsystem.setShooterPower(0.95);
+        tiltSubsystem.setTiltAngle(0);        
+        shooterSubsystem.setAllShooterPower(0.95);
         startTime = RobotController.getFPGATime() / 1000;
     }
 
@@ -44,7 +47,7 @@ public class ShootWithAngleCommand extends Command {
                 }
                 break;
             case END:
-                shooterSubsystem.setShooterPower(0);                
+                shooterSubsystem.setAllShooterPower(0);                
                 break;
         }
         

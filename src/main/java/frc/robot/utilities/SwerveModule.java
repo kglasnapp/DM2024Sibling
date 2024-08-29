@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
 
 public class SwerveModule {
@@ -136,7 +137,8 @@ public class SwerveModule {
 
   public static double getPowerRatio() {
     if (RobotContainer.driveHID.getLeftBumper() || 
-        RobotContainer.driveHID.getLeftTriggerAxis() > 0.1) {
+        RobotContainer.driveHID.getLeftTriggerAxis() > 0.1 ||
+        DrivetrainSubsystem.speedsComeFromController) {
       return 600;
     }
     return powerRatio;

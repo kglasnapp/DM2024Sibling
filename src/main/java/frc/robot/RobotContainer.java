@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.ChangeNormalModeCommand;
+import frc.robot.commands.ChangeTurboModeCommand;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.IntakeNoteCommand;
 import frc.robot.commands.ShootCommand;
@@ -71,7 +73,7 @@ public class RobotContainer {
 
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   public final static IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-  public final ClimberSubsystem climberSubsystem = (testMode) ? null : new ClimberSubsystem();
+  public final ClimberSubsystem climberSubsystem =  new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
@@ -118,7 +120,7 @@ public class RobotContainer {
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
         driveController.y()));// Set precision based upon left bumper
 
-    limeLightPoseSubsystem = new LimeLightPoseSubsystem(drivetrainSubsystem, "limelight-front");
+    limeLightPoseSubsystem = new LimeLightPoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();
     configureDashboard();
     autotonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
@@ -126,10 +128,10 @@ public class RobotContainer {
 
   void homeAllSubsystems() {
     if (!hasBeenHomed) {
-      // TODO enable code to home shooter
-      // robotContainer.shooterSubsystem.state = ShooterSubsystemOld.State.GO_HOME;
       tilt.homeTilt();
-     // climberSubsystem.homeClimber();
+      if (climberSubsystem != null) {
+        // TODO once climber built enable homing climberSubsystem.homeClimber();
+      }
       hasBeenHomed = true;
     }
   }
@@ -184,12 +186,13 @@ public class RobotContainer {
     }
   }
 
+  // TODO this method need a lot of work
   public void calibrateShooter(CommandXboxController controller) {
     controller.pov(0).onTrue(new Command() {
       @Override
       public void initialize() {
-        double currentAngle = shooterSubsystem.getTiltAngle();
-        shooterSubsystem.setTiltAngle(currentAngle - 0.5);
+        double currentAngle = tilt.getTiltAngle();
+        tilt.setTiltAngle(currentAngle - 0.5);
         logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
       }
 
@@ -202,7 +205,7 @@ public class RobotContainer {
     controller.pov(90).onTrue(new Command() {
       @Override
       public void initialize() {
-        shooterSubsystem.setShooterPower(1);
+        shooterSubsystem.setAllShooterPower(1.0);
       }
 
       @Override
@@ -214,8 +217,8 @@ public class RobotContainer {
     controller.pov(180).onTrue(new Command() {
       @Override
       public void initialize() {
-        double currentAngle = shooterSubsystem.getTiltAngle();
-        shooterSubsystem.setTiltAngle(currentAngle + 0.5);
+        double currentAngle = tilt.getTiltAngle();
+        tilt.setTiltAngle(currentAngle + 0.5);
         logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
       }
 
@@ -231,7 +234,7 @@ public class RobotContainer {
         // grabberSubsystem.grabberOut();
         logf("Shooting at %.2f distance with %.2f angle\n",
             // ShootToSpeakerCommand.distance(BLUE_SPEAKER, limeLightPoseSubsystem.get()),
-            shooterSubsystem.getTiltAngle());
+            tilt.getTiltAngle());
       }
 
       @Override
@@ -252,14 +255,22 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
 
     driveController.y().onTrue(
-        new ShootCommand(shooterSubsystem, indexerSubsystem));
+        new ShootCommand(shooterSubsystem, indexerSubsystem,  limeLightPoseSubsystem));
+
+    driveController.rightTrigger().onTrue(
+        new ChangeNormalModeCommand());
+
+    driveController.leftTrigger().onTrue(
+        new ChangeTurboModeCommand());
+
   }
 
+  // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
     opController.back().onTrue(new TiltHomeCommand(tilt));
     opController.x().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
-    opController.leftBumper().onTrue(new TiltManualCommand(tilt, false));
-    opController.rightBumper().onTrue(new TiltManualCommand(tilt, true));
+    opController.leftBumper().onTrue(new TiltManualCommand(tilt, false)); // Send shooter down
+    opController.rightBumper().onTrue(new TiltManualCommand(tilt, true)); // Send shooter up
   }
 
   public void testAutonomous() {
@@ -284,3 +295,5 @@ public class RobotContainer {
     return value;
   }
 }
+
+

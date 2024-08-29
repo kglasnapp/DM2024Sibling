@@ -22,6 +22,7 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
+    // TODO Change the next tqo .762 to .62865 -- note .628 is 24.7 inches
     public static final double DRIVETRAIN_TRACKWIDTH_METERS = .762; // FIXed Measure and set trackwidth
     /**
      * The front-to-back distance between the drivetrain wheels.

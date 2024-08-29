@@ -33,6 +33,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.utilities.SwerveModule;
 import frc.robot.utilities.SwerveModuleConstants;
 
@@ -58,12 +59,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * line.
    */
   // TODO: this is a test config. The original values are below
+   // The above equation comes to 58.4  which is probably too high
   public static final double MAX_VELOCITY_METERS_PER_SECOND = 5880.0 / 60.0 / (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) *
   0.10033 * Math.PI;
+  
+  
   /* 
-  100.0 / 60.0 *
-      (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) *
-      0.10033 * Math.PI;
+
+  100.0 / 60.0 * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) * 0.10033 * 3.15
 */
   // public static final double MAX_VELOCITY_METERS_PER_SECOND = 100.0 / 60.0 *
   // SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
@@ -120,6 +123,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   SwerveModule swerveModules[];
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+  public static boolean speedsComeFromController = true;
 
   public DrivetrainSubsystem() {
     // ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -231,6 +235,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // // We will only get valid fused headings if the magnetometer is calibrated
       // System.out.println("returning the angle FUSE ZERO from the robot:
       // "+m_navx.getAngle());
+      // TODO need to adjust the gyro angle
       zeroNavx = m_navx.getFusedHeading();
     } else {
       zeroNavx = 0;
@@ -284,13 +289,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // counter-clockwise makes the angle increase.
     // return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
 
-   Rotation2d r =  Rotation2d.fromDegrees(-(-m_navx.getYaw() + currentOrientation));
+   Rotation2d r =  Rotation2d.fromDegrees((-m_navx.getYaw() + currentOrientation));
    SmartDashboard.putNumber("Rot NC", r.getDegrees());
    return r;
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
+    drive(chassisSpeeds, false);
+  }
+
+  public void drive(ChassisSpeeds chassisSpeeds, boolean speedsComeFromController) {
     m_chassisSpeeds = chassisSpeeds;
+    DrivetrainSubsystem.speedsComeFromController = speedsComeFromController;
   }
 
   // Read the absolute values from the cancoder
@@ -304,7 +314,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // m_chassisSpeeds.omegaRadiansPerSecond);
 
 
-    if (Robot.count % 20 == -1) {
+    if (Robot.count % 20 == 1) {
       for (SwerveModule mod : swerveModules) {
         SmartDashboard.putNumber(
             "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -322,7 +332,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_frontRightModule.setDesiredState(states[1]);
     m_backLeftModule.setDesiredState(states[2]);
     m_backRightModule.setDesiredState(states[3]);
-    if (Robot.count % 20 == -7) { // disable Smartdash board display
+    if (Robot.count % 20 == 7) { // disable Smartdash board display
       SmartDashboard.putNumber("FL", states[0].angle.getDegrees());
       SmartDashboard.putNumber("FR", states[1].angle.getDegrees());
       SmartDashboard.putNumber("BL", states[2].angle.getDegrees());

@@ -40,8 +40,8 @@ public class LimeLightPoseSubsystem extends SubsystemBase implements Supplier<Po
     ShuffleboardTab tab;
     private final Field2d field2d = new Field2d();
     Pose2d pose = new Pose2d(1.89, 0.5, new Rotation2d(Math.toRadians(180)));
-    private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(10));
-    private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(1, 1, Units.degreesToRadians(50));
+    private static final Vector<N3> stateStdDevs = VecBuilder.fill(0.1, 0.1, 10);
+    private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(5,5, 500);
     DrivetrainSubsystem drivetrainSubsystem;
     static int count = 0;
     public String cameraId;
@@ -110,6 +110,7 @@ public class LimeLightPoseSubsystem extends SubsystemBase implements Supplier<Po
                 double area = ta.getDouble(0.0);
                 if (Robot.count % 10 == 0) {
                     //post to smart dashboard periodically
+                    // logf("line X = %.2f  y = %.2f\n",x,y);
                     SmartDashboard.putNumber("LimeLX", x);
                     SmartDashboard.putNumber("LimeLY", y);
                     SmartDashboard.putNumber("LimeLArea", area);
