@@ -4,20 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.BACK_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.DRIVETRAIN_TRACK_LENGTH;
-import static frc.robot.Constants.DRIVETRAIN_TRACK_WIDTH;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
+import static frc.robot.Constants.*;
 import static frc.robot.Util.logf;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -159,7 +146,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getGyroscopeRotationRate() {
-    return -m_navx.getYaw();
+    return -m_navx.getRate();
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {

@@ -109,8 +109,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     instance = this;
-    // Set the default Robot Mode to Cube
-    logf("creating RobotContainer\n");
+    logf("Creating RobotContainer\n");
 
     // Controller inputs range from -1.0 -> 1.0
     // Drive train operates in meters per second
@@ -124,10 +123,9 @@ public class RobotContainer {
         () -> sRX.calculate(-modifyAxis(driveController.getRightX())
             * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
         // Set precision based upon left bumper
-        // Not used, currently implemented with separate commands
-        driveController.y(),
+        driveController.leftBumper(),
         // Set robot oriented control based upon left bumper
-        driveController.leftBumper()));
+        driveController.rightBumper()));
 
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();
@@ -254,23 +252,23 @@ public class RobotContainer {
   }
 
   public void configureDriverController(CommandXboxController controller) {
-    driveController.back().whileTrue(new RunCommand(new Runnable() {
+    controller.back().whileTrue(new RunCommand(new Runnable() {
       public void run() {
         drivetrainSubsystem.zeroGyroscope();
       }
     }));
 
-    driveController.x().onTrue(
+    controller.x().onTrue(
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
 
-    driveController.y().onTrue(
+    controller.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem));
 
-    driveController.rightTrigger().onTrue(
-        new ChangeNormalModeCommand());
+    // driveController.rightTrigger().onTrue(
+    // new ChangeNormalModeCommand());
 
-    driveController.leftTrigger().onTrue(
-        new ChangeTurboModeCommand());
+    // driveController.leftTrigger().onTrue(
+    // new ChangeTurboModeCommand());
 
   }
 

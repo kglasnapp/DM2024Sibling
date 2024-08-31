@@ -42,18 +42,17 @@ public class DefaultDriveCommand extends Command {
         this.precisionActivator = precisionActivator;
         this.robotOrientedActivator = robotOrientedActivator;
 
-        logf("Default Drive Command started precision:%b\n", this.precisionActivator.getAsBoolean());
         addRequirements(drivetrainSubsystem);
     }
 
     @Override
     public void execute() {
         // Currently implemented with separate commands
-        // if (precisionActivator.getAsBoolean()) {
-        // SwerveModule.setPowerRatio(SwerveModule.PRECISION);
-        // } else {
-        // SwerveModule.setPowerRatio(SwerveModule.TURBO);
-        // }
+        if (precisionActivator.getAsBoolean()) {
+            SwerveModule.setPowerRatio(SwerveModule.PRECISION);
+        } else {
+            SwerveModule.setPowerRatio(SwerveModule.TURBO);
+        }
 
         if (Robot.count % 20 == 0) {
             if (m_translationXSupplier.getAsDouble() != 0 &&
@@ -84,6 +83,6 @@ public class DefaultDriveCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
-        // SwerveModule.setPowerRatio(SwerveModule.DEFAULT);
+        SwerveModule.setPowerRatio(SwerveModule.DEFAULT);
     }
 }
