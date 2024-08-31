@@ -55,12 +55,6 @@ public class SwerveModule {
   public static final double driveKV = 2.44;
   public static final double driveKA = 0.27;
 
-  /* Swerve Profiling Values */
-  // FIXME: Why does this need to be here when there is already a max speed
-  // constant else where
-  public static final double maxSpeed = 19.5 / 0.305; // meters per second
-  public static final double maxAngularVelocity = 11.5;
-
   /* Neutral Modes */
   public static final IdleMode angleNeutralMode = IdleMode.kBrake;
   public static final IdleMode driveNeutralMode = IdleMode.kBrake;
@@ -199,10 +193,10 @@ public class SwerveModule {
 
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
-      double percentOutput = desiredState.speedMetersPerSecond / maxSpeed;
+      double percentOutput = desiredState.speedMetersPerSecond / DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND;
       driveMotor.set(percentOutput / 20);
     } else {
-      double desiredSpeed = desiredState.speedMetersPerSecond * maxSpeed / getPowerRatio();
+      double desiredSpeed = desiredState.speedMetersPerSecond / getPowerRatio();
       // desiredSpeed = desiredState.speedMetersPerSecond;
       driveController.setReference(
           desiredSpeed,
