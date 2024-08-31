@@ -50,7 +50,7 @@ import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TiltSubsystem;
 
@@ -73,7 +73,7 @@ public class RobotContainer {
 
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   public final static IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-  public final ClimberSubsystem climberSubsystem =  new ClimberSubsystem();
+  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
@@ -88,7 +88,7 @@ public class RobotContainer {
   public static SendableChooser<Integer> autonomousChooserFirtWait = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserFirstStep = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
-  public LimeLightPoseSubsystem limeLightPoseSubsystem;
+  public PoseSubsystem poseSubsystem;
   public static CoralSubsystem coralSubsystem = new CoralSubsystem();
   public TiltSubsystem tilt = new TiltSubsystem();
 
@@ -99,7 +99,7 @@ public class RobotContainer {
   public final static Pose2d RED_AMP = new Pose2d(578.77, 323, new Rotation2d(Math.toRadians(270)));
 
   public static RobotContainer instance;
-  public Autonomous autotonomous;
+  public Autonomous autonomous;
   public boolean hasBeenHomed = false;
 
   /**
@@ -120,10 +120,10 @@ public class RobotContainer {
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
         driveController.y()));// Set precision based upon left bumper
 
-    limeLightPoseSubsystem = new LimeLightPoseSubsystem(drivetrainSubsystem, "limelight");
+    poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();
     configureDashboard();
-    autotonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
+    autonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
   }
 
   void homeAllSubsystems() {
@@ -255,7 +255,7 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
 
     driveController.y().onTrue(
-        new ShootCommand(shooterSubsystem, indexerSubsystem,  limeLightPoseSubsystem));
+        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem));
 
     driveController.rightTrigger().onTrue(
         new ChangeNormalModeCommand());
@@ -295,5 +295,3 @@ public class RobotContainer {
     return value;
   }
 }
-
-

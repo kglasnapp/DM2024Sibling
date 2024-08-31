@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
@@ -27,8 +28,6 @@ public class DefaultDriveCommand extends Command {
     private final DoubleSupplier m_rotationSupplier;
     private final BooleanSupplier precisionActivator;
 
-    double count = 0;
-
     public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem,
             DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
@@ -48,7 +47,7 @@ public class DefaultDriveCommand extends Command {
         // You can use `new ChassisSpeeds(...)` for robot-oriented movement instead of
         // field-oriented movement
 
-        if (count % 20 == 0) {
+        if (Robot.count % 20 == 0) {
             if (m_translationXSupplier.getAsDouble() != 0 &&
                     m_translationYSupplier.getAsDouble() != 0) {
                 logf("Robot Oriented Speed X: %.2f y:%.2f angle:%.2f\n", m_translationXSupplier.getAsDouble(),
@@ -71,7 +70,8 @@ public class DefaultDriveCommand extends Command {
                             m_rotationSupplier.getAsDouble(),
                             m_drivetrainSubsystem.getGyroscopeRotation()));
         }
-        count++;
+
+        // FIXME: Precision mode isnt implemented here???
     }
 
     @Override

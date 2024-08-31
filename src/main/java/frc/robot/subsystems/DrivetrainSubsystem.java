@@ -144,7 +144,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // System.out.println("returning the angle FUSE ZERO from the robot:
       // "+m_navx.getAngle());
 
-      Rotation2d r = Rotation2d.fromDegrees((-m_navx.getFusedHeading() + zeroNavx));
+      Rotation2d r = Rotation2d.fromDegrees(-m_navx.getFusedHeading() + zeroNavx);
       SmartDashboard.putNumber("Rot Cal", r.getDegrees());
       return r;
     }
@@ -156,6 +156,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     Rotation2d r = Rotation2d.fromDegrees((-m_navx.getYaw()));
     SmartDashboard.putNumber("Rot NC", r.getDegrees());
     return r;
+  }
+
+  public double getGyroscopeRotationRate() {
+    return -m_navx.getYaw();
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
@@ -207,22 +211,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
    *         backLeft, backRight
    */
   public SwerveModulePosition[] getModulePositions() {
-    Rotation2d flA = m_frontLeftModule.getAngle(); // new Rotation2d(m_frontLeftModule.getAngle().getRadians());
-                                                   // //getSteerAngle());
-    Rotation2d frA = m_frontRightModule.getAngle(); // new Rotation2d(m_frontRightModule.getSteerAngle());
-    Rotation2d blA = m_backLeftModule.getAngle(); // new Rotation2d(m_backLeftModule.getSteerAngle());
-    Rotation2d brA = m_backRightModule.getAngle(); // new Rotation2d(m_backRightModule.getSteerAngle());
+    Rotation2d flA = m_frontLeftModule.getAngle();
+    Rotation2d frA = m_frontRightModule.getAngle();
+    Rotation2d blA = m_backLeftModule.getAngle();
+    Rotation2d brA = m_backRightModule.getAngle();
     double flP = m_frontLeftModule.getPosition();
     double frP = m_frontRightModule.getPosition();
     double blP = m_backLeftModule.getPosition();
     double brP = m_backRightModule.getPosition();
 
-    // if (Robot.count % 20 == 6) {
-    // SmartDashboard.putNumber("FL POS", flP);
-    // SmartDashboard.putNumber("FR POS", frP);
-    // SmartDashboard.putNumber("BR POS", brP);
-    // SmartDashboard.putNumber("BL POS", blP);
-    //
     // The postition is in meters
     return new SwerveModulePosition[] {
         new SwerveModulePosition(flP, flA),

@@ -8,9 +8,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.utilities.Util.logf;
 
 public class ExampleSubsystem extends SubsystemBase {
-  /** Creates a new ReplaceMeSubs`ystem. */
   public ExampleSubsystem() {
-     logf("Start of Example Sustem\n");
+    logf("Start of Example System\n");
   }
 
   @Override
