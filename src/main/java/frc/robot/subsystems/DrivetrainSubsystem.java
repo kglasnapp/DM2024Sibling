@@ -4,24 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.BACK_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
-import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_OFFSET;
+import static frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,7 +18,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.utilities.SwerveModule;
-import frc.robot.utilities.SwerveModuleConstants;
+import frc.robot.utilities.SwerveModuleIds;
+import frc.robot.utilities.SwerveModuleType;
 
 import static frc.robot.Util.logf;
 
@@ -59,15 +43,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * line.
    */
   // TODO: this is a test config. The original values are below
-   // The above equation comes to 58.4  which is probably too high
-  public static final double MAX_VELOCITY_METERS_PER_SECOND = 5880.0 / 60.0 / (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) *
-  0.10033 * Math.PI;
-  
-  
-  /* 
+  // The above equation comes to 58.4 which is probably too high
+  public static final double MAX_VELOCITY_METERS_PER_SECOND = 5880.0 / 60.0 / (14.0 / 50.0) * (27.0 / 17.0)
+      * (15.0 / 45.0) *
+      0.10033 * Math.PI;
 
-  100.0 / 60.0 * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) * 0.10033 * 3.15
-*/
+  /*
+   * 
+   * 100.0 / 60.0 * (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0) * 0.10033 * 3.15
+   */
   // public static final double MAX_VELOCITY_METERS_PER_SECOND = 100.0 / 60.0 *
   // SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
   // SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
@@ -92,17 +76,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // Here we calculate the theoretical maximum angular velocity. You can also
   // replace this with a measured amount.
   public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-      Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
+      Math.hypot(DRIVETRAIN_TRACK_WIDTH / 2.0, DRIVETRAIN_TRACK_LENGTH / 2.0);
 
   public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       // Front left
-      new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0),
+      new Translation2d(DRIVETRAIN_TRACK_WIDTH / 2.0, DRIVETRAIN_TRACK_LENGTH / 2.0),
       // Front right
-      new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0),
+      new Translation2d(DRIVETRAIN_TRACK_WIDTH / 2.0, -DRIVETRAIN_TRACK_LENGTH / 2.0),
       // Back left
-      new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0),
+      new Translation2d(-DRIVETRAIN_TRACK_WIDTH / 2.0, DRIVETRAIN_TRACK_LENGTH / 2.0),
       // Back right
-      new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0));
+      new Translation2d(-DRIVETRAIN_TRACK_WIDTH / 2.0, -DRIVETRAIN_TRACK_LENGTH / 2.0));
 
   // By default we use a Pigeon for our gyroscope. But if you use another
   // gyroscope, like a NavX, you can change this.
@@ -151,22 +135,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // By default we will use Falcon 500s in standard configuration. But if you use
     // a different configuration or motors
     // you MUST change it. If you do not, your code will crash on startup.
-    // FIXed Setup motor configuration
-    m_frontLeftModule = new SwerveModule(0, new SwerveModuleConstants(
-        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER,
-        FRONT_LEFT_MODULE_STEER_OFFSET));
 
-    m_frontRightModule = new SwerveModule(1, new SwerveModuleConstants(
-        FRONT_RIGHT_MODULE_DRIVE_MOTOR, FRONT_RIGHT_MODULE_STEER_MOTOR, FRONT_RIGHT_MODULE_STEER_ENCODER,
-        FRONT_RIGHT_MODULE_STEER_OFFSET));
+    m_frontLeftModule = new SwerveModule(0, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
+        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER));
 
-    m_backLeftModule = new SwerveModule(2, new SwerveModuleConstants(
-        BACK_LEFT_MODULE_DRIVE_MOTOR, BACK_LEFT_MODULE_STEER_MOTOR, BACK_LEFT_MODULE_STEER_ENCODER,
-        BACK_LEFT_MODULE_STEER_OFFSET));
+    m_frontRightModule = new SwerveModule(1, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
+        FRONT_RIGHT_MODULE_DRIVE_MOTOR, FRONT_RIGHT_MODULE_STEER_MOTOR, FRONT_RIGHT_MODULE_STEER_ENCODER));
 
-    m_backRightModule = new SwerveModule(3, new SwerveModuleConstants(
-        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER,
-        BACK_RIGHT_MODULE_STEER_OFFSET));
+    m_backLeftModule = new SwerveModule(2, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
+        BACK_LEFT_MODULE_DRIVE_MOTOR, BACK_LEFT_MODULE_STEER_MOTOR, BACK_LEFT_MODULE_STEER_ENCODER));
+
+    m_backRightModule = new SwerveModule(3, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
+        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
 
     // m_frontLeftModule = Mk4iSwerveModuleHelper.createNeo(
     // // This parameter is optional, but will allow you to see the current state of
@@ -279,7 +259,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // // We will only get valid fused headings if the magnetometer is calibrated
       // System.out.println("returning the angle FUSE ZERO from the robot:
       // "+m_navx.getAngle());
-      
+
       Rotation2d r = Rotation2d.fromDegrees((-m_navx.getFusedHeading() + zeroNavx + currentOrientation));
       SmartDashboard.putNumber("Rot Cal", r.getDegrees());
       return r;
@@ -289,9 +269,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // counter-clockwise makes the angle increase.
     // return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
 
-   Rotation2d r =  Rotation2d.fromDegrees((-m_navx.getYaw() + currentOrientation));
-   SmartDashboard.putNumber("Rot NC", r.getDegrees());
-   return r;
+    Rotation2d r = Rotation2d.fromDegrees((-m_navx.getYaw() + currentOrientation));
+    SmartDashboard.putNumber("Rot NC", r.getDegrees());
+    return r;
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
@@ -312,7 +292,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     // drive(m_chassisSpeeds.vyMetersPerSecond, m_chassisSpeeds.vxMetersPerSecond,
     // m_chassisSpeeds.omegaRadiansPerSecond);
-
 
     if (Robot.count % 20 == 1) {
       for (SwerveModule mod : swerveModules) {
@@ -343,8 +322,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   // private String chop(String s) {
-  //   // returns the string after removing the last character
-  //   return s.substring(0, s.length() - 1);
+  // // returns the string after removing the last character
+  // return s.substring(0, s.length() - 1);
   // }
 
   public double getAngleForModule(SwerveModule module, SwerveModuleState state) {
@@ -491,7 +470,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("FR POS", frP);
     // SmartDashboard.putNumber("BR POS", brP);
     // SmartDashboard.putNumber("BL POS", blP);
-    // 
+    //
     // The postition is in meters
     return new SwerveModulePosition[] {
         new SwerveModulePosition(flP, flA),
