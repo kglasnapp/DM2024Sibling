@@ -20,8 +20,9 @@ public class SwerveModule {
   public static final double TURBO = 1;
   public static final double NORMAL = 5;
   public static final double PRECISION = 10;
+  public static final double DEFAULT = TURBO;
 
-  private static double powerRatio = SwerveModule.TURBO;
+  private static double powerRatio = DEFAULT;
 
   public static final double openLoopRamp = 0.25;
   public static final double closedLoopRamp = 0.0;
@@ -108,10 +109,12 @@ public class SwerveModule {
     // lastAngle = getState().angle;
   }
 
+  // FIXME: This should prob be in drivetrain subsystem
   public static double getPowerRatio() {
     return powerRatio;
   }
 
+  // FIXME: This should prob be in drivetrain subsystem
   public static void setPowerRatio(double powerRatio) {
     SwerveModule.powerRatio = powerRatio;
   }

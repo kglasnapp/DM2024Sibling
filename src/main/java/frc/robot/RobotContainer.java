@@ -86,16 +86,16 @@ public class RobotContainer {
   private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 1.0);
 
   public static SendableChooser<Boolean> autonomousAim = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserFirtWait = new SendableChooser<>();
+  public static SendableChooser<Integer> autonomousChooserFirstWait = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserFirstStep = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
   public PoseSubsystem poseSubsystem;
   public static CoralSubsystem coralSubsystem = new CoralSubsystem();
   public TiltSubsystem tilt = new TiltSubsystem();
 
+  // TODO: Move these to a separate file
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
   public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));
-
   public final static Pose2d BLUE_AMP = new Pose2d(72.5, 323, new Rotation2d(Math.toRadians(270)));
   public final static Pose2d RED_AMP = new Pose2d(578.77, 323, new Rotation2d(Math.toRadians(270)));
 
@@ -113,13 +113,17 @@ public class RobotContainer {
 
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
-        () -> sLY.calculate(-modifyAxis(driveController.getLeftY())
+        () -> sLY.calculate(modifyAxis(driveController.getLeftY())
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
-        () -> sLX.calculate(-modifyAxis(driveController.getLeftX())
+        () -> sLX.calculate(modifyAxis(driveController.getLeftX())
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
         () -> sRX.calculate(-modifyAxis(driveController.getRightX())
             * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
-        driveController.y()));// Set precision based upon left bumper
+        // Set precision based upon left bumper
+        // Not used, currently implemented with separate commands
+        driveController.y(),
+        // Set robot oriented control based upon left bumper
+        driveController.leftBumper()));
 
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();

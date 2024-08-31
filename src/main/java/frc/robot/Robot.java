@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // cmd = RobotContainer.autonomousChooser.getSelected();
-    Integer firstStepWait = RobotContainer.autonomousChooserFirtWait.getSelected();
+    Integer firstStepWait = RobotContainer.autonomousChooserFirstWait.getSelected();
     boolean autoAim = RobotContainer.autonomousAim.getSelected();
     Integer firstStep = RobotContainer.autonomousChooserFirstStep.getSelected();
     Integer lastStep = RobotContainer.autonomousChooserLastStep.getSelected();
