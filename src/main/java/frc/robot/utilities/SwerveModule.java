@@ -1,11 +1,11 @@
 package frc.robot.utilities;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
@@ -13,8 +13,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
 
@@ -122,7 +120,7 @@ public class SwerveModule {
     // Custom optimize command, since default WPILib optimize assumes continuous
     // controller which
     // REV and CTRE are not
-    desiredState = OnboardModuleState.optimize(desiredState, getState().angle);
+    desiredState = SwerveModuleState.optimize(desiredState, getAngle());
     setAngle(desiredState);
     setSpeed(desiredState, false);
   }
@@ -159,6 +157,9 @@ public class SwerveModule {
     angleController.setFF(angleKFF);
 
     angleController.setFeedbackDevice(integratedAngleEncoder);
+    angleController.setPositionPIDWrappingEnabled(true);
+    angleController.setPositionPIDWrappingMinInput(-180);
+    angleController.setPositionPIDWrappingMaxInput(180);
 
     angleMotor.enableVoltageCompensation(voltageComp);
     angleMotor.burnFlash();
@@ -184,6 +185,7 @@ public class SwerveModule {
 
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
+      // FIXME: Do we even need this?
       double percentOutput = desiredState.speedMetersPerSecond / DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND;
       driveMotor.set(percentOutput / 20);
     } else {
@@ -200,10 +202,9 @@ public class SwerveModule {
   int resetIteration = 0;
 
   private void setAngle(SwerveModuleState desiredState) {
-    double desiredAngle = desiredState.angle.getDegrees();
-    // double currentAngle = integratedAngleEncoder.getPosition();
+    // Sync relative encoder with absolute encoder every 5 seconds
     if (integratedAngleEncoder.getVelocity() < 0.5) {
-      if (++resetIteration >= 500) {
+      if (++resetIteration >= 250) {
         resetIteration = 0;
 
         double absoluteAngle = getCanCoder().getDegrees();
@@ -213,9 +214,8 @@ public class SwerveModule {
       resetIteration = 0;
     }
 
-    double angle = desiredAngle; // + (currentAngle - currentAngle % 360);
-
-    angleController.setReference(angle, CANSparkBase.ControlType.kPosition);
+    double desiredAngle = desiredState.angle.getDegrees();
+    angleController.setReference(desiredAngle, CANSparkBase.ControlType.kPosition);
   }
 
   public Rotation2d getAngle() {
