@@ -32,6 +32,9 @@ public final class Constants {
      */
     public static final double DRIVETRAIN_TRACK_LENGTH = Units.inchesToMeters(24.75);
 
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
+    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 7; // FIXed Set front left module drive motor ID
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 8; // FIXed Set front left module steer motor ID
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 7; // FIXed Set front left steer encoder ID

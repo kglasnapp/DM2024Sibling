@@ -12,7 +12,7 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -24,9 +24,6 @@ public class SwerveModule {
   public static final double PRECISION = 10;
 
   private static double powerRatio = SwerveModule.TURBO;
-
-  public static final double wheelDiameter = Units.inchesToMeters(4.0);
-  public static final double wheelCircumference = wheelDiameter * Math.PI;
 
   public static final double openLoopRamp = 0.25;
   public static final double closedLoopRamp = 0.0;
@@ -90,7 +87,7 @@ public class SwerveModule {
   public SwerveModule(int moduleNumber, SwerveModuleType swerve_type, SwerveModuleIds moduleConstants) {
     this.moduleNumber = moduleNumber;
 
-    driveConversionPositionFactor = (wheelDiameter * Math.PI) * swerve_type.driveGearRatio;
+    driveConversionPositionFactor = Constants.WHEEL_CIRCUMFERENCE * swerve_type.driveGearRatio;
     driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
     angleConversionFactor = 360.0 * swerve_type.angleGearRatio;
 
@@ -211,50 +208,14 @@ public class SwerveModule {
 
         double absoluteAngle = getCanCoder().getDegrees();
         integratedAngleEncoder.setPosition(absoluteAngle % 360);
-        // currentAngle = absoluteAngle;
-        // System.out.println("***** Reset Module "+moduleNumber+" angleMotorId =
-        // "+angleMotor.getDeviceId()+" absolute angle = "+absoluteAngle+ " integrated
-        // angle = "+integratedAngleEncoder.getPosition());
       }
     } else {
       resetIteration = 0;
     }
 
-    // Prevent rotating module if speed is less then 1%. Prevents jittering.
-    // Rotation2d angle =
-    // (Math.abs(desiredState.speedMetersPerSecond) <= ( 0.01))
-    // ? lastAngle
-    // : desiredState.angle;
-    // double currentAngleMod = currentAngle % (360);
-    // if (currentAngleMod < 0.0) {
-    // currentAngleMod += 360;
-    // }
-    // double adjustedReferenceAngle = desiredAngle + currentAngle -
-    // currentAngleMod;
-    // // if (desiredState.angle.getDegrees() - currentAngleMod > 180) {
-    // // adjustedReferenceAngle -= 360;
-    // // } else if (desiredAngle - currentAngleMod < -180) {
-    // // adjustedReferenceAngle += 360;
-    // // }
-
     double angle = desiredAngle; // + (currentAngle - currentAngle % 360);
 
-    if (Robot.count % 20 == 0) {
-
-      // System.out.println("Module "+moduleNumber+" setting angle
-      // "+desiredState.angle.getDegrees());
-    }
-
     angleController.setReference(angle, CANSparkBase.ControlType.kPosition);
-
-    if (Robot.count % 10 == 0) {
-      double cancoderAngle = integratedAngleEncoder.getPosition();
-      if (Math.abs(angle - cancoderAngle) > 2.5) {
-        // Util.logf("Module %d set point:%.3f angle %.3f\n ", moduleNumber, angle,
-        // integratedAngleEncoder.getPosition());
-      }
-    }
-    // lastAngle = Rotation2d.fromDegrees(angle);
   }
 
   public Rotation2d getAngle() {
