@@ -80,9 +80,10 @@ public class RobotContainer {
   public final static XboxController operatorHID = operatorController.getHID();
   public final static XboxController driveHID = driveController.getHID();
 
-  private SlewRateLimiter sLX = new SlewRateLimiter(15);
-  private SlewRateLimiter sLY = new SlewRateLimiter(15);
-  private SlewRateLimiter sRX = new SlewRateLimiter(15);
+  // Second number is seconds to reach max speed
+  private SlewRateLimiter sLX = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
+  private SlewRateLimiter sLY = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
+  private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 1.0);
 
   public static SendableChooser<Boolean> autonomousAim = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserFirtWait = new SendableChooser<>();
@@ -112,12 +113,12 @@ public class RobotContainer {
 
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
-        () -> (-modifyAxis((sLY.calculate(driveController.getLeftY())))
+        () -> sLY.calculate(-modifyAxis(driveController.getLeftY())
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
-        () -> -modifyAxis((sLX.calculate(driveController.getLeftX())))
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-        () -> (-modifyAxis((sRX.calculate(driveController.getRightX())))
+        () -> sLX.calculate(-modifyAxis(driveController.getLeftX())
             * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
+        () -> sRX.calculate(-modifyAxis(driveController.getRightX())
+            * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
         driveController.y()));// Set precision based upon left bumper
 
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
