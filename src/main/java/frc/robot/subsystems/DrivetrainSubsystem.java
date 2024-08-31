@@ -107,7 +107,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   SwerveModule swerveModules[];
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-  public static boolean speedsComeFromController = true;
 
   public DrivetrainSubsystem() {
     // ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -275,12 +274,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    drive(chassisSpeeds, false);
-  }
-
-  public void drive(ChassisSpeeds chassisSpeeds, boolean speedsComeFromController) {
     m_chassisSpeeds = chassisSpeeds;
-    DrivetrainSubsystem.speedsComeFromController = speedsComeFromController;
   }
 
   // Read the absolute values from the cancoder

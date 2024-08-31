@@ -114,13 +114,7 @@ public class SwerveModule {
   }
 
   public static double getPowerRatio() {
-    if (RobotContainer.driveHID.getLeftBumper() ||
-        RobotContainer.driveHID.getLeftTriggerAxis() > 0.1 ||
-        DrivetrainSubsystem.speedsComeFromController) {
-      return 600;
-    }
     return powerRatio;
-    // return 600;
   }
 
   public static void setPowerRatio(double powerRatio) {
