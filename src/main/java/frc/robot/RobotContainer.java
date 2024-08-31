@@ -80,7 +80,8 @@ public class RobotContainer {
   public final static XboxController operatorHID = operatorController.getHID();
   public final static XboxController driveHID = driveController.getHID();
 
-  // Second number is seconds to reach max speed
+  // Rate limit is in meters/per second/per second (acceleration)
+  // Formula: MAX_SPEED / TIME_TO_ACCELERATE
   private SlewRateLimiter sLX = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
   private SlewRateLimiter sLY = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
   private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 1.0);
@@ -111,6 +112,9 @@ public class RobotContainer {
     // Set the default Robot Mode to Cube
     logf("creating RobotContainer\n");
 
+    // Controller inputs range from -1.0 -> 1.0
+    // Drive train operates in meters per second
+    // modifyAxis: deadband compensation
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
         () -> sLY.calculate(modifyAxis(driveController.getLeftY())
@@ -282,12 +286,12 @@ public class RobotContainer {
     driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11, false, 0));
   }
 
-  private static double deadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
+  private static double deadBand(double value, double deadBand) {
+    if (Math.abs(value) > deadBand) {
       if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
+        return (value - deadBand) / (1.0 - deadBand);
       } else {
-        return (value + deadband) / (1.0 - deadband);
+        return (value + deadBand) / (1.0 - deadBand);
       }
     } else {
       return 0.0;
@@ -295,8 +299,12 @@ public class RobotContainer {
   }
 
   private static double modifyAxis(double value) {
-    value = deadband(value, 0.08);
-    value = Math.copySign(value * value, value); // Square the axis
+    value = deadBand(value, Constants.CONTROLLER_DEAD_BAND);
+
+    // Apply polynomial shaping to input
+    // Reduces sensitivity when stick is close to center
+    value = Math.copySign(Math.pow(value, Constants.CONTROLLER_SENSITIVITY), value);
+
     return value;
   }
 }

@@ -51,6 +51,13 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 4; // FIXed Set back right steer motor ID
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 3; // FIXed Set back right steer encoder ID
 
+    // Larger numbers -> less sensitive to small changes in input
+    // 1.0 = Linear
+    // 2.0 = Squared
+    // Should be a float greater than 1.0
+    public static final double CONTROLLER_SENSITIVITY = 2.0;
+    public static final double CONTROLLER_DEAD_BAND = 0.08;
+
     public static boolean logging = false;
 
     // FIXME: None of these are referenced
