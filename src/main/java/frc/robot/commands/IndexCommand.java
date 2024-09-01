@@ -7,13 +7,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class IntakeNoteCommand extends Command {
-    IntakeSubsystem intakeSubsystem;
+public class IndexCommand extends Command {
     IndexerSubsystem indexerSubsystem;
     long startTime;
 
-    public IntakeNoteCommand(IntakeSubsystem intakeSubsystem, IndexerSubsystem indexerSubsystem) {
-        this.intakeSubsystem = intakeSubsystem;
+    public IndexCommand(IndexerSubsystem indexerSubsystem) {
         this.indexerSubsystem = indexerSubsystem;
         // addRequirements(intakeSubsystem);
         // addRequirements(indexerSubsystem);
@@ -22,9 +20,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void initialize() {
         startTime = RobotController.getFPGATime();
-        intakeSubsystem.intakeIn();
         indexerSubsystem.setSpeed(.3);
-        logf("Start Intake\n");
     }
 
     @Override
@@ -34,10 +30,7 @@ public class IntakeNoteCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        long elapsedTime = RobotController.getFPGATime() - startTime;
-        logf("Intake complete saw a note at %.1f seconds\n", elapsedTime / 1000000.0);
         indexerSubsystem.setSpeed(0);
-        intakeSubsystem.stop();
     }
 
     @Override

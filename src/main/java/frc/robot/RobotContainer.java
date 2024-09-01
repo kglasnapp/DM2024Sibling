@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -37,14 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.ChangeNormalModeCommand;
-import frc.robot.commands.ChangeTurboModeCommand;
-import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.IntakeNoteCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.TiltHomeCommand;
-import frc.robot.commands.TiltManualCommand;
-import frc.robot.commands.TiltSetAngleCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -53,6 +46,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TiltSubsystem;
+import frc.robot.commands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -82,9 +76,9 @@ public class RobotContainer {
 
   // Rate limit is in meters/per second/per second (acceleration)
   // Formula: MAX_SPEED / TIME_TO_ACCELERATE
-  private SlewRateLimiter sLX = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
-  private SlewRateLimiter sLY = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 1.0);
-  private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 1.0);
+  private SlewRateLimiter sLX = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sLY = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
   public static SendableChooser<Boolean> autonomousAim = new SendableChooser<>();
   public static SendableChooser<Integer> autonomousChooserFirstWait = new SendableChooser<>();
@@ -194,76 +188,77 @@ public class RobotContainer {
   }
 
   // TODO this method need a lot of work
-  public void calibrateShooter(CommandXboxController controller) {
-    controller.pov(0).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = tilt.getTiltAngle();
-        tilt.setTiltAngle(currentAngle - 0.5);
-        logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
-      }
+  // public void calibrateShooter(CommandXboxController controller) {
+  //   controller.pov(0).onTrue(new Command() {
+  //     @Override
+  //     public void initialize() {
+  //       double currentAngle = tilt.getTiltAngle();
+  //       tilt.setTiltAngle(currentAngle - 0.5);
+  //       logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
+  //     }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  //     @Override
+  //     public boolean isFinished() {
+  //       return true;
+  //     }
+  //   });
 
-    controller.pov(90).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        shooterSubsystem.setAllShooterPower(1.0);
-      }
+  //   controller.pov(90).onTrue(new Command() {
+  //     @Override
+  //     public void initialize() {
+  //       shooterSubsystem.setAllShooterPower(1.0);
+  //     }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  //     @Override
+  //     public boolean isFinished() {
+  //       return true;
+  //     }
+  //   });
 
-    controller.pov(180).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = tilt.getTiltAngle();
-        tilt.setTiltAngle(currentAngle + 0.5);
-        logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
-      }
+  //   controller.pov(180).onTrue(new Command() {
+  //     @Override
+  //     public void initialize() {
+  //       double currentAngle = tilt.getTiltAngle();
+  //       tilt.setTiltAngle(currentAngle + 0.5);
+  //       logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
+  //     }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  //     @Override
+  //     public boolean isFinished() {
+  //       return true;
+  //     }
+  //   });
 
-    controller.pov(270).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        // grabberSubsystem.grabberOut();
-        logf("Shooting at %.2f distance with %.2f angle\n",
-            // ShootToSpeakerCommand.distance(BLUE_SPEAKER, limeLightPoseSubsystem.get()),
-            tilt.getTiltAngle());
-      }
+  //   controller.pov(270).onTrue(new Command() {
+  //     @Override
+  //     public void initialize() {
+  //       // grabberSubsystem.grabberOut();
+  //       logf("Shooting at %.2f distance with %.2f angle\n",
+  //           // ShootToSpeakerCommand.distance(BLUE_SPEAKER, limeLightPoseSubsystem.get()),
+  //           tilt.getTiltAngle());
+  //     }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
-  }
+  //     @Override
+  //     public boolean isFinished() {
+  //       return true;
+  //     }
+  //   });
+  // }
 
-  public void configureDriverController(CommandXboxController controller) {
-    controller.back().whileTrue(new RunCommand(new Runnable() {
+  public void configureDriverController(CommandXboxController driverController) {
+    driverController.back().whileTrue(new RunCommand(new Runnable() {
       public void run() {
         drivetrainSubsystem.zeroGyroscope();
       }
     }));
-
-    controller.x().onTrue(
+    driverController.x().onTrue(
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
-
-    controller.y().onTrue(
-        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem));
-
+    driverController.y().onTrue(
+        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
+    driverController.a().onTrue(
+        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, .5));
+    driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
+    //driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
     // driveController.rightTrigger().onTrue(
     // new ChangeNormalModeCommand());
 
@@ -275,14 +270,19 @@ public class RobotContainer {
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
     opController.back().onTrue(new TiltHomeCommand(tilt));
-    opController.x().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
+    opController.povRight().whileTrue(new TiltSetAngleCommand(tilt, 30.0));
+    opController.povDown().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
+    opController.povUp().whileTrue(new TiltSetAngleCommand(tilt, 92.0));
+    opController.povLeft().whileTrue(new TiltSetAngleCommand(tilt, 55.0));
+    opController.x().whileTrue(new IndexCommand(indexerSubsystem));
+    opController.y().whileTrue(new IntakeCommand(intakeSubsystem));
     opController.leftBumper().onTrue(new TiltManualCommand(tilt, false)); // Send shooter down
     opController.rightBumper().onTrue(new TiltManualCommand(tilt, true)); // Send shooter up
   }
 
-  public void testAutonomous() {
-    driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11, false, 0));
-  }
+  // public void testAutonomous() {
+  //   driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11, false, 0));
+  // }
 
   private static double deadBand(double value, double deadBand) {
     if (Math.abs(value) > deadBand) {

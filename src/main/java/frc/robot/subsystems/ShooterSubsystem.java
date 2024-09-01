@@ -114,6 +114,11 @@ public class ShooterSubsystem extends SubsystemBase {
         lowerMotor.setSpeed(power);
     }
 
+    public void stop() {
+        upperMotor.setSpeed(0);
+        lowerMotor.setSpeed(0);
+    }
+
     public boolean isShooterAtSpeed(double desired) {
         double upSpeed = Math.abs(upperMotor.getVelocity());
         double lowSpeed = Math.abs(lowerMotor.getVelocity());
@@ -129,7 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
 
-    int lastPOV = -1;
+    //int lastPOV = -1;
 
     @Override
     public void periodic() {
@@ -140,24 +145,24 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Motor Pos", lowerMotor.getPosition());
         // }
 
-        int pov = RobotContainer.operatorController.getHID().getPOV();
-        double value = 0;
-        if ((lastPOV != pov) && (pov >= 0)) {
-            if (pov == 0) {
-                value = 0.0;
-            }
-            if (pov == 90) {
-                value = 0.1;
-            }
-            if (pov == 180) {
-                value = 0.6;
-            }
-            if (pov == 270) {
-                value = 0.9;
-            }
-            upperMotor.setSpeed(value);
-            lowerMotor.setSpeed(value);
-            lastPOV = pov;
-        }
+        //int pov = RobotContainer.operatorController.getHID().getPOV();
+        //double value = 0;
+        // if ((lastPOV != pov) && (pov >= 0)) {
+        //     if (pov == 0) {
+        //         value = 0.0;
+        //     }
+        //     if (pov == 90) {
+        //         value = 0.1;
+        //     }
+        //     if (pov == 180) {
+        //         value = 0.6;
+        //     }
+        //     if (pov == 270) {
+        //         value = 0.9;
+        //     }
+        //     upperMotor.setSpeed(value);
+        //     lowerMotor.setSpeed(value);
+        //     lastPOV = pov;
+        // }
     }
 }

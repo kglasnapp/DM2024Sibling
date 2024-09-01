@@ -138,7 +138,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
             field2d.setRobotPose(get());
         }
         if (Robot.count % 250 == 0) {
-            logf("Pose %s yaw:%.2f\n", getFormattedPose());
+            logf("Pose %s\n", getFormattedPose());
         }
     }
 

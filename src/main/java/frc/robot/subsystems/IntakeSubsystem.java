@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
         motor.setSpeed(.9);
     }
 
-    public void intakeStop() {
+    public void stop() {
         motor.setSpeed(0);
     }
 
@@ -73,25 +73,25 @@ public class IntakeSubsystem extends SubsystemBase {
         if (Robot.count % 5 == 0) {
             SmartDashboard.putNumber("Intake Speed", motor.getVelocity());
         }
-        int pov = RobotContainer.driveController.getHID().getPOV();
-        double value = 0;
-        if ((lastPOV != pov) && (pov >= 0)) {
-            if (pov == 0) {
-                value = 0.0;
-            }
-            if (pov == 90) {
-                value = 0.25;
-            }
-            if (pov == 180) {
-                value = 0.65;
-            }
-            if (pov == 270) {
-                value = 0.9;
-            }
-            motor.setSpeed(value);
-            lastPOV = pov;
-        } else if (lastPOV != pov) {
-            lastPOV = pov;
-        }
+        // int pov = RobotContainer.driveController.getHID().getPOV();
+        // double value = 0;
+        // if ((lastPOV != pov) && (pov >= 0)) {
+        //     if (pov == 0) {
+        //         value = 0.0;
+        //     }
+        //     if (pov == 90) {
+        //         value = 0.25;
+        //     }
+        //     if (pov == 180) {
+        //         value = 0.65;
+        //     }
+        //     if (pov == 270) {
+        //         value = 0.9;
+        //     }
+        //     motor.setSpeed(value);
+        //     lastPOV = pov;
+        // } else if (lastPOV != pov) {
+        //     lastPOV = pov;
+        // }
     }
 }
