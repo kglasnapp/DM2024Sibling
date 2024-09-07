@@ -28,27 +28,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // The maximum voltage that will be delivered to the drive motors.
   public static final double MAX_VOLTAGE = 12.0;
 
-  /**
-   * The maximum velocity of the robot in meters per second.
-   * <p>
-   * This is a measure of how fast the robot should be able to drive in a straight
-   * line.
-   * 
-   * Uses Mk4i for gear ratio as it is slowed than the Mk4n
-   * The formula for calculating the theoretical maximum velocity is:
-   * <Motor Free Speed RPM> / 60 * <Gear Ratio> * <Wheel Circumference Meters>
-   */
-  public static final double MAX_VELOCITY_METERS_PER_SECOND = 5880.0 / 60.0 * SwerveModuleType.Mk4iL2.driveGearRatio
-      * Constants.WHEEL_CIRCUMFERENCE;
-
-  /**
-   * The maximum angular velocity of the robot in radians per second.
-   * <p>
-   * This is a measure of how fast the robot can rotate in place.
-   */
-  public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-      Math.hypot(DRIVETRAIN_TRACK_WIDTH / 2.0, DRIVETRAIN_TRACK_LENGTH / 2.0);
-
   public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       // Front left
       new Translation2d(DRIVETRAIN_TRACK_WIDTH / 2.0, DRIVETRAIN_TRACK_LENGTH / 2.0),
@@ -171,7 +150,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY_METERS_PER_SECOND);
 
     m_frontLeftModule.setDesiredState(states[0]);
     m_frontRightModule.setDesiredState(states[1]);
@@ -216,4 +195,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     };
   }
 
+  public ChassisSpeeds getChassisSpeeds() {
+    return m_chassisSpeeds;
+  }
 }

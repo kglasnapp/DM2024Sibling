@@ -66,7 +66,7 @@ public class RobotContainer {
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  public final static IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   public final static CommandXboxController driveController = new CommandXboxController(2);
@@ -76,14 +76,10 @@ public class RobotContainer {
 
   // Rate limit is in meters/per second/per second (acceleration)
   // Formula: MAX_SPEED / TIME_TO_ACCELERATE
-  private SlewRateLimiter sLX = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
-  private SlewRateLimiter sLY = new SlewRateLimiter(DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
-  private SlewRateLimiter sRX = new SlewRateLimiter(DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
+  private SlewRateLimiter sLX = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sLY = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sRX = new SlewRateLimiter(Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
-  public static SendableChooser<Boolean> autonomousAim = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserFirstWait = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserFirstStep = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
   public PoseSubsystem poseSubsystem;
   public static CoralSubsystem coralSubsystem = new CoralSubsystem();
   public TiltSubsystem tilt = new TiltSubsystem();
@@ -111,11 +107,11 @@ public class RobotContainer {
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
         () -> sLY.calculate(modifyAxis(driveController.getLeftY())
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
+            * Constants.MAX_VELOCITY_METERS_PER_SECOND),
         () -> sLX.calculate(modifyAxis(driveController.getLeftX())
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
+            * Constants.MAX_VELOCITY_METERS_PER_SECOND),
         () -> sRX.calculate(-modifyAxis(driveController.getRightX())
-            * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
+            * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
         // Set precision based upon left bumper
         driveController.leftBumper(),
         // Set robot oriented control based upon left bumper
@@ -124,7 +120,9 @@ public class RobotContainer {
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();
     configureDashboard();
-    autonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
+    
+    // This needs to be initialized after everything else
+    autonomous = new Autonomous(this);
   }
 
   void homeAllSubsystems() {

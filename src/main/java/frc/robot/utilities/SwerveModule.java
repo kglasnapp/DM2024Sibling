@@ -13,7 +13,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
 
 public class SwerveModule {
@@ -189,7 +188,7 @@ public class SwerveModule {
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
       // FIXME: Do we even need this?
-      double percentOutput = desiredState.speedMetersPerSecond / DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND;
+      double percentOutput = desiredState.speedMetersPerSecond / Constants.MAX_VELOCITY_METERS_PER_SECOND;
       driveMotor.set(percentOutput / 20);
     } else {
       double desiredSpeed = desiredState.speedMetersPerSecond / getPowerRatio();

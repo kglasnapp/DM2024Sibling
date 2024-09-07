@@ -86,50 +86,54 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                     poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
             LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
 
-            // if our angular velocity is greater than 720 degrees per second,
-            // ignore vision updates
-            if (Math.abs(drivetrainSubsystem.getGyroscopeRotationRate()) > 720) {
-                doRejectUpdate = true;
-            }
-            if (mt2.tagCount == 0) {
-                doRejectUpdate = true;
-            }
-            if (!doRejectUpdate) {
-                if (!assumeNextVisionPose) {
-                    poseEstimator.addVisionMeasurement(
-                            mt2.pose,
-                            mt2.timestampSeconds);
-                } else {
-                    setCurrentPose(mt2.pose);
-                    assumeNextVisionPose = false;
+            if (mt2 != null) {
+                // if our angular velocity is greater than 720 degrees per second,
+                // ignore vision updates
+                if (Math.abs(drivetrainSubsystem.getGyroscopeRotationRate()) > 720) {
+                    doRejectUpdate = true;
+                }
+                if (mt2.tagCount == 0) {
+                    doRejectUpdate = true;
+                }
+                if (!doRejectUpdate) {
+                    if (!assumeNextVisionPose) {
+                        poseEstimator.addVisionMeasurement(
+                                mt2.pose,
+                                mt2.timestampSeconds);
+                    } else {
+                        setCurrentPose(mt2.pose);
+                        assumeNextVisionPose = false;
+                    }
                 }
             }
         } else {
             LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
 
-            // More rigorous checks when only one april tag is seen
-            if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-                if (mt1.rawFiducials[0].ambiguity > .7) {
+            if (mt1 != null) {
+                // More rigorous checks when only one april tag is seen
+                if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+                    if (mt1.rawFiducials[0].ambiguity > .7) {
+                        doRejectUpdate = true;
+                    }
+                    if (mt1.rawFiducials[0].distToCamera > 3) {
+                        doRejectUpdate = true;
+                    }
+                }
+
+                // Ignore spurious updates with no april tags visible
+                if (mt1.tagCount == 0) {
                     doRejectUpdate = true;
                 }
-                if (mt1.rawFiducials[0].distToCamera > 3) {
-                    doRejectUpdate = true;
-                }
-            }
 
-            // Ignore spurious updates with no april tags visible
-            if (mt1.tagCount == 0) {
-                doRejectUpdate = true;
-            }
-
-            if (!doRejectUpdate) {
-                if (!assumeNextVisionPose) {
-                    poseEstimator.addVisionMeasurement(
-                            mt1.pose,
-                            mt1.timestampSeconds);
-                } else {
-                    setCurrentPose(mt1.pose);
-                    assumeNextVisionPose = false;
+                if (!doRejectUpdate) {
+                    if (!assumeNextVisionPose) {
+                        poseEstimator.addVisionMeasurement(
+                                mt1.pose,
+                                mt1.timestampSeconds);
+                    } else {
+                        setCurrentPose(mt1.pose);
+                        assumeNextVisionPose = false;
+                    }
                 }
             }
         }
