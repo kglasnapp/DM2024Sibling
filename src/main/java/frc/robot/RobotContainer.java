@@ -29,12 +29,19 @@ package frc.robot;
 
 import static frc.robot.Util.logf;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -94,6 +101,8 @@ public class RobotContainer {
   public Autonomous autonomous;
   public boolean hasBeenHomed = false;
 
+  //private final SendableChooser<Command> autoChooser;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -118,11 +127,47 @@ public class RobotContainer {
         driveController.rightBumper()));
 
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
+
+
+    // This needs to be initialized after everything else
+    // autonomous = new Autonomous(this);
+
+    // NamedCommands.registerCommand("intake",
+    //     new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
+    // NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(shooterSubsystem,
+    //     indexerSubsystem, tilt, .55, 55));
+    // NamedCommands.registerCommand("homeShooter", null);
+    // NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(shooterSubsystem,
+    //     indexerSubsystem, tilt, .55, 10));
+
+    AutoBuilder.configureHolonomic(
+        poseSubsystem::get,
+        poseSubsystem::setCurrentPose,
+        drivetrainSubsystem::getChassisSpeeds,
+        drivetrainSubsystem::drive,
+        Constants.PATH_FOLLOWER_CONFIG,
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        // Reference to this subsystem to set requirements
+        drivetrainSubsystem);
+
+    FollowPathCommand.warmupCommand().schedule();
+
+    // autoChooser = AutoBuilder.buildAutoChooser("Speaker5Auto");
+    // SmartDashboard.putData(autoChooser);
+
     configureButtonBindings();
     configureDashboard();
-    
-    // This needs to be initialized after everything else
-    autonomous = new Autonomous(this);
   }
 
   void homeAllSubsystems() {
@@ -187,60 +232,61 @@ public class RobotContainer {
 
   // TODO this method need a lot of work
   // public void calibrateShooter(CommandXboxController controller) {
-  //   controller.pov(0).onTrue(new Command() {
-  //     @Override
-  //     public void initialize() {
-  //       double currentAngle = tilt.getTiltAngle();
-  //       tilt.setTiltAngle(currentAngle - 0.5);
-  //       logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
-  //     }
+  // controller.pov(0).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // double currentAngle = tilt.getTiltAngle();
+  // tilt.setTiltAngle(currentAngle - 0.5);
+  // logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
+  // }
 
-  //     @Override
-  //     public boolean isFinished() {
-  //       return true;
-  //     }
-  //   });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-  //   controller.pov(90).onTrue(new Command() {
-  //     @Override
-  //     public void initialize() {
-  //       shooterSubsystem.setAllShooterPower(1.0);
-  //     }
+  // controller.pov(90).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // shooterSubsystem.setAllShooterPower(1.0);
+  // }
 
-  //     @Override
-  //     public boolean isFinished() {
-  //       return true;
-  //     }
-  //   });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-  //   controller.pov(180).onTrue(new Command() {
-  //     @Override
-  //     public void initialize() {
-  //       double currentAngle = tilt.getTiltAngle();
-  //       tilt.setTiltAngle(currentAngle + 0.5);
-  //       logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
-  //     }
+  // controller.pov(180).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // double currentAngle = tilt.getTiltAngle();
+  // tilt.setTiltAngle(currentAngle + 0.5);
+  // logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
+  // }
 
-  //     @Override
-  //     public boolean isFinished() {
-  //       return true;
-  //     }
-  //   });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-  //   controller.pov(270).onTrue(new Command() {
-  //     @Override
-  //     public void initialize() {
-  //       // grabberSubsystem.grabberOut();
-  //       logf("Shooting at %.2f distance with %.2f angle\n",
-  //           // ShootToSpeakerCommand.distance(BLUE_SPEAKER, limeLightPoseSubsystem.get()),
-  //           tilt.getTiltAngle());
-  //     }
+  // controller.pov(270).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // // grabberSubsystem.grabberOut();
+  // logf("Shooting at %.2f distance with %.2f angle\n",
+  // // ShootToSpeakerCommand.distance(BLUE_SPEAKER,
+  // limeLightPoseSubsystem.get()),
+  // tilt.getTiltAngle());
+  // }
 
-  //     @Override
-  //     public boolean isFinished() {
-  //       return true;
-  //     }
-  //   });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
   // }
 
   public void configureDriverController(CommandXboxController driverController) {
@@ -253,22 +299,25 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
     driverController.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
-    driverController.a().onTrue(
-        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, .5));
+    driverController.a().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
     driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
-    //driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
+    // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
+    // indexerSubsystem, intakeSubsystem));
     // driveController.rightTrigger().onTrue(
     // new ChangeNormalModeCommand());
 
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
-
+    // driverController.a().whileTrue(getAutonomousCommand());
   }
 
+  public Command getAutonomousCommand() {
+    return new PathPlannerAuto("Speaker5Auto");
+  }
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
     opController.back().onTrue(new TiltHomeCommand(tilt));
-    opController.povRight().whileTrue(new TiltSetAngleCommand(tilt, 30.0));
+    opController.povRight().whileTrue(new TiltSetAngleCommand(tilt, 30.5));
     opController.povDown().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
     opController.povUp().whileTrue(new TiltSetAngleCommand(tilt, 92.0));
     opController.povLeft().whileTrue(new TiltSetAngleCommand(tilt, 55.0));
@@ -279,7 +328,8 @@ public class RobotContainer {
   }
 
   // public void testAutonomous() {
-  //   driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11, false, 0));
+  // driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11,
+  // false, 0));
   // }
 
   private static double deadBand(double value, double deadBand) {

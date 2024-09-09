@@ -60,16 +60,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public DrivetrainSubsystem() {
     m_frontLeftModule = new SwerveModule(0, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
-        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER));
+        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
 
     m_frontRightModule = new SwerveModule(1, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
-        FRONT_RIGHT_MODULE_DRIVE_MOTOR, FRONT_RIGHT_MODULE_STEER_MOTOR, FRONT_RIGHT_MODULE_STEER_ENCODER));
-
-    m_backLeftModule = new SwerveModule(2, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
         BACK_LEFT_MODULE_DRIVE_MOTOR, BACK_LEFT_MODULE_STEER_MOTOR, BACK_LEFT_MODULE_STEER_ENCODER));
 
+    m_backLeftModule = new SwerveModule(2, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
+        FRONT_RIGHT_MODULE_DRIVE_MOTOR, FRONT_RIGHT_MODULE_STEER_MOTOR, FRONT_RIGHT_MODULE_STEER_ENCODER));
+
     m_backRightModule = new SwerveModule(3, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
-        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
+        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER));
 
     swerveModules = new SwerveModule[] {
         m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule
@@ -83,19 +83,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public void zeroGyroscope() {
     // FIXed Uncomment if you are using a NavX
-    logf("zero Gyro DT\n");
+    //TODO: calibrate magneto navx
     if (m_navx.isMagnetometerCalibrated()) {
-      // // We will only get valid fused headings if the magnetometer is calibrated
-      // System.out.println("returning the angle FUSE ZERO from the robot:
-      // "+m_navx.getAngle());
-      // TODO need to adjust the gyro angle
+      // We will only get valid fused headings if the magnetometer is calibrated
+      //System.out.println("returning the angle FUSE ZERO from the robot:
+      //"+m_navx.getAngle());
+      //TODO need to adjust the gyro angle
       zeroNavx = m_navx.getFusedHeading();
     } else {
-      zeroNavx = 0;
+     zeroNavx = -90;
     }
 
     // m_navx.reset();
     m_navx.zeroYaw();
+    logf("zero Gyro DT zeroNavs: %.2f, fused headig: %.2f\n", zeroNavx, m_navx.getFusedHeading());
   }
 
   double zeroNavx = 0.0;
@@ -119,7 +120,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // counter-clockwise makes the angle increase.
     // return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
 
-    Rotation2d r = Rotation2d.fromDegrees((-m_navx.getYaw()));
+    Rotation2d r = Rotation2d.fromDegrees(-m_navx.getYaw());
     SmartDashboard.putNumber("Rot NC", r.getDegrees());
     return r;
   }

@@ -31,6 +31,7 @@ public class AmpShotCommand extends Command {
     public AmpShotCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
         this.indexer = indexer;
         this.shooter = shooter;
+        addRequirements(shooter);
     }
 
     public static enum STATE {
@@ -46,6 +47,7 @@ public class AmpShotCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        finished = true;
         logf("Initializing the shooters\n");
         state = STATE.IDLE;
         startTime = RobotController.getFPGATime();

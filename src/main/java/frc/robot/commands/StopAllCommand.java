@@ -27,6 +27,8 @@ public class StopAllCommand extends Command {
         this.indexer = indexer;
         this.shooter = shooter;
         this.intake = intake;
+        addRequirements(intake);
+        addRequirements(shooter);
     }
 
     // Called when the command is initially scheduled.
@@ -36,7 +38,6 @@ public class StopAllCommand extends Command {
 
     @Override
     public void execute() {
-        isFinished();
     }
 
     // Called once the command ends or is interrupted.

@@ -39,16 +39,22 @@
 
 ## Motor IDs
 - Swerve Drive
-  - Front Left:  Drive:7 Steer:8 Cancoder:7
-  - Front Right: Drive:5 Steer:6 Cancoder:5
-  - Back Left:   Drive:1 Steer:2 Cancoder:1
-  - Back Right:  Drive:3 Steer:4 Cancoder:3
+  - Rear Right:  Drive:7 Steer:8 Cancoder:7
+  - Rear Left: Drive:5 Steer:6 Cancoder:5
+  - Front Right:   Drive:1 Steer:2 Cancoder:1
+  - Front Left:  Drive:3 Steer:4 Cancoder:3
 
 - Shooter Left:30 Right:31
 - Indexer:11
 - Note Sensor: DIO-2
 - Intake:21
 
+
+0 inch 55 degrees 100%
+67 inch 38 degrees 100%
+127 in 30.5 degree, 100%
+
+add 39 inch for distance from speaker to april tag
 
 OLD
 Back Left S: -0.861083984375

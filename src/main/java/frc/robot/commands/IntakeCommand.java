@@ -15,7 +15,7 @@ public class IntakeCommand extends Command {
 
     public IntakeCommand(IntakeSubsystem intakeSubsystem) {
         this.intakeSubsystem = intakeSubsystem;
-        // addRequirements(intakeSubsystem);
+        addRequirements(intakeSubsystem);
         // addRequirements(indexerSubsystem);
     }
 

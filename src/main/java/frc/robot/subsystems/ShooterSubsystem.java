@@ -110,6 +110,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setAllShooterPower(double power) {
+        logf("speedPercentage: %.2f", power);
         upperMotor.setSpeed(power);
         lowerMotor.setSpeed(power);
     }
