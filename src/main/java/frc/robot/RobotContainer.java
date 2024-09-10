@@ -99,14 +99,19 @@ public class RobotContainer {
 
   public static RobotContainer instance;
   public Autonomous autonomous;
+  private final SendableChooser<Command> autoChooser;
   public boolean hasBeenHomed = false;
 
-  //private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    RegisterNamedCommands();
+    autoChooser = AutoBuilder.buildAutoChooser("Speaker5Auto");
+    SmartDashboard.putData(autoChooser);
+
     instance = this;
     logf("Creating RobotContainer\n");
 
@@ -127,44 +132,6 @@ public class RobotContainer {
         driveController.rightBumper()));
 
     poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
-
-
-    // This needs to be initialized after everything else
-    // autonomous = new Autonomous(this);
-
-    // NamedCommands.registerCommand("intake",
-    //     new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
-    // NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(shooterSubsystem,
-    //     indexerSubsystem, tilt, .55, 55));
-    // NamedCommands.registerCommand("homeShooter", null);
-    // NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(shooterSubsystem,
-    //     indexerSubsystem, tilt, .55, 10));
-
-    AutoBuilder.configureHolonomic(
-        poseSubsystem::get,
-        poseSubsystem::setCurrentPose,
-        drivetrainSubsystem::getChassisSpeeds,
-        drivetrainSubsystem::drive,
-        Constants.PATH_FOLLOWER_CONFIG,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        // Reference to this subsystem to set requirements
-        drivetrainSubsystem);
-
-    FollowPathCommand.warmupCommand().schedule();
-
-    // autoChooser = AutoBuilder.buildAutoChooser("Speaker5Auto");
-    // SmartDashboard.putData(autoChooser);
 
     configureButtonBindings();
     configureDashboard();
@@ -228,6 +195,16 @@ public class RobotContainer {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  private void RegisterNamedCommands() {
+    NamedCommands.registerCommand("intake",
+        new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
+    NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(shooterSubsystem,
+        indexerSubsystem, tilt, .55, 55));
+    NamedCommands.registerCommand("homeShooter", null);
+    NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(shooterSubsystem,
+        indexerSubsystem, tilt, .55, 10));
   }
 
   // TODO this method need a lot of work
@@ -299,7 +276,7 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
     driverController.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
-    driverController.a().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
+    // driverController.a().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
     driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
     // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
@@ -308,12 +285,13 @@ public class RobotContainer {
 
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
-    // driverController.a().whileTrue(getAutonomousCommand());
+    driverController.a().whileTrue(getAutonomousCommand());
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Speaker5Auto");
+    return autoChooser.getSelected();
   }
+
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
     opController.back().onTrue(new TiltHomeCommand(tilt));

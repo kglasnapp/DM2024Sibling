@@ -4,22 +4,29 @@ import static frc.robot.Util.logf;
 
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.utilities.LimelightHelpers;
 
 public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
-    private static final Pose2d STARTING_POSE = new Pose2d(1.89, 0.5, new Rotation2d(Math.toRadians(180)));
+        //private static final Pose2d STARTING_POSE = new Pose2d(1.89, 0.5, new Rotation2d(Math.toRadians(180)));
+        private static final Pose2d STARTING_POSE_RED = new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180));
+        private static final Pose2d STARTING_POSE_BLUE = new Pose2d();
 
     // Defines the accuracy of the different position sources
     // Numbers are standard deviations in x, y, rot order
@@ -40,17 +47,30 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.cameraId = cameraId;
 
+        posePlannerConfigureHolonomic();
+
         tab = Shuffleboard.getTab("Odometry");
         tab.addString("Pose", this::getFormattedPose).withPosition(0, 0).withSize(2, 0);
         tab.add("Field", field2d).withPosition(2, 0).withSize(6, 4);
 
-        poseEstimator = new SwerveDrivePoseEstimator(
+         if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                poseEstimator = new SwerveDrivePoseEstimator(
+                DrivetrainSubsystem.m_kinematics,
+                Rotation2d.fromDegrees(drivetrainSubsystem.m_navx.getYaw()),
+                drivetrainSubsystem.getModulePositions(),
+                STARTING_POSE_RED,
+                ODOMETRY_ACCURACY,
+                VISION_ACCURACY);
+         }
+         else {
+                poseEstimator = new SwerveDrivePoseEstimator(
                 DrivetrainSubsystem.m_kinematics,
                 drivetrainSubsystem.getGyroscopeRotation(),
                 drivetrainSubsystem.getModulePositions(),
-                STARTING_POSE,
+                STARTING_POSE_BLUE,
                 ODOMETRY_ACCURACY,
                 VISION_ACCURACY);
+         }
     }
 
     public void setCurrentPose(Pose2d pose) {
@@ -160,5 +180,28 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     @Override
     public Pose2d get() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    private void posePlannerConfigureHolonomic() {
+        AutoBuilder.configureHolonomic(
+        this::get,
+        this::setCurrentPose,
+        drivetrainSubsystem::getChassisSpeeds,
+        drivetrainSubsystem::drive,
+        Constants.PATH_FOLLOWER_CONFIG,
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        // Reference to this subsystem to set requirements
+        drivetrainSubsystem);
     }
 }
