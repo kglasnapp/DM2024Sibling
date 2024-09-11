@@ -7,8 +7,10 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.utilities.SwerveModule;
 
 public class DefaultDriveCommand extends Command {
 
@@ -26,56 +28,61 @@ public class DefaultDriveCommand extends Command {
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
     private final BooleanSupplier precisionActivator;
-
-    double count = 0;
+    private final BooleanSupplier robotOrientedActivator;
 
     public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem,
             DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
             DoubleSupplier rotationSupplier,
-            BooleanSupplier precisionActivator) {
+            BooleanSupplier precisionActivator, BooleanSupplier robotOrientedActivator) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.m_translationXSupplier = translationXSupplier;
         this.m_translationYSupplier = translationYSupplier;
         this.m_rotationSupplier = rotationSupplier;
         this.precisionActivator = precisionActivator;
-        logf("Default Drive Command started precision:%b\n", this.precisionActivator.getAsBoolean());
+        this.robotOrientedActivator = robotOrientedActivator;
+
         addRequirements(drivetrainSubsystem);
     }
 
     @Override
     public void execute() {
-        // You can use `new ChassisSpeeds(...)` for robot-oriented movement instead of
-        // field-oriented movement
+        // Currently implemented with separate commands
+        if (precisionActivator.getAsBoolean()) {
+            SwerveModule.setPowerRatio(SwerveModule.PRECISION);
+        } else {
+            SwerveModule.setPowerRatio(SwerveModule.TURBO);
+        }
 
-        if (count % 20 == 0) {
+        if (Robot.count % 20 == 0) {
             if (m_translationXSupplier.getAsDouble() != 0 &&
                     m_translationYSupplier.getAsDouble() != 0) {
                 logf("Robot Oriented Speed X: %.2f y:%.2f angle:%.2f\n", m_translationXSupplier.getAsDouble(),
                         m_translationYSupplier.getAsDouble(), m_rotationSupplier.getAsDouble());
             }
         }
+
         // this allows for Robot Oriented driving
-        if (RobotContainer.getLeftBumper()) {
+        if (robotOrientedActivator.getAsBoolean()) {
             m_drivetrainSubsystem.drive(
                     new ChassisSpeeds(
-                            -m_translationXSupplier.getAsDouble(),
-                            -m_translationYSupplier.getAsDouble(),
-                            m_rotationSupplier.getAsDouble()), true);
+                            m_translationXSupplier.getAsDouble(),
+                            m_translationYSupplier.getAsDouble(),
+                            m_rotationSupplier.getAsDouble()));
 
         } else {
             m_drivetrainSubsystem.drive(
                     ChassisSpeeds.fromFieldRelativeSpeeds(
-                            -m_translationXSupplier.getAsDouble(),
-                            -m_translationYSupplier.getAsDouble(),
+                            m_translationXSupplier.getAsDouble(),
+                            m_translationYSupplier.getAsDouble(),
                             m_rotationSupplier.getAsDouble(),
-                            m_drivetrainSubsystem.getGyroscopeRotation()), true);
+                            m_drivetrainSubsystem.getGyroscopeRotation()));
         }
-        count++;
     }
 
     @Override
     public void end(boolean interrupted) {
         m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
+        SwerveModule.setPowerRatio(SwerveModule.DEFAULT);
     }
 }

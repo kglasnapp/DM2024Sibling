@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -32,27 +33,22 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.ChangeNormalModeCommand;
-import frc.robot.commands.ChangeTurboModeCommand;
-import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.IntakeNoteCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.TiltHomeCommand;
-import frc.robot.commands.TiltManualCommand;
-import frc.robot.commands.TiltSetAngleCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TiltSubsystem;
+import frc.robot.commands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -72,63 +68,67 @@ public class RobotContainer {
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  public final static IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-  public final ClimberSubsystem climberSubsystem =  new ClimberSubsystem();
-  public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
+  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+  public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
+  public final CoralSubsystem coralSubsystem = new CoralSubsystem();
+  public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
+  public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
   public final static XboxController driveHID = driveController.getHID();
 
-  private SlewRateLimiter sLX = new SlewRateLimiter(15);
-  private SlewRateLimiter sLY = new SlewRateLimiter(15);
-  private SlewRateLimiter sRX = new SlewRateLimiter(15);
+  // Rate limit is in meters/per second/per second (acceleration)
+  // Formula: MAX_SPEED / TIME_TO_ACCELERATE
+  private SlewRateLimiter sLX = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sLY = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
+  private SlewRateLimiter sRX = new SlewRateLimiter(Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
-  public static SendableChooser<Boolean> autonomousAim = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserFirtWait = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserFirstStep = new SendableChooser<>();
-  public static SendableChooser<Integer> autonomousChooserLastStep = new SendableChooser<>();
-  public LimeLightPoseSubsystem limeLightPoseSubsystem;
-  public static CoralSubsystem coralSubsystem = new CoralSubsystem();
-  public TiltSubsystem tilt = new TiltSubsystem();
-
+  // TODO: Move these to a separate file
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
   public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));
-
   public final static Pose2d BLUE_AMP = new Pose2d(72.5, 323, new Rotation2d(Math.toRadians(270)));
   public final static Pose2d RED_AMP = new Pose2d(578.77, 323, new Rotation2d(Math.toRadians(270)));
 
   public static RobotContainer instance;
-  public Autonomous autotonomous;
+  public Autonomous autonomous;
   public boolean hasBeenHomed = false;
+
+  // private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    instance = this;
-    // Set the default Robot Mode to Cube
-    logf("creating RobotContainer\n");
+    autonomous = new Autonomous(this);
 
+    instance = this;
+    logf("Creating RobotContainer\n");
+
+    // Controller inputs range from -1.0 -> 1.0
+    // Drive train operates in meters per second
+    // modifyAxis: deadband compensation
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
-        () -> (-modifyAxis((sLY.calculate(driveController.getLeftY())))
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
-        () -> -modifyAxis((sLX.calculate(driveController.getLeftX())))
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-        () -> (-modifyAxis((sRX.calculate(driveController.getRightX())))
-            * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND),
-        driveController.y()));// Set precision based upon left bumper
+        () -> sLY.calculate(modifyAxis(driveController.getLeftY())
+            * Constants.MAX_VELOCITY_METERS_PER_SECOND),
+        () -> sLX.calculate(modifyAxis(driveController.getLeftX())
+            * Constants.MAX_VELOCITY_METERS_PER_SECOND),
+        () -> sRX.calculate(-modifyAxis(driveController.getRightX())
+            * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),
+        // Set precision based upon left bumper
+        driveController.leftBumper(),
+        // Set robot oriented control based upon left bumper
+        driveController.rightBumper()));
 
-    limeLightPoseSubsystem = new LimeLightPoseSubsystem(drivetrainSubsystem, "limelight");
     configureButtonBindings();
     configureDashboard();
-    autotonomous = new Autonomous(this, drivetrainSubsystem, intakeSubsystem);
   }
 
   void homeAllSubsystems() {
     if (!hasBeenHomed) {
-      tilt.homeTilt();
+      tiltSubsystem.homeTilt();
       if (climberSubsystem != null) {
         // TODO once climber built enable homing climberSubsystem.homeClimber();
       }
@@ -187,102 +187,111 @@ public class RobotContainer {
   }
 
   // TODO this method need a lot of work
-  public void calibrateShooter(CommandXboxController controller) {
-    controller.pov(0).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = tilt.getTiltAngle();
-        tilt.setTiltAngle(currentAngle - 0.5);
-        logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
-      }
+  // public void calibrateShooter(CommandXboxController controller) {
+  // controller.pov(0).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // double currentAngle = tilt.getTiltAngle();
+  // tilt.setTiltAngle(currentAngle - 0.5);
+  // logf("setting tilt angle 1 to:%.2f \n", currentAngle - 0.5);
+  // }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-    controller.pov(90).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        shooterSubsystem.setAllShooterPower(1.0);
-      }
+  // controller.pov(90).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // shooterSubsystem.setAllShooterPower(1.0);
+  // }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-    controller.pov(180).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        double currentAngle = tilt.getTiltAngle();
-        tilt.setTiltAngle(currentAngle + 0.5);
-        logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
-      }
+  // controller.pov(180).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // double currentAngle = tilt.getTiltAngle();
+  // tilt.setTiltAngle(currentAngle + 0.5);
+  // logf("setting tilt angle 2 to:%.2f\n", (currentAngle + 0.5));
+  // }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
 
-    controller.pov(270).onTrue(new Command() {
-      @Override
-      public void initialize() {
-        // grabberSubsystem.grabberOut();
-        logf("Shooting at %.2f distance with %.2f angle\n",
-            // ShootToSpeakerCommand.distance(BLUE_SPEAKER, limeLightPoseSubsystem.get()),
-            tilt.getTiltAngle());
-      }
+  // controller.pov(270).onTrue(new Command() {
+  // @Override
+  // public void initialize() {
+  // // grabberSubsystem.grabberOut();
+  // logf("Shooting at %.2f distance with %.2f angle\n",
+  // // ShootToSpeakerCommand.distance(BLUE_SPEAKER,
+  // limeLightPoseSubsystem.get()),
+  // tilt.getTiltAngle());
+  // }
 
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    });
-  }
+  // @Override
+  // public boolean isFinished() {
+  // return true;
+  // }
+  // });
+  // }
 
-  public void configureDriverController(CommandXboxController controller) {
-    driveController.back().whileTrue(new RunCommand(new Runnable() {
+  public void configureDriverController(CommandXboxController driverController) {
+    driverController.back().whileTrue(new RunCommand(new Runnable() {
       public void run() {
         drivetrainSubsystem.zeroGyroscope();
       }
     }));
-
-    driveController.x().onTrue(
+    driverController.x().onTrue(
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
+    driverController.y().onTrue(
+        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
+    // driverController.a().onTrue(new StopAllCommand(shooterSubsystem,
+    // indexerSubsystem, intakeSubsystem));
+    driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
+    // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
+    // indexerSubsystem, intakeSubsystem));
+    // driveController.rightTrigger().onTrue(
+    // new ChangeNormalModeCommand());
 
-    driveController.y().onTrue(
-        new ShootCommand(shooterSubsystem, indexerSubsystem,  limeLightPoseSubsystem));
-
-    driveController.rightTrigger().onTrue(
-        new ChangeNormalModeCommand());
-
-    driveController.leftTrigger().onTrue(
-        new ChangeTurboModeCommand());
-
+    // driveController.leftTrigger().onTrue(
+    // new ChangeTurboModeCommand());
+    driverController.a().whileTrue(autonomous.getAutonomousCommand());
   }
 
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
-    opController.back().onTrue(new TiltHomeCommand(tilt));
-    opController.x().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
-    opController.leftBumper().onTrue(new TiltManualCommand(tilt, false)); // Send shooter down
-    opController.rightBumper().onTrue(new TiltManualCommand(tilt, true)); // Send shooter up
+    opController.back().onTrue(new TiltHomeCommand(tiltSubsystem));
+    opController.povRight().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 30.5));
+    opController.povDown().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 45.0));
+    opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 92.0));
+    opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
+    opController.x().whileTrue(new IndexCommand(indexerSubsystem));
+    opController.y().whileTrue(new IntakeCommand(intakeSubsystem));
+    opController.leftBumper().onTrue(new TiltManualCommand(tiltSubsystem, false)); // Send shooter down
+    opController.rightBumper().onTrue(new TiltManualCommand(tiltSubsystem, true)); // Send shooter up
   }
 
-  public void testAutonomous() {
-    driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11, false, 0));
-  }
+  // public void testAutonomous() {
+  // driveController.pov(0).whileTrue(Autonomous.getAutonomousCommand(this, 9, 11,
+  // false, 0));
+  // }
 
-  private static double deadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
+  private static double deadBand(double value, double deadBand) {
+    if (Math.abs(value) > deadBand) {
       if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
+        return (value - deadBand) / (1.0 - deadBand);
       } else {
-        return (value + deadband) / (1.0 - deadband);
+        return (value + deadBand) / (1.0 - deadBand);
       }
     } else {
       return 0.0;
@@ -290,10 +299,12 @@ public class RobotContainer {
   }
 
   private static double modifyAxis(double value) {
-    value = deadband(value, 0.08);
-    value = Math.copySign(value * value, value); // Square the axis
+    value = deadBand(value, Constants.CONTROLLER_DEAD_BAND);
+
+    // Apply polynomial shaping to input
+    // Reduces sensitivity when stick is close to center
+    value = Math.copySign(Math.pow(value, Constants.CONTROLLER_SENSITIVITY), value);
+
     return value;
   }
 }
-
-

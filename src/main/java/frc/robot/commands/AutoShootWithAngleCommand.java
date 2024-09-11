@@ -15,12 +15,15 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TiltSubsystem;
+
 import static frc.robot.Util.logf;
 
-public class ShootCommand extends Command {
+public class AutoShootWithAngleCommand extends Command {
     IndexerSubsystem indexer;
     ShooterSubsystem shooter;
     PoseSubsystem poseSubsystem;
+    TiltSubsystem tiltSubsystem;
     long startTime;
     int waitCount = 0;
     STATE lastState = STATE.IDLE;
@@ -29,31 +32,19 @@ public class ShootCommand extends Command {
     int MAX_SPEED = 5500;
     boolean finished = false;
 
-    public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
-            PoseSubsystem poseSubsystem) {
+    public AutoShootWithAngleCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
+            TiltSubsystem tiltSubsystem, double speedPercentage, double angle) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.indexer = indexer;
         this.shooter = shooter;
-        this.poseSubsystem = poseSubsystem;
-        addRequirements(shooter);
-        addRequirements(indexer);
-        //addRequirements(null);
-    }
-
-    public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
-            PoseSubsystem poseSubsystem, double speedPercentage) {
-        // Use addRequirements() here to declare subsystem dependencies.
-        this.indexer = indexer;
-        this.shooter = shooter;
-        this.poseSubsystem = poseSubsystem;
+        this.tiltSubsystem = tiltSubsystem;
         this.speedPercentage = speedPercentage;
-        addRequirements(shooter);
-        addRequirements(indexer);
-        addRequirements(shooter);
+        this.angle = angle;
     }
 
     public static enum STATE {
         IDLE,
+        WAIT_SHOOT_ANGLE,
         WAIT_SHOOT_SPEED,
         WAIT_NOTE_OUT,
         WAIT,
@@ -66,14 +57,14 @@ public class ShootCommand extends Command {
     @Override
     public void initialize() {
         logf("Initializing the shooters\n");
-        state = STATE.IDLE;
-        startTime = RobotController.getFPGATime();
         boolean note = indexer.isNotePresent();
-        finished = false;
-        logf("The note is present: %b, speed: %.2f\n", note, speedPercentage);
+        startTime = RobotController.getFPGATime();
+        logf("The note is present: %b\n", note);
         if (note) {
+            tiltSubsystem.setAngle(angle);
+            state = STATE.WAIT_SHOOT_ANGLE;
             shooter.setAllShooterPower(speedPercentage);
-            state = STATE.WAIT_SHOOT_SPEED;
+            //state = STATE.WAIT_SHOOT_SPEED;
         } else {
             state = STATE.FINISHED;
         }
@@ -86,8 +77,17 @@ public class ShootCommand extends Command {
             long elapsedTime = RobotController.getFPGATime() - startTime;
             logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime / 1000000.0);
         }
+        if (state == STATE.WAIT_SHOOT_ANGLE) {
+            if(tiltSubsystem.getTiltAngle() <= angle+1 && tiltSubsystem.getTiltAngle() >= angle-1)
+            {
+                state = STATE.WAIT_SHOOT_SPEED;
+            }
+            if (RobotController.getFPGATime() - startTime > 2000000) {
+                finished = true;
+            }
+        }
         if (state == STATE.WAIT_SHOOT_SPEED) {
-            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage-.02))) {
+            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage-.1))) {
                 state = STATE.WAIT_NOTE_OUT;
                 indexer.setSpeed(.5);
             }
@@ -119,9 +119,6 @@ public class ShootCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        logf("shoot command end\n");
-        shooter.stop();
-        indexer.stop();
     }
 
     // Returns true when the command should end.

@@ -25,7 +25,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private final static int LEFT_CLIMBER_MOTOR_ID = 30;
     private final static int RIGHT_CLIMBER_MOTOR_ID = 31;
     private final static int LEFT_SERVO_ID = 2;
-    private final static int RIGHT_SERVO_ID = 3;
+    private final static int RIGHT_SERVO_ID = 1;
 
     // Defines for speeds
     // Speed for down left -, right +
@@ -53,7 +53,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private Servo rightClimberServo = new Servo(RIGHT_SERVO_ID);
     private int lockCounter = -1;
 
-    private final double CURRENT_LIMIT = 10;
+    private final double CURRENT_LIMIT = 20;
     private final double unLockAngle = 0;
     private final double lockAngle = .12;
     private final double maxHeight = 380;
@@ -237,16 +237,16 @@ public class ClimberSubsystem extends SubsystemBase {
     private boolean controlMotors() {
         double leftSpeed = 0;
         double rightSpeed = 0;
-        if (RobotContainer.operatorHID.getLeftY() > 0.5) {
+        if (RobotContainer.operatorHID.getRightY() > 0.5) {
             leftSpeed = -SPEED; // Move climber down
         }
-        if (RobotContainer.operatorHID.getRightY() > 0.5) {
+        if (RobotContainer.operatorHID.getLeftY() > 0.5) {
             rightSpeed = SPEED; // Move climber down
         }
-        if (RobotContainer.operatorHID.getLeftY() < -.5) {
+        if (RobotContainer.operatorHID.getRightY() < -.5) {
             leftSpeed = SPEED; // Move climber up
         }
-        if (RobotContainer.operatorHID.getRightY() < -.5) {
+        if (RobotContainer.operatorHID.getLeftY() < -.5) {
             rightSpeed = -SPEED; // Move climber up
         }
         if (Math.abs(getEncoderPosition(leftClimber)) > maxHeight &&

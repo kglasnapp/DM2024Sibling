@@ -4,89 +4,103 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.geometry.Transform3d;
-
+import edu.wpi.first.math.util.Units;
+import frc.robot.utilities.SwerveModuleType;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants
+ * should be declared
  * globally (i.e. public static). Do not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    /**
-     * The left-to-right distance between the drivetrain wheels
-     *
-     * Should be measured from center to center.
-     */
-    // TODO Change the next tqo .762 to .62865 -- note .628 is 24.7 inches
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = .762; // FIXed Measure and set trackwidth
-    /**
-     * The front-to-back distance between the drivetrain wheels.
-     *
-     * Should be measured from center to center.
-     */
-    public static final double DRIVETRAIN_WHEELBASE_METERS = .762; // FIXed Measure and set wheelbase
-
-    // public static final int DRIVETRAIN_PIGEON_ID = 0; // FIXed Set Pigeon ID
-
-    public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 7; // FIXed Set front left module drive motor ID
-    public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 8; // FIXed Set front left module steer motor ID
-    public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 7; // FIXed Set front left steer encoder ID
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(47.988); //48.340); // FIXed Measure and set front left steer offset
-
-    public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 5; // FIXed Set front right drive motor ID
-    public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 6; // FIXed Set front right steer motor ID
-    public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 5; // FIXed Set front right steer encoder ID
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(307.617); //305.859); // FIXed Measure and set front right steer offset
-
-    public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 1; // FIXed Set back left drive motor ID
-    public static final int BACK_LEFT_MODULE_STEER_MOTOR = 2; // FIXed Set back left steer motor ID
-    public static final int BACK_LEFT_MODULE_STEER_ENCODER = 1; // FIXed Set back left steer encoder ID
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(158.3 + 30); //345.146); //161.543); // FIXed Measure and set back left steer offset
-
-    public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 3; // FIXed Set back right drive motor ID
-    public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 4; // FIXed Set back right steer motor ID
-    public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 3; // FIXed Set back right steer encoder ID
-
-
-
-
-
-    // public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; // FIXed Set front left module drive motor ID
-    // public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 2; // FIXed Set front left module steer motor ID
-    // public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 1; // FIXed Set front left steer encoder ID
-    // public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(47.988); //48.340); // FIXed Measure and set front left steer offset
-
-    // public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 3; // FIXed Set front right drive motor ID
-    // public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 4; // FIXed Set front right steer motor ID
-    // public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 3; // FIXed Set front right steer encoder ID
-    // public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(307.617); //305.859); // FIXed Measure and set front right steer offset
-
-    // public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5; // FIXed Set back left drive motor ID
-    // public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6; // FIXed Set back left steer motor ID
-    // public static final int BACK_LEFT_MODULE_STEER_ENCODER = 5; // FIXed Set back left steer encoder ID
-    // public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(158.3 + 30); //345.146); //161.543); // FIXed Measure and set back left steer offset
-
-    // public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7; // FIXed Set back right drive motor ID
-    // public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8; // FIXed Set back right steer motor ID
-    // public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 7; // FIXed Set back right steer encoder ID
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(271.3 + 20); //281.865); //275.977); // FIXed Measure and set back right steer offset
-    public static boolean logging = false;
-    public static String robotType = "Swerve";
-    public static final int kTimeoutMs = 20;
-    public static final boolean isMini = false;
-    public static class VisionConstants {
-
-    
         /**
-         * Physical location of the camera on the robot, relative to the center of the robot.
+         * The left-to-right distance between the drivetrain wheels
+         *
+         * Should be measured from center to center.
          */
-        public static final Transform3d CAMERA_TO_ROBOT[] =
-            { };
-            // new Transform3d(new Translation3d(-0.36, -0.045, 0.0), new Rotation3d(0.0,0.0,0.0));
-      }
+        public static final double DRIVETRAIN_TRACK_WIDTH = Units.inchesToMeters(24.75);
+        /**
+         * The front-to-back distance between the drivetrain wheels
+         *
+         * Should be measured from center to center.
+         */
+        public static final double DRIVETRAIN_TRACK_LENGTH = Units.inchesToMeters(24.75);
+
+        /**
+         * Drive base radius in meters. Distance from robot center to furthest module.
+         */
+        public static final double DRIVETRAIN_RADIUS = Math.hypot(DRIVETRAIN_TRACK_WIDTH / 2.0,
+                        DRIVETRAIN_TRACK_LENGTH / 2.0);
+
+        public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
+        public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+
+        /**
+         * The maximum velocity of the robot in meters per second.
+         * <p>
+         * This is a measure of how fast the robot should be able to drive in a straight
+         * line.
+         * 
+         * Uses Mk4i for gear ratio as it is slowed than the Mk4n
+         * The formula for calculating the theoretical maximum velocity is:
+         * <Motor Free Speed RPM> / 60 * <Gear Ratio> * <Wheel Circumference Meters>
+         */
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 4800.0 / 60.0
+                        * SwerveModuleType.Mk4iL2.driveGearRatio
+                        * WHEEL_CIRCUMFERENCE;
+        /**
+         * The maximum angular velocity of the robot in radians per second.
+         * <p>
+         * This is a measure of how fast the robot can rotate in place.
+         */
+        public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND
+                        / DRIVETRAIN_RADIUS;
+
+        public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7;
+        public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8;
+        public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 7;
+
+        public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
+        public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
+        public static final int BACK_LEFT_MODULE_STEER_ENCODER = 5;
+
+        public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 1;
+        public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 2;
+        public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 1;
+
+        public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3;
+        public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 4;
+        public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 3;
+
+        public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
+                        // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0),
+                        // Rotation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0),
+                        // Max module speed, in m/s
+                        MAX_VELOCITY_METERS_PER_SECOND,
+                        // Drive base radius in meters. Distance from robot center to furthest module.
+                        DRIVETRAIN_RADIUS,
+                        new ReplanningConfig() // Default path replanning config. See the API for the options here
+        );
+
+        // Larger numbers -> less sensitive to small changes in input
+        // 1.0 = Linear
+        // 2.0 = Squared
+        // Should be a float greater than 1.0
+        public static final double CONTROLLER_SENSITIVITY = 2.0;
+        public static final double CONTROLLER_DEAD_BAND = 0.08;
+
+        public static boolean logging = false;
 }

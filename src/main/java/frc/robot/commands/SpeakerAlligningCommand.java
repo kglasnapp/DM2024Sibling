@@ -8,15 +8,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 
 public class SpeakerAlligningCommand extends Command {
-    LimeLightPoseSubsystem poseEstimatorSubsystem;
+    PoseSubsystem poseEstimatorSubsystem;
     DrivetrainSubsystem drivetrainSubsystem;
     RotateCommand rotateCommand;
 
     public SpeakerAlligningCommand(
-            LimeLightPoseSubsystem poseEstimatorSubsystem,
+            PoseSubsystem poseEstimatorSubsystem,
             DrivetrainSubsystem drivetrainSubsystem) {
         this.poseEstimatorSubsystem = poseEstimatorSubsystem;
         this.drivetrainSubsystem = drivetrainSubsystem;
@@ -26,8 +26,9 @@ public class SpeakerAlligningCommand extends Command {
     public void initialize() {
         Alliance alliance = DriverStation.getAlliance().get();
         Pose2d speakerPose = alliance == Alliance.Blue ? RobotContainer.BLUE_SPEAKER : RobotContainer.RED_SPEAKER;
-        Pose2d pose2d = poseEstimatorSubsystem.getPose();
-        // speakerPose = new Pose2d(speakerPose.getX(), speakerPose.getY(), speakerPose.getRotation());
+        Pose2d pose2d = poseEstimatorSubsystem.get();
+        // speakerPose = new Pose2d(speakerPose.getX(), speakerPose.getY(),
+        // speakerPose.getRotation());
         double targetAngle = Math
                 .toDegrees(Math.atan2(pose2d.getY() - speakerPose.getY() + 0.05, pose2d.getX() - speakerPose.getX()));
         double angleToRotate = 180 - pose2d.getRotation().getDegrees() + targetAngle;

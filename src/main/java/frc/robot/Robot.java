@@ -98,24 +98,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    // cmd = RobotContainer.autonomousChooser.getSelected();
-    Integer firstStepWait = RobotContainer.autonomousChooserFirtWait.getSelected();
-    boolean autoAim = RobotContainer.autonomousAim.getSelected();
-    Integer firstStep = RobotContainer.autonomousChooserFirstStep.getSelected();
-    Integer lastStep = RobotContainer.autonomousChooserLastStep.getSelected();
-    if (lastStep >= firstStep) {
-      lastStep++;
-    } else {
-      lastStep--;
-    }
-    Command cmd = Autonomous.getAutonomousCommand(robotContainer, firstStep, lastStep, autoAim, firstStepWait);
+    Command cmd = robotContainer.autonomous.getAutonomousCommand();
     if (cmd != null) {
       logf("Executing autonomous %s\n", cmd.getName());
       cmd.schedule();
     }
-    if (!RobotContainer.testMode) {
-    }
-    // homeAllSubsystems();
   }
 
   /** This function is called periodically during autonomous. */

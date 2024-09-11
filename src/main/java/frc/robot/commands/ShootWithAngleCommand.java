@@ -21,6 +21,7 @@ public class ShootWithAngleCommand extends Command {
     public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem,TiltSubsystem tiltSubsystem) {
             this.shooterSubsystem = shooterSubsystem;
             this.tiltSubsystem = tiltSubsystem;
+            addRequirements(shooterSubsystem);
         }
 
     @Override

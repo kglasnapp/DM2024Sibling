@@ -49,22 +49,14 @@ public class IndexerSubsystem  extends SubsystemBase {
        indexerMotor.set(speed); 
     }
 
+    public void stop() {
+        indexerMotor.set(0);
+    }
+
     @Override
     public void periodic() {
         if (Robot.count % 10 == 4) {
             SmartDashboard.putBoolean("Note", isNotePresent());
-        }
-        if (RobotContainer.operatorController.getHID().getAButtonPressed()) {
-            indexerMotor.set(0.3);
-        } 
-        if (RobotContainer.operatorController.getHID().getBButtonReleased()) {
-            indexerMotor.set(0);
-        }
-        if (RobotContainer.operatorController.getHID().getBButtonPressed()) {
-            indexerMotor.set(-0.3);
-        } 
-        if (RobotContainer.operatorController.getHID().getAButtonReleased()) {
-            indexerMotor.set(0);
         }
     }
 }

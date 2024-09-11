@@ -90,7 +90,7 @@ public class TiltSubsystem extends SubsystemBase {
         pid = new PID_MAX();
         pid.PIDCoefficientsShooterTilt(pidControllerTiltMotor);
         pid.PIDToMax();
-        logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
+        //logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
     }
 
     public void homeTilt() {
