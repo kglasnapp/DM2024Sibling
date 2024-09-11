@@ -1,22 +1,15 @@
 package frc.robot.commands;
 // Copyright (c) FIRST and other WPILib contributors.
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
+import static frc.robot.Util.logf;
 
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import static frc.robot.Util.logf;
 
 public class StopAllCommand extends Command {
     IndexerSubsystem indexer;
@@ -28,6 +21,7 @@ public class StopAllCommand extends Command {
         this.shooter = shooter;
         this.intake = intake;
         addRequirements(intake);
+        addRequirements(indexer);
         addRequirements(shooter);
     }
 

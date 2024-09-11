@@ -75,7 +75,7 @@ public class RobotContainer {
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
+  public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();

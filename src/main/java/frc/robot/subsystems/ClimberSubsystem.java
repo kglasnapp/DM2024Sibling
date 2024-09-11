@@ -53,7 +53,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private Servo rightClimberServo = new Servo(RIGHT_SERVO_ID);
     private int lockCounter = -1;
 
-    private final double CURRENT_LIMIT = 10;
+    private final double CURRENT_LIMIT = 20;
     private final double unLockAngle = 0;
     private final double lockAngle = .12;
     private final double maxHeight = 380;

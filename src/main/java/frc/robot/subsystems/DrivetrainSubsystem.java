@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.utilities.SwerveModule;
 import frc.robot.utilities.SwerveModuleIds;
 import frc.robot.utilities.SwerveModuleType;
@@ -54,11 +55,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final SwerveModule m_backLeftModule;
   private final SwerveModule m_backRightModule;
 
+  private RobotContainer robotContainer;
+
   SwerveModule swerveModules[];
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-  public DrivetrainSubsystem() {
+  public DrivetrainSubsystem(RobotContainer robotContainer) {
+    this.robotContainer = robotContainer;
+
     m_frontLeftModule = new SwerveModule(0, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
         BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
 
@@ -83,38 +88,41 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public void zeroGyroscope() {
     // FIXed Uncomment if you are using a NavX
-    //TODO: calibrate magneto navx
-    if (m_navx.isMagnetometerCalibrated()) {
-      // We will only get valid fused headings if the magnetometer is calibrated
-      //System.out.println("returning the angle FUSE ZERO from the robot:
-      //"+m_navx.getAngle());
-      //TODO need to adjust the gyro angle
-      zeroNavx = m_navx.getFusedHeading();
-    } else {
-     zeroNavx = -90;
-    }
+    // TODO: calibrate magneto navx
+    // if (m_navx.isMagnetometerCalibrated()) {
+    // // We will only get valid fused headings if the magnetometer is calibrated
+    // // System.out.println("returning the angle FUSE ZERO from the robot:
+    // // "+m_navx.getAngle());
+    // // getFusedHeading() is an angle only valid if magnetic calibration has benn
+    // // completed
+    // zeroNavx = m_navx.getFusedHeading();
+    // } else {
+    // zeroNavx = -90;
+    // }
 
+    // Can do an angle adjustment using setAngleAdjustment it
+    // Will adjust angle for getAngle does not impact getYaw
+    // m_navx.setAngleAdjustment(90);
     // m_navx.reset();
     m_navx.zeroYaw();
-    logf("zero Gyro DT zeroNavs: %.2f, fused headig: %.2f\n", zeroNavx, m_navx.getFusedHeading());
+    robotContainer.poseSubsystem.refreshGyroOffset();
+
+    logf("zeroGyroscope fused:%.2f angle:%.2f\n",
+        m_navx.getFusedHeading(), m_navx.getAngle());
   }
 
-  double zeroNavx = 0.0;
+  // double zeroNavx = 0.0;
 
   public Rotation2d getGyroscopeRotation() {
-    // FIXed Remove if you are using a Pigeon
-    // return Rotation2d.fromDegrees(m_pigeon.getFusedHeading());
+    // if (m_navx.isMagnetometerCalibrated()) {
+    // // // We will only get valid fused headings if the magnetometer is calibrated
+    // // System.out.println("returning the angle FUSE ZERO from the robot:
+    // // "+m_navx.getAngle());
 
-    // FIXed Uncomment if you are using a NavX
-    if (m_navx.isMagnetometerCalibrated()) {
-      // // We will only get valid fused headings if the magnetometer is calibrated
-      // System.out.println("returning the angle FUSE ZERO from the robot:
-      // "+m_navx.getAngle());
-
-      Rotation2d r = Rotation2d.fromDegrees(-m_navx.getFusedHeading() + zeroNavx);
-      SmartDashboard.putNumber("Rot Cal", r.getDegrees());
-      return r;
-    }
+    // Rotation2d r = Rotation2d.fromDegrees(-m_navx.getFusedHeading() + zeroNavx);
+    // SmartDashboard.putNumber("Rot Cal", r.getDegrees());
+    // return r;
+    // }
     //
     // We have to invert the angle of the NavX so that rotating the robot
     // counter-clockwise makes the angle increase.
@@ -122,6 +130,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     Rotation2d r = Rotation2d.fromDegrees(-m_navx.getYaw());
     SmartDashboard.putNumber("Rot NC", r.getDegrees());
+    SmartDashboard.putNumber("Angle", m_navx.getAngle());
     return r;
   }
 
@@ -139,7 +148,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // double encPosDeg = backLeft.getPosition();
   @Override
   public void periodic() {
-    if (Robot.count % 20 == 1) {
+    if (Robot.count % 20 == -1) {
       for (SwerveModule mod : swerveModules) {
         SmartDashboard.putNumber(
             "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -157,7 +166,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_frontRightModule.setDesiredState(states[1]);
     m_backLeftModule.setDesiredState(states[2]);
     m_backRightModule.setDesiredState(states[3]);
-    if (Robot.count % 20 == 7) { // disable Smartdash board display
+    if (Robot.count % 20 == -1) { // disable Smartdash board display
       SmartDashboard.putNumber("FL", states[0].angle.getDegrees());
       SmartDashboard.putNumber("FR", states[1].angle.getDegrees());
       SmartDashboard.putNumber("BL", states[2].angle.getDegrees());

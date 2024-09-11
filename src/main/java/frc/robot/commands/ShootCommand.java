@@ -36,6 +36,8 @@ public class ShootCommand extends Command {
         this.shooter = shooter;
         this.poseSubsystem = poseSubsystem;
         addRequirements(shooter);
+        addRequirements(indexer);
+        //addRequirements(null);
     }
 
     public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
@@ -45,6 +47,9 @@ public class ShootCommand extends Command {
         this.shooter = shooter;
         this.poseSubsystem = poseSubsystem;
         this.speedPercentage = speedPercentage;
+        addRequirements(shooter);
+        addRequirements(indexer);
+        addRequirements(shooter);
     }
 
     public static enum STATE {

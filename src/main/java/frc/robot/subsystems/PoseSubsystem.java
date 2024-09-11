@@ -31,7 +31,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     // Defines the accuracy of the different position sources
     // Numbers are standard deviations in x, y, rot order
     private static final Vector<N3> ODOMETRY_ACCURACY = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-    private static final Vector<N3> VISION_ACCURACY = VecBuilder.fill(0.6, 0.6, 9999999);
+    private static final Vector<N3> VISION_ACCURACY = VecBuilder.fill(0.6, 0.6, Units.degreesToRadians(20));
 
     private DrivetrainSubsystem drivetrainSubsystem;
     private SwerveDrivePoseEstimator poseEstimator;
@@ -74,15 +74,16 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     }
 
     public void setCurrentPose(Pose2d pose) {
-        logf("Setting the new pose %s\n", pose.toString());
+        logf("Setting the new pose %s angle:%.2f yaw:%.2f\n", pose.toString(),
+                drivetrainSubsystem.m_navx.getAngle(), drivetrainSubsystem.m_navx.getYaw());
 
-        poseEstimator = new SwerveDrivePoseEstimator(
-                DrivetrainSubsystem.m_kinematics,
-                drivetrainSubsystem.getGyroscopeRotation(),
-                drivetrainSubsystem.getModulePositions(),
-                pose,
-                ODOMETRY_ACCURACY,
-                VISION_ACCURACY);
+        poseEstimator.resetPosition(drivetrainSubsystem.getGyroscopeRotation(),
+                drivetrainSubsystem.getModulePositions(), pose);
+    }
+
+    public void refreshGyroOffset() {
+        poseEstimator.resetPosition(drivetrainSubsystem.getGyroscopeRotation(),
+                drivetrainSubsystem.getModulePositions(), poseEstimator.getEstimatedPosition());
     }
 
     public void assumeNextVisionPose() {
@@ -162,7 +163,8 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
             field2d.setRobotPose(get());
         }
         if (Robot.count % 250 == 0) {
-            logf("Pose %s\n", getFormattedPose());
+            logf("Pose %s angle:%.2f yaw:%.2f\n", getFormattedPose(),
+                    drivetrainSubsystem.m_navx.getAngle(), drivetrainSubsystem.m_navx.getYaw());
         }
     }
 

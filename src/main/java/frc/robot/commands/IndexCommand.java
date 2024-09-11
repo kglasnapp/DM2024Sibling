@@ -13,8 +13,8 @@ public class IndexCommand extends Command {
 
     public IndexCommand(IndexerSubsystem indexerSubsystem) {
         this.indexerSubsystem = indexerSubsystem;
-        // addRequirements(intakeSubsystem);
-        // addRequirements(indexerSubsystem);
+        //addRequirements(intakeSubsystem);
+        addRequirements(indexerSubsystem);
     }
 
     @Override
