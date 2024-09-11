@@ -76,6 +76,8 @@ public class RobotContainer {
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
+  public static CoralSubsystem coralSubsystem = new CoralSubsystem();
+  public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
@@ -88,8 +90,6 @@ public class RobotContainer {
   private SlewRateLimiter sRX = new SlewRateLimiter(Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
   public PoseSubsystem poseSubsystem;
-  public static CoralSubsystem coralSubsystem = new CoralSubsystem();
-  public TiltSubsystem tilt = new TiltSubsystem();
 
   // TODO: Move these to a separate file
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
@@ -109,6 +109,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
     RegisterNamedCommands();
+    
+    poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
+
     autoChooser = AutoBuilder.buildAutoChooser("Speaker5Auto");
     SmartDashboard.putData(autoChooser);
 
@@ -131,7 +134,6 @@ public class RobotContainer {
         // Set robot oriented control based upon left bumper
         driveController.rightBumper()));
 
-    poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
 
     configureButtonBindings();
     configureDashboard();
@@ -139,7 +141,7 @@ public class RobotContainer {
 
   void homeAllSubsystems() {
     if (!hasBeenHomed) {
-      tilt.homeTilt();
+      tiltSubsystem.homeTilt();
       if (climberSubsystem != null) {
         // TODO once climber built enable homing climberSubsystem.homeClimber();
       }
@@ -201,10 +203,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("intake",
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
     NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(shooterSubsystem,
-        indexerSubsystem, tilt, .55, 55));
-    NamedCommands.registerCommand("homeShooter", null);
+        indexerSubsystem, tiltSubsystem, .55, 55));
+    NamedCommands.registerCommand("homeShooter", new TiltHomeCommand(tiltSubsystem));
     NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(shooterSubsystem,
-        indexerSubsystem, tilt, .55, 10));
+        indexerSubsystem, tiltSubsystem, .55, 10));
   }
 
   // TODO this method need a lot of work
@@ -294,15 +296,15 @@ public class RobotContainer {
 
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
-    opController.back().onTrue(new TiltHomeCommand(tilt));
-    opController.povRight().whileTrue(new TiltSetAngleCommand(tilt, 30.5));
-    opController.povDown().whileTrue(new TiltSetAngleCommand(tilt, 45.0));
-    opController.povUp().whileTrue(new TiltSetAngleCommand(tilt, 92.0));
-    opController.povLeft().whileTrue(new TiltSetAngleCommand(tilt, 55.0));
+    opController.back().onTrue(new TiltHomeCommand(tiltSubsystem));
+    opController.povRight().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 30.5));
+    opController.povDown().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 45.0));
+    opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 92.0));
+    opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
     opController.x().whileTrue(new IndexCommand(indexerSubsystem));
     opController.y().whileTrue(new IntakeCommand(intakeSubsystem));
-    opController.leftBumper().onTrue(new TiltManualCommand(tilt, false)); // Send shooter down
-    opController.rightBumper().onTrue(new TiltManualCommand(tilt, true)); // Send shooter up
+    opController.leftBumper().onTrue(new TiltManualCommand(tiltSubsystem, false)); // Send shooter down
+    opController.rightBumper().onTrue(new TiltManualCommand(tiltSubsystem, true)); // Send shooter up
   }
 
   // public void testAutonomous() {
