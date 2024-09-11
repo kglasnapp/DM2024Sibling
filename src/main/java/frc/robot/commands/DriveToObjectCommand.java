@@ -12,27 +12,28 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class DriveToObjectCommand extends Command {
     private DrivetrainSubsystem drivetrainSubsystem;
-    private CoralSubsystem coral;
+    private CoralSubsystem coralSubsystem;
     private double x;
     private double area;
     private double finishArea = 10;
     private double finishX = 0.002;
-    //private String type;
+    // private String type;
     private double startTime;
     private double timeout;
 
     /** Creates a new ReplaceMeCommand. */
-    public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, String type) {
-        this(drivetrainSubsystem, type, 1000);
+    public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, CoralSubsystem coralSubsystem, String type) {
+        this(drivetrainSubsystem, coralSubsystem, type, 1000);
     }
 
-    public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, String type, double timeout) {
+    public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, CoralSubsystem coralSubsystem, String type,
+            double timeout) {
         this.timeout = timeout;
         // Use addRequirements() here to declare subsystem dependencies.
         this.drivetrainSubsystem = drivetrainSubsystem;
         addRequirements(drivetrainSubsystem);
-        //this.type = type;
-        coral = RobotContainer.coralSubsystem;
+        // this.type = type;
+        this.coralSubsystem = coralSubsystem;
     }
 
     // Called when the command is initially scheduled.
@@ -63,34 +64,34 @@ public class DriveToObjectCommand extends Command {
         double xSpeed = 0;
         switch (state) {
             case IDLE:
-                if (coral.percent == 1) {
+                if (coralSubsystem.percent == 1) {
                     state = State.START;
                 } else {
-                     drivetrainSubsystem.drive(new ChassisSpeeds(-0.0048, 0, Math.toRadians(0)));
+                    drivetrainSubsystem.drive(new ChassisSpeeds(-0.0048, 0, Math.toRadians(0)));
                 }
                 break;
             case START:
-                area = coral.area;
-                if (//(area > finishArea)||
-                (coral.percent != 1)) {
+                area = coralSubsystem.area;
+                if (// (area > finishArea)||
+                (coralSubsystem.percent != 1)) {
                     if (counter++ > 3) {
                         state = State.TIMER_START;
                         startTimeToGetTheNote = RobotController.getFPGATime() / 1000;
                     }
                     drivetrainSubsystem.drive(new ChassisSpeeds(-0.012, 0, 0));
-                    //drivetrainSubsystem.drive(new ChassisSpeeds(-0.3, 0, 0));
+                    // drivetrainSubsystem.drive(new ChassisSpeeds(-0.3, 0, 0));
                     break;
                 } else {
                     counter = 0;
-                }    
-                x = -coral.x ;
-                x+=2.5;
+                }
+                x = -coralSubsystem.x;
+                x += 2.5;
                 if (Math.abs(x) > finishX) {
                     omegaSpeed = x * x * 0.003;
                     if (x < 0) {
                         omegaSpeed = -omegaSpeed;
                     }
-                }                
+                }
                 xSpeed = -0.022;
                 drivetrainSubsystem.drive(new ChassisSpeeds(xSpeed, 0, Math.toRadians(omegaSpeed)));
                 break;
@@ -107,7 +108,8 @@ public class DriveToObjectCommand extends Command {
         }
 
         logf("Coral state:%s x:%.4f y:%.4f area:%.3f PerCent:%.3f xSpeed:%.5f omegaSpeed:%.5f\n",
-                state, coral.x, coral.y, coral.area, coral.percent, xSpeed, omegaSpeed);
+                state, coralSubsystem.x, coralSubsystem.y, coralSubsystem.area, coralSubsystem.percent, xSpeed,
+                omegaSpeed);
 
     }
 
@@ -116,7 +118,7 @@ public class DriveToObjectCommand extends Command {
     public boolean isFinished() {
         boolean value = (startTime + timeout < RobotController.getFPGATime() / 1000) || state == State.FINISHED;
         if (value) {
-            logf("Drive to object command area = " + area + " finish area = " + finishArea  + "\n");
+            logf("Drive to object command area = " + area + " finish area = " + finishArea + "\n");
         }
         return value || finished;
         // if (!coral.type.equals(type)) {
@@ -127,6 +129,7 @@ public class DriveToObjectCommand extends Command {
     }
 
     boolean finished = false;
+
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {

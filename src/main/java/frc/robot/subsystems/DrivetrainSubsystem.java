@@ -139,6 +139,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
+    if (Robot.count % 5 == 0) {
+      logf("Target Speeds: x %.2f, y %.2f, rot %.2f\n", chassisSpeeds.vxMetersPerSecond,
+          chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+    }
     m_chassisSpeeds = chassisSpeeds;
   }
 

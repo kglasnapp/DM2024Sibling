@@ -4,8 +4,6 @@ import static frc.robot.Util.logf;
 
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -19,7 +17,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.utilities.LimelightHelpers;
 
@@ -46,8 +43,6 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     public PoseSubsystem(DrivetrainSubsystem drivetrainSubsystem, String cameraId) {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.cameraId = cameraId;
-
-        posePlannerConfigureHolonomic();
 
         tab = Shuffleboard.getTab("Odometry");
         tab.addString("Pose", this::getFormattedPose).withPosition(0, 0).withSize(2, 0);
@@ -102,62 +97,62 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
         boolean doRejectUpdate = false;
 
         // FIXME: Dont use megatag 2 when assumeNextVisionPose is true
-        if (useMegaTag2) {
-            LimelightHelpers.SetRobotOrientation("limelight",
-                    poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-            LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
+        // if (useMegaTag2) {
+        //     LimelightHelpers.SetRobotOrientation("limelight",
+        //             poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        //     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
 
-            if (mt2 != null) {
-                // if our angular velocity is greater than 720 degrees per second,
-                // ignore vision updates
-                if (Math.abs(drivetrainSubsystem.getGyroscopeRotationRate()) > 720) {
-                    doRejectUpdate = true;
-                }
-                if (mt2.tagCount == 0) {
-                    doRejectUpdate = true;
-                }
-                if (!doRejectUpdate) {
-                    if (!assumeNextVisionPose) {
-                        poseEstimator.addVisionMeasurement(
-                                mt2.pose,
-                                mt2.timestampSeconds);
-                    } else {
-                        setCurrentPose(mt2.pose);
-                        assumeNextVisionPose = false;
-                    }
-                }
-            }
-        } else {
-            LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
+        //     if (mt2 != null) {
+        //         // if our angular velocity is greater than 720 degrees per second,
+        //         // ignore vision updates
+        //         if (Math.abs(drivetrainSubsystem.getGyroscopeRotationRate()) > 720) {
+        //             doRejectUpdate = true;
+        //         }
+        //         if (mt2.tagCount == 0) {
+        //             doRejectUpdate = true;
+        //         }
+        //         if (!doRejectUpdate) {
+        //             if (!assumeNextVisionPose) {
+        //                 poseEstimator.addVisionMeasurement(
+        //                         mt2.pose,
+        //                         mt2.timestampSeconds);
+        //             } else {
+        //                 setCurrentPose(mt2.pose);
+        //                 assumeNextVisionPose = false;
+        //             }
+        //         }
+        //     }
+        // } else {
+        //     LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
 
-            if (mt1 != null) {
-                // More rigorous checks when only one april tag is seen
-                if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-                    if (mt1.rawFiducials[0].ambiguity > .7) {
-                        doRejectUpdate = true;
-                    }
-                    if (mt1.rawFiducials[0].distToCamera > 3) {
-                        doRejectUpdate = true;
-                    }
-                }
+        //     if (mt1 != null) {
+        //         // More rigorous checks when only one april tag is seen
+        //         if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
+        //             if (mt1.rawFiducials[0].ambiguity > .7) {
+        //                 doRejectUpdate = true;
+        //             }
+        //             if (mt1.rawFiducials[0].distToCamera > 3) {
+        //                 doRejectUpdate = true;
+        //             }
+        //         }
 
-                // Ignore spurious updates with no april tags visible
-                if (mt1.tagCount == 0) {
-                    doRejectUpdate = true;
-                }
+        //         // Ignore spurious updates with no april tags visible
+        //         if (mt1.tagCount == 0) {
+        //             doRejectUpdate = true;
+        //         }
 
-                if (!doRejectUpdate) {
-                    if (!assumeNextVisionPose) {
-                        poseEstimator.addVisionMeasurement(
-                                mt1.pose,
-                                mt1.timestampSeconds);
-                    } else {
-                        setCurrentPose(mt1.pose);
-                        assumeNextVisionPose = false;
-                    }
-                }
-            }
-        }
+        //         if (!doRejectUpdate) {
+        //             if (!assumeNextVisionPose) {
+        //                 poseEstimator.addVisionMeasurement(
+        //                         mt1.pose,
+        //                         mt1.timestampSeconds);
+        //             } else {
+        //                 setCurrentPose(mt1.pose);
+        //                 assumeNextVisionPose = false;
+        //             }
+        //         }
+        //     }
+        // }
 
         if (Robot.count % 10 == 0) {
             field2d.setRobotPose(get());
@@ -182,28 +177,5 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     @Override
     public Pose2d get() {
         return poseEstimator.getEstimatedPosition();
-    }
-
-    private void posePlannerConfigureHolonomic() {
-        AutoBuilder.configureHolonomic(
-        this::get,
-        this::setCurrentPose,
-        drivetrainSubsystem::getChassisSpeeds,
-        drivetrainSubsystem::drive,
-        Constants.PATH_FOLLOWER_CONFIG,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        // Reference to this subsystem to set requirements
-        drivetrainSubsystem);
     }
 }

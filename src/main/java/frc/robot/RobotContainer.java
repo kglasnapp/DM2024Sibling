@@ -29,11 +29,6 @@ package frc.robot;
 
 import static frc.robot.Util.logf;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -76,8 +71,9 @@ public class RobotContainer {
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
-  public static CoralSubsystem coralSubsystem = new CoralSubsystem();
+  public final CoralSubsystem coralSubsystem = new CoralSubsystem();
   public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
+  public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
@@ -89,8 +85,6 @@ public class RobotContainer {
   private SlewRateLimiter sLY = new SlewRateLimiter(Constants.MAX_VELOCITY_METERS_PER_SECOND / 0.5);
   private SlewRateLimiter sRX = new SlewRateLimiter(Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
-  public PoseSubsystem poseSubsystem;
-
   // TODO: Move these to a separate file
   public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
   public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));
@@ -99,7 +93,6 @@ public class RobotContainer {
 
   public static RobotContainer instance;
   public Autonomous autonomous;
-  private final SendableChooser<Command> autoChooser;
   public boolean hasBeenHomed = false;
 
   // private final SendableChooser<Command> autoChooser;
@@ -108,12 +101,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    RegisterNamedCommands();
-    
-    poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
-
-    autoChooser = AutoBuilder.buildAutoChooser("Speaker5Auto");
-    SmartDashboard.putData(autoChooser);
+    autonomous = new Autonomous(this);
 
     instance = this;
     logf("Creating RobotContainer\n");
@@ -133,7 +121,6 @@ public class RobotContainer {
         driveController.leftBumper(),
         // Set robot oriented control based upon left bumper
         driveController.rightBumper()));
-
 
     configureButtonBindings();
     configureDashboard();
@@ -197,16 +184,6 @@ public class RobotContainer {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  private void RegisterNamedCommands() {
-    NamedCommands.registerCommand("intake",
-        new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
-    NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(shooterSubsystem,
-        indexerSubsystem, tiltSubsystem, .55, 55));
-    NamedCommands.registerCommand("homeShooter", new TiltHomeCommand(tiltSubsystem));
-    NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(shooterSubsystem,
-        indexerSubsystem, tiltSubsystem, .55, 10));
   }
 
   // TODO this method need a lot of work
@@ -278,7 +255,8 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
     driverController.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
-    // driverController.a().onTrue(new StopAllCommand(shooterSubsystem, indexerSubsystem, intakeSubsystem));
+    // driverController.a().onTrue(new StopAllCommand(shooterSubsystem,
+    // indexerSubsystem, intakeSubsystem));
     driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
     // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
@@ -287,11 +265,7 @@ public class RobotContainer {
 
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
-    driverController.a().whileTrue(getAutonomousCommand());
-  }
-
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    driverController.a().whileTrue(autonomous.getAutonomousCommand());
   }
 
   // --------------------- Buttons for Operator -----------------
