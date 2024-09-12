@@ -73,6 +73,7 @@ public class RobotContainer {
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
   public final CoralSubsystem coralSubsystem = new CoralSubsystem();
   public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
+  // TODO Keith why not limelight-2 and how do we set the correct pipeline
   public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
@@ -111,9 +112,9 @@ public class RobotContainer {
     // modifyAxis: deadband compensation
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         drivetrainSubsystem,
-        () -> sLY.calculate(modifyAxis(driveController.getLeftY())
+        () -> sLY.calculate(-modifyAxis(driveController.getLeftY())
             * Constants.MAX_VELOCITY_METERS_PER_SECOND),
-        () -> sLX.calculate(modifyAxis(driveController.getLeftX())
+        () -> sLX.calculate(-modifyAxis(driveController.getLeftX())
             * Constants.MAX_VELOCITY_METERS_PER_SECOND),
         () -> sRX.calculate(-modifyAxis(driveController.getRightX())
             * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND),

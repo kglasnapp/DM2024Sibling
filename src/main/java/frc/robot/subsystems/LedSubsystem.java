@@ -11,13 +11,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class LedSubsystem extends SubsystemBase {
     boolean changed = false;
     private AddressableLED m_led;
-    private AddressableLEDBuffer m_ledBuffer;    
-
+    private AddressableLEDBuffer m_ledBuffer;
 
     public LedSubsystem() {
-       
+
         initNeoPixel();
-        setColors(Leds.GRABBER, 0,0,0);
+        setColors(Leds.GRABBER, 0, 0, 0);
     }
 
     public enum Leds {
@@ -41,18 +40,14 @@ public class LedSubsystem extends SubsystemBase {
     int counter = 0;
     boolean light = false;
     boolean on = true;
+
     @Override
     public void periodic() {
-       logf("Current status = %s\n", state.toString());
-        
         if (changed) {
-                m_led.setData(m_ledBuffer);
+            m_led.setData(m_ledBuffer);
         }
         changed = false;
     }
-
-
-    
 
     private void initNeoPixel() {
         m_led = new AddressableLED(9);
@@ -78,6 +73,14 @@ public class LedSubsystem extends SubsystemBase {
             setColors(led, 80, 0, 0);
         } else {
             setColors(led, 0, 80, 0);
+        }
+    }
+
+    public void setNoteState(Leds led, boolean notePresent) {
+        if (notePresent) {
+            setColors(led, 0, 80, 0);
+        } else {
+            setColors(led, 80, 0, 0);
         }
     }
 }

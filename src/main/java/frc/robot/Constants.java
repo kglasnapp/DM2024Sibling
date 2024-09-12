@@ -67,14 +67,6 @@ public final class Constants {
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND
                         / DRIVETRAIN_RADIUS;
 
-        public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7;
-        public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8;
-        public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 7;
-
-        public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
-        public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
-        public static final int BACK_LEFT_MODULE_STEER_ENCODER = 5;
-
         public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 1;
         public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 2;
         public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 1;
@@ -82,6 +74,14 @@ public final class Constants {
         public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3;
         public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 4;
         public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 3;
+
+        public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 7;
+        public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 8;
+        public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 7;
+
+        public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
+        public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
+        public static final int BACK_LEFT_MODULE_STEER_ENCODER = 5;
 
         public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                         // Translation PID constants
@@ -100,7 +100,7 @@ public final class Constants {
         // 2.0 = Squared
         // Should be a float greater than 1.0
         public static final double CONTROLLER_SENSITIVITY = 2.0;
-        public static final double CONTROLLER_DEAD_BAND = 0.08;
+        public static final double CONTROLLER_DEAD_BAND = 0.04;
 
         public static boolean logging = false;
 }

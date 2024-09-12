@@ -64,17 +64,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public DrivetrainSubsystem(RobotContainer robotContainer) {
     this.robotContainer = robotContainer;
 
-    m_frontLeftModule = new SwerveModule(0, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
-        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
+    m_frontLeftModule = new SwerveModule(0, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
+        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER));
 
-    m_frontRightModule = new SwerveModule(1, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
-        BACK_LEFT_MODULE_DRIVE_MOTOR, BACK_LEFT_MODULE_STEER_MOTOR, BACK_LEFT_MODULE_STEER_ENCODER));
-
-    m_backLeftModule = new SwerveModule(2, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
+    m_frontRightModule = new SwerveModule(1, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
         FRONT_RIGHT_MODULE_DRIVE_MOTOR, FRONT_RIGHT_MODULE_STEER_MOTOR, FRONT_RIGHT_MODULE_STEER_ENCODER));
 
-    m_backRightModule = new SwerveModule(3, SwerveModuleType.Mk4iL2, new SwerveModuleIds(
-        FRONT_LEFT_MODULE_DRIVE_MOTOR, FRONT_LEFT_MODULE_STEER_MOTOR, FRONT_LEFT_MODULE_STEER_ENCODER));
+    m_backLeftModule = new SwerveModule(2, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
+        BACK_LEFT_MODULE_DRIVE_MOTOR, BACK_LEFT_MODULE_STEER_MOTOR, BACK_LEFT_MODULE_STEER_ENCODER));
+
+    m_backRightModule = new SwerveModule(3, SwerveModuleType.Mk4nL2, new SwerveModuleIds(
+        BACK_RIGHT_MODULE_DRIVE_MOTOR, BACK_RIGHT_MODULE_STEER_MOTOR, BACK_RIGHT_MODULE_STEER_ENCODER));
 
     swerveModules = new SwerveModule[] {
         m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule
