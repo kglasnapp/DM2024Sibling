@@ -123,7 +123,6 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
         //         }
         //     }
         // } else {
-            // TODO Keith is using blue only correct ???
         //     LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraId);
 
         //     if (mt1 != null) {

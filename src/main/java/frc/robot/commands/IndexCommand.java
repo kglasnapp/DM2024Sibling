@@ -20,7 +20,7 @@ public class IndexCommand extends Command {
     @Override
     public void initialize() {
         startTime = RobotController.getFPGATime();
-        indexerSubsystem.setSpeed(.3);
+        indexerSubsystem.setSpeed(IndexerSubsystem.INTAKE_SPEED);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class IndexCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        indexerSubsystem.setSpeed(0);
+        indexerSubsystem.stop();
     }
 
     @Override

@@ -77,8 +77,8 @@ public class AmpShotCommand extends Command {
             waitCount--;
             if (waitCount < 0) {
                 logf("Shoot Command finished\n");
-                indexer.setSpeed(0);
-                shooter.setAllShooterPower(0);
+                indexer.stop();
+                shooter.stop();
                 finished = true;
             }
         }
@@ -90,8 +90,8 @@ public class AmpShotCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        indexer.setSpeed(0);
-        shooter.setAllShooterPower(0);
+        indexer.stop();
+        shooter.stop();
         logf("Amp command end interupt:%b\n", interrupted);
     }
 
@@ -99,5 +99,5 @@ public class AmpShotCommand extends Command {
     @Override
     public boolean isFinished() {
         return finished;
-    }    
+    }
 }

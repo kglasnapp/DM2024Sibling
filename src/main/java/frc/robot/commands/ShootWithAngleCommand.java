@@ -11,24 +11,26 @@ public class ShootWithAngleCommand extends Command {
 
     boolean finished = false;
     double startTime = 0;
+
     enum State {
         START_MOTORS,
         TRIGGER,
         END
     };
+
     State state;
 
-    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem,TiltSubsystem tiltSubsystem) {
-            this.shooterSubsystem = shooterSubsystem;
-            this.tiltSubsystem = tiltSubsystem;
-            addRequirements(shooterSubsystem);
-        }
+    public ShootWithAngleCommand(ShooterSubsystem shooterSubsystem, TiltSubsystem tiltSubsystem) {
+        this.shooterSubsystem = shooterSubsystem;
+        this.tiltSubsystem = tiltSubsystem;
+        addRequirements(shooterSubsystem);
+    }
 
     @Override
     public void initialize() {
         state = State.START_MOTORS;
         finished = false;
-        tiltSubsystem.setTiltAngle(0);        
+        tiltSubsystem.setTiltAngle(0);
         shooterSubsystem.setAllShooterPower(0.95);
         startTime = RobotController.getFPGATime() / 1000;
     }
@@ -40,7 +42,7 @@ public class ShootWithAngleCommand extends Command {
                 if (RobotController.getFPGATime() / 1000 > startTime + 1000) {
                     startTime = RobotController.getFPGATime() / 1000;
                     state = State.TRIGGER;
-                }        
+                }
                 break;
             case TRIGGER:
                 if (RobotController.getFPGATime() / 1000 > startTime + 3000) {
@@ -48,10 +50,10 @@ public class ShootWithAngleCommand extends Command {
                 }
                 break;
             case END:
-                shooterSubsystem.setAllShooterPower(0);                
+                shooterSubsystem.stop();
                 break;
         }
-        
+
     }
 
     @Override

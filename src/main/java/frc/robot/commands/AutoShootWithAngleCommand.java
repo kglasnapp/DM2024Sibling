@@ -89,7 +89,7 @@ public class AutoShootWithAngleCommand extends Command {
         if (state == STATE.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage-.1))) {
                 state = STATE.WAIT_NOTE_OUT;
-                indexer.setSpeed(.5);
+                indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
         }
         if (state == STATE.WAIT_NOTE_OUT) {
@@ -105,8 +105,8 @@ public class AutoShootWithAngleCommand extends Command {
             waitCount--;
             if (waitCount < 0) {
                 logf("Shoot Command finished\n");
-                indexer.setSpeed(0);
-                shooter.setAllShooterPower(0);
+                indexer.stop();
+                shooter.stop();
                 finished = true;
             }
 

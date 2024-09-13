@@ -100,7 +100,7 @@ public final class Constants {
         // 2.0 = Squared
         // Should be a float greater than 1.0
         public static final double CONTROLLER_SENSITIVITY = 2.0;
-        public static final double CONTROLLER_DEAD_BAND = 0.04;
+        public static final double CONTROLLER_DEAD_BAND = 0.08;
 
         public static boolean logging = false;
 }

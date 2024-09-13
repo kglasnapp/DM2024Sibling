@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.AutoIntakeNoteCommand;
 import frc.robot.commands.AutoShootWithAngleCommand;
 import frc.robot.commands.IntakeNoteCommand;
 import frc.robot.commands.TiltHomeCommand;
@@ -17,7 +18,7 @@ public class Autonomous {
 
     public Autonomous(RobotContainer robotContainer) {
         NamedCommands.registerCommand("intake",
-                new IntakeNoteCommand(robotContainer.intakeSubsystem, robotContainer.indexerSubsystem));
+                new AutoIntakeNoteCommand(robotContainer.intakeSubsystem, robotContainer.indexerSubsystem));
         NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
                 robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 55));
         NamedCommands.registerCommand("homeShooter", new TiltHomeCommand(robotContainer.tiltSubsystem));

@@ -73,7 +73,6 @@ public class RobotContainer {
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
   public final CoralSubsystem coralSubsystem = new CoralSubsystem();
   public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
-  // TODO Keith why not limelight-2 and how do we set the correct pipeline
   public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);

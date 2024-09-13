@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-public class IndexerSubsystem  extends SubsystemBase {
+public class IndexerSubsystem extends SubsystemBase {
+    public static double SHOOT_SPEED = 0.9;
+    public static double INTAKE_SPEED = 0.7;
 
     public static int INDEXER_MOTOR_ID = 11;
 
@@ -46,7 +48,7 @@ public class IndexerSubsystem  extends SubsystemBase {
     }
 
     public void setSpeed(double speed) {
-       indexerMotor.set(speed); 
+        indexerMotor.set(speed);
     }
 
     public void stop() {

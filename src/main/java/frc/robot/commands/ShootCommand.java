@@ -37,7 +37,7 @@ public class ShootCommand extends Command {
         this.poseSubsystem = poseSubsystem;
         addRequirements(shooter);
         addRequirements(indexer);
-        //addRequirements(null);
+        // addRequirements(null);
     }
 
     public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
@@ -87,9 +87,9 @@ public class ShootCommand extends Command {
             logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime / 1000000.0);
         }
         if (state == STATE.WAIT_SHOOT_SPEED) {
-            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage-.02))) {
+            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {
                 state = STATE.WAIT_NOTE_OUT;
-                indexer.setSpeed(.5);
+                indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
         }
         if (state == STATE.WAIT_NOTE_OUT) {
@@ -105,8 +105,8 @@ public class ShootCommand extends Command {
             waitCount--;
             if (waitCount < 0) {
                 logf("Shoot Command finished\n");
-                indexer.setSpeed(0);
-                shooter.setAllShooterPower(0);
+                indexer.stop();
+                shooter.stop();
                 finished = true;
             }
 
