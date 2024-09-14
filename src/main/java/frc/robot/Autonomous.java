@@ -1,8 +1,13 @@
 package frc.robot;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -57,5 +62,30 @@ public class Autonomous {
             return null;
         }
         return autoChooser.getSelected();
+    }
+
+    public Map<String, Command> getAllAutosByName() {
+        Map<String, Command> map = new HashMap<String, Command>();
+
+        for (String auto : AutoBuilder.getAllAutoNames()) {
+            map.put(auto, new PathPlannerAuto(auto));
+        }
+
+        return map;
+    }
+
+    public String getSelectedAutoName() {
+        // Auto chooser stores the name of the selected auto but doesnt make it
+        // publiclly accessiable. Here, we access it anyways with reflection
+        try {
+            Field f = autoChooser.getClass().getField("m_selected");
+            f.setAccessible(true);
+            return (String) f.get(autoChooser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Just return nothing incase our hack didnt work
+        return "";
     }
 }

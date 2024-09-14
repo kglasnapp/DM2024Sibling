@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import static frc.robot.Util.logf;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //import static frc.robot.utilities.Util.logf;
@@ -14,13 +16,13 @@ public class LedSubsystem extends SubsystemBase {
     private AddressableLEDBuffer m_ledBuffer;
 
     public LedSubsystem() {
-
         initNeoPixel();
         setColors(Leds.GRABBER, 0, 0, 0);
     }
 
     public enum Leds {
-        GRABBER(0, 144);
+        GRABBER(0, 144),
+        ALLEDS(0, 144);
 
         public final int val;
         public final int number;
@@ -36,6 +38,8 @@ public class LedSubsystem extends SubsystemBase {
     };
 
     State state = State.SET_IDLE_COLOR;
+    Alliance lastAlliance = Alliance.Blue;
+    boolean lastNoteState = false;
 
     int counter = 0;
     boolean light = false;
@@ -76,11 +80,29 @@ public class LedSubsystem extends SubsystemBase {
         }
     }
 
-    public void setNoteState(Leds led, boolean notePresent) {
-        if (notePresent) {
-            setColors(led, 0, 80, 0);
+    public void setNoteState(boolean notePresent) {
+        Leds leds = Leds.ALLEDS;
+        if (notePresent != lastNoteState) {
+            lastNoteState = notePresent;
+
+            if (notePresent) {
+                setColors(leds, 0, 80, 0);
+            } else {
+                setAllianceState(lastAlliance);
+            }
+        }
+    }
+
+    public void setAllianceState(Alliance alliance) {
+        Leds leds = Leds.ALLEDS;
+        lastAlliance = alliance;
+
+        if (alliance == Alliance.Blue) {
+            setColors(leds, 0, 0, 80);
+        } else if (alliance == Alliance.Red) {
+            setColors(leds, 80, 0, 0);
         } else {
-            setColors(led, 80, 0, 0);
+            setColors(leds, 0, 0, 0);
         }
     }
 }

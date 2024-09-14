@@ -21,11 +21,13 @@ public class IndexerSubsystem extends SubsystemBase {
 
     private TalonFX indexerMotor = new TalonFX(INDEXER_MOTOR_ID);
     private final double CURRENT_LIMIT = 60;
+    private final LedSubsystem leds;
 
     private DigitalInput notePresent = new DigitalInput(2);
 
-    public IndexerSubsystem() {
+    public IndexerSubsystem(LedSubsystem leds) {
         setConfig(indexerMotor);
+        this.leds = leds;
     }
 
     private void setConfig(TalonFX talon) {
@@ -59,6 +61,10 @@ public class IndexerSubsystem extends SubsystemBase {
     public void periodic() {
         if (Robot.count % 10 == 4) {
             SmartDashboard.putBoolean("Note", isNotePresent());
+        }
+
+        if (Robot.count % 5 == 0) {
+            leds.setNoteState(isNotePresent());
         }
     }
 }

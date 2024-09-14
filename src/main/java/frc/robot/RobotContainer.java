@@ -29,6 +29,8 @@ package frc.robot;
 
 import static frc.robot.Util.logf;
 
+import java.util.Set;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,6 +40,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -45,6 +48,7 @@ import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TiltSubsystem;
@@ -67,8 +71,9 @@ public class RobotContainer {
   // private final LimeLightPose limeLightPose = new LimeLightPose();
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
+  public final LedSubsystem leds = new LedSubsystem();
   public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem(leds);
   public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
   public final CoralSubsystem coralSubsystem = new CoralSubsystem();
@@ -245,6 +250,9 @@ public class RobotContainer {
   // });
   // }
 
+  /**
+   * @param driverController
+   */
   public void configureDriverController(CommandXboxController driverController) {
     driverController.back().whileTrue(new RunCommand(new Runnable() {
       public void run() {
@@ -265,7 +273,7 @@ public class RobotContainer {
 
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
-    driverController.a().whileTrue(autonomous.getAutonomousCommand());
+    driverController.a().whileTrue(Commands.select(autonomous.getAllAutosByName(), autonomous::getSelectedAutoName));
   }
 
   // --------------------- Buttons for Operator -----------------
