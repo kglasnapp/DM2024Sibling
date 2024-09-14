@@ -91,10 +91,10 @@ public class RobotContainer {
   private SlewRateLimiter sRX = new SlewRateLimiter(Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND / 0.25);
 
   // TODO: Move these to a separate file
-  public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.54, new Rotation2d());
-  public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.54, new Rotation2d(Math.toRadians(180)));
-  public final static Pose2d BLUE_AMP = new Pose2d(72.5, 323, new Rotation2d(Math.toRadians(270)));
-  public final static Pose2d RED_AMP = new Pose2d(578.77, 323, new Rotation2d(Math.toRadians(270)));
+  public final static Pose2d BLUE_SPEAKER = new Pose2d(-0.0381, 5.55, new Rotation2d());
+  public final static Pose2d RED_SPEAKER = new Pose2d(16.57, 5.55, new Rotation2d(Math.toRadians(180)));
+  public final static Pose2d BLUE_AMP = new Pose2d(1.84, 8.20, new Rotation2d(Math.toRadians(270)));
+  public final static Pose2d RED_AMP = new Pose2d(14.70, 8.20, new Rotation2d(Math.toRadians(270)));
 
   public static RobotContainer instance;
   public Autonomous autonomous;
