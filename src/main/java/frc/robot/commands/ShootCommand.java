@@ -23,7 +23,7 @@ public class ShootCommand extends Command {
     PoseSubsystem poseSubsystem;
     long startTime;
     int waitCount = 0;
-    STATE lastState = STATE.IDLE;
+    State lastState = State.IDLE;
     double angle;
     double speedPercentage = 0;
     int MAX_SPEED = 5500;
@@ -52,30 +52,31 @@ public class ShootCommand extends Command {
         addRequirements(shooter);
     }
 
-    public static enum STATE {
+    public static enum State {
         IDLE,
         WAIT_SHOOT_SPEED,
+        WAIT1,
         WAIT_NOTE_OUT,
-        WAIT,
+        WAIT2,
         FINISHED
     };
 
-    STATE state = STATE.IDLE;
+    State state = State.IDLE;
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         logf("Initializing the shooters\n");
-        state = STATE.IDLE;
+        state = State.IDLE;
         startTime = RobotController.getFPGATime();
         boolean note = indexer.isNotePresent();
         finished = false;
         logf("The note is present: %b, speed: %.2f\n", note, speedPercentage);
         if (note) {
             shooter.setAllShooterPower(speedPercentage);
-            state = STATE.WAIT_SHOOT_SPEED;
+            state = State.WAIT_SHOOT_SPEED;
         } else {
-            state = STATE.FINISHED;
+            state = State.FINISHED;
         }
     }
 
@@ -86,22 +87,29 @@ public class ShootCommand extends Command {
             long elapsedTime = RobotController.getFPGATime() - startTime;
             logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime / 1000000.0);
         }
-        if (state == STATE.WAIT_SHOOT_SPEED) {
+        if (state == State.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {
-                state = STATE.WAIT_NOTE_OUT;
+                state = State.WAIT1;
+                waitCount = 25;
                 indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
         }
-        if (state == STATE.WAIT_NOTE_OUT) {
+        if (state == State.WAIT1) {
+            waitCount--;
+            if (waitCount < 0) {
+                state = State.WAIT_NOTE_OUT;
+            }
+        }
+        if (state == State.WAIT_NOTE_OUT) {
             boolean note = indexer.isNotePresent();
             logf("Shoot Command Note Out: %b\n", note);
             if (!note) {
 
-                state = STATE.WAIT;
-                waitCount = 5;
+                state = State.WAIT2;
+                waitCount = 25;
             }
         }
-        if (state == STATE.WAIT) {
+        if (state == State.WAIT2) {
             waitCount--;
             if (waitCount < 0) {
                 logf("Shoot Command finished\n");
@@ -111,7 +119,7 @@ public class ShootCommand extends Command {
             }
 
         }
-        if (state == STATE.FINISHED) {
+        if (state == State.FINISHED) {
             finished = true;
         }
     }

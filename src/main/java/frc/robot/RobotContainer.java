@@ -263,6 +263,8 @@ public class RobotContainer {
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem));
     driverController.y().onTrue(
         new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1));
+    driverController.a().onTrue(
+        new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 0.8));
     // driverController.a().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
     driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
@@ -273,14 +275,15 @@ public class RobotContainer {
 
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
-    driverController.a().whileTrue(Commands.select(autonomous.getAllAutosByName(), autonomous::getSelectedAutoName));
+
+    // driverController.a().whileTrue(Commands.select(autonomous.getAllAutosByName(), autonomous::getSelectedAutoName));
   }
 
   // --------------------- Buttons for Operator -----------------
   public void configureOperatorController(CommandXboxController opController) {
     opController.back().onTrue(new TiltHomeCommand(tiltSubsystem));
     opController.povRight().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 30.5));
-    opController.povDown().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 45.0));
+    opController.povDown().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 39.0));
     opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 92.0));
     opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
     opController.x().whileTrue(new IndexCommand(indexerSubsystem));
