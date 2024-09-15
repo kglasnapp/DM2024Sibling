@@ -4,71 +4,91 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.utilities.Util;
+
 import static frc.robot.utilities.Util.logf;
 
-public class RotateCommand extends Command {
-    double initialTime = 0;
-    double targetRotationAngle = 180;
-    double goal = 0;
-    double initialAngle = 0;    
-    DrivetrainSubsystem drivetrainSubsystem;
+import java.util.function.DoubleSupplier;
 
-    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem) {
-        this(drivetrainSubsystem, 180);
+public class RotateCommand extends Command {
+    private final DoubleSupplier rotationTargetSupplier;
+    private final DrivetrainSubsystem drivetrainSubsystem;
+    private final PoseSubsystem poseSubsystem;
+    private final boolean relative;
+    private final boolean continuous;
+    private long initialTime = 0;
+    private double offset = 0;
+    private double error = 0;
+
+    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem, PoseSubsystem poseSubsystem) {
+        this(drivetrainSubsystem, poseSubsystem, 180, true);
     }
 
-    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem, double targetRotationAngleDegrees) {
+    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem, PoseSubsystem poseSubsystem, double degrees) {
+        this(drivetrainSubsystem, poseSubsystem, degrees, true);
+    }
+
+    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem, PoseSubsystem poseSubsystem, double degrees,
+            boolean relative) {
         this.drivetrainSubsystem = drivetrainSubsystem;
-        this.targetRotationAngle = targetRotationAngleDegrees; //normalizeAngle(targetRotationAngleDegrees);        
+        this.poseSubsystem = poseSubsystem;
+        this.rotationTargetSupplier = () -> degrees;
+        this.relative = relative;
+        this.continuous = false;
+        addRequirements(drivetrainSubsystem);
+    }
+
+    public RotateCommand(DrivetrainSubsystem drivetrainSubsystem, PoseSubsystem poseSubsystem,
+            DoubleSupplier rotationErrorSupplier,
+            boolean relative, boolean continuous) {
+        this.drivetrainSubsystem = drivetrainSubsystem;
+        this.poseSubsystem = poseSubsystem;
+        this.rotationTargetSupplier = rotationErrorSupplier;
+        this.relative = relative;
+        this.continuous = continuous;
+        addRequirements(drivetrainSubsystem);
     }
 
     @Override
     public void initialize() {
-        addRequirements(drivetrainSubsystem);
-        initialAngle = normalizeAngle(drivetrainSubsystem.getGyroscopeRotation().getDegrees());
-        goal = normalizeAngle(initialAngle + targetRotationAngle);        
-        logf("Start Rotate Command initial angle: %.2f targetRotation = %.2f shortestPath = %.2f\n", 
-            initialAngle, targetRotationAngle, shortestPathBetweenAngles(initialAngle, goal));
+        if (relative) {
+            offset = poseSubsystem.get().getRotation().getDegrees();
+        }
         initialTime = RobotController.getFPGATime();
+        logf("Start Rotate Command\n");
     }
-
-    
-  public static void main(String arg[]) {
-    System.out.println(shortestPathBetweenAngles(179,-178));
-    System.out.println(shortestPathBetweenAngles(-179,178));
-    System.out.println(shortestPathBetweenAngles(179,178));
-    System.out.println(shortestPathBetweenAngles(90,45));
-  }
-
-  public static double shortestPathBetweenAngles(double sourceAngle, double targetAngle) {
-    double result = targetAngle - sourceAngle;
-    result += (result>180) ? -360 : (result<-180) ? 360 : 0;
-    return result;
-  }
 
     @Override
     public void execute() {
-        double normilizedYaw = normalizeAngle(drivetrainSubsystem.getGyroscopeRotation().getDegrees());
-        double shortestPathAngle = shortestPathBetweenAngles(normilizedYaw, goal);
-        double omegaSpeed = shortestPathAngle / 64;
-        logf("In rotate command goal = %.2f yaw = %.2f and omegaSpeed = %.2f\n", goal, normilizedYaw, omegaSpeed);
-        drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, Math.toRadians(omegaSpeed)));
-    }
+        double yaw = poseSubsystem.get().getRotation().getDegrees();
+        double goal = rotationTargetSupplier.getAsDouble() + offset;
 
-    double normalizeAngle(double angle) {
-        return Util.normalizeAngle(angle);
+        error = shortestPathBetweenAngles(yaw, goal);
+        double omegaSpeed = error * 2.5;
+
+        logf("In rotate command goal = %.2f yaw = %.2f and omegaSpeed = %.2f\n", Util.normalizeAngle(goal),
+                Util.normalizeAngle(yaw), omegaSpeed);
+        drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, Math.toRadians(omegaSpeed)));
     }
 
     @Override
     public boolean isFinished() {
-        double currentAngle = normalizeAngle(drivetrainSubsystem.getGyroscopeRotation().getDegrees());
-        return Math.abs(normalizeAngle(goal - currentAngle)) < 1;
+        if (!continuous) {
+            return Math.abs(error) < 0.5;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
-        logf("Rotate Command Complete time:%.2f\n", (RobotController.getFPGATime() - initialTime) / 1000000);
+        logf("Rotate Command Complete time:%.2f\n", (RobotController.getFPGATime() - initialTime) / 1000000.0);
         drivetrainSubsystem.stop();
+    }
+
+    private static double shortestPathBetweenAngles(double from, double to) {
+        double result = Util.normalizeAngle(Util.normalizeAngle(to) - Util.normalizeAngle(from));
+        return result;
     }
 }

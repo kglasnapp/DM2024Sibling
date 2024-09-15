@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7063500881195067,
+      "x": 0.7063500881195068,
       "y": 4.187590599060059
     },
     "rotation": 123.31061216688974
@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.1"
+                  "pathName": "OffsetSpeaker5.1"
                 }
               },
               {
@@ -55,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.2"
+                  "pathName": "OffsetSpeaker5.2"
                 }
               },
               {
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.3"
+                  "pathName": "OffsetSpeaker5.3"
                 }
               },
               {
@@ -105,7 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.4"
+                  "pathName": "OffsetSpeaker5.4"
                 }
               },
               {

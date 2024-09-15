@@ -68,6 +68,7 @@ public class AutoShootWithAngleCommand extends Command {
         } else {
             state = STATE.FINISHED;
         }
+        finished = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.

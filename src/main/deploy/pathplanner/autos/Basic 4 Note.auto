@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7063500881195067,
-      "y": 4.187590599060059
+      "x": 1.3814625740051272,
+      "y": 5.562201976776123
     },
-    "rotation": 123.31061216688974
+    "rotation": 179.90874767107852
   },
   "command": {
     "type": "sequential",
@@ -18,19 +18,13 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "homeShooter"
-          }
-        },
-        {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.1"
+                  "pathName": "4 Note.1"
                 }
               },
               {
@@ -45,17 +39,17 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "fancyShoot"
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.2"
+                  "pathName": "4 Note.2"
                 }
               },
               {
@@ -70,17 +64,17 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "fancyShoot"
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Speaker5.3"
+                  "pathName": "4 Note.3"
                 }
               },
               {
@@ -95,32 +89,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Speaker5.4"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "name": "fancyShoot"
           }
         }
       ]

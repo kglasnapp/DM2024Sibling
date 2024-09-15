@@ -46,7 +46,7 @@ public class AutoIntakeNoteCommand extends Command {
             logf("note indexed\n");
             finished = true;
         }
-        if (count > 20 && intakeSubsystem.getMotorCurrent() > 12) {
+        if (count > 20 && intakeSubsystem.getMotorCurrent() > 13) {
             logf("Note Grabbed\n");
             startTimer = true;
         }
@@ -58,7 +58,10 @@ public class AutoIntakeNoteCommand extends Command {
             logf("timer expired\n");
             finished = true;
         }
-        count ++;
+        if (count > 225) {
+            finished = true;
+        }
+         count ++;
     }
 
     @Override

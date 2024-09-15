@@ -91,13 +91,13 @@ public class ShootCommand extends Command {
             if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {
                 state = State.WAIT1;
                 waitCount = 25;
-                indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
         }
         if (state == State.WAIT1) {
             waitCount--;
             if (waitCount < 0) {
                 state = State.WAIT_NOTE_OUT;
+                indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
         }
         if (state == State.WAIT_NOTE_OUT) {

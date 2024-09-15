@@ -13,10 +13,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.AimTiltToSpeaker;
 import frc.robot.commands.AutoIntakeNoteCommand;
 import frc.robot.commands.AutoShootWithAngleCommand;
 import frc.robot.commands.IntakeNoteCommand;
+import frc.robot.commands.ShootCommand;
+import frc.robot.commands.SpeakerAlligningCommand;
 import frc.robot.commands.TiltHomeCommand;
+import frc.robot.commands.TiltSetAngleCommand;
 
 public class Autonomous {
     private SendableChooser<Command> autoChooser;
@@ -25,10 +30,15 @@ public class Autonomous {
         NamedCommands.registerCommand("intake",
                 new AutoIntakeNoteCommand(robotContainer.intakeSubsystem, robotContainer.indexerSubsystem));
         NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
-                robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 55));
-        NamedCommands.registerCommand("homeShooter", new TiltHomeCommand(robotContainer.tiltSubsystem));
+                robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 45));
+        NamedCommands.registerCommand("homeShooter", new TiltSetAngleCommand(robotContainer.tiltSubsystem, 10.0));
         NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
                 robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 10));
+        NamedCommands.registerCommand("fancyShoot", Commands
+                .parallel(new AimTiltToSpeaker(robotContainer.tiltSubsystem, robotContainer.poseSubsystem, false),
+                        new SpeakerAlligningCommand(robotContainer.poseSubsystem, robotContainer.drivetrainSubsystem))
+                .andThen(new ShootCommand(robotContainer.shooterSubsystem, robotContainer.indexerSubsystem,
+                        robotContainer.poseSubsystem, 1.0)));
 
         AutoBuilder.configureHolonomic(
                 robotContainer.poseSubsystem::get,

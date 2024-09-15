@@ -34,13 +34,13 @@ public class SwerveModule {
   public static final int driveContinuousCurrentLimit = 60;
 
   /* Angle Motor PID Values */
-  public static final double angleKP = 0.01;
-  public static final double angleKI = 0.0;
+  public static final double angleKP = 0.012;
+  public static final double angleKI = 0.0006;
   public static final double angleKD = 0.0;
   public static final double angleKFF = 0.0;
 
   /* Drive Motor PID Values */
-  public static final double driveKP = 0.1;
+  public static final double driveKP = 0.01;
   public static final double driveKI = 0.0;
   public static final double driveKD = 0.0;
   public static final double driveKFF = 0.0;
@@ -157,6 +157,8 @@ public class SwerveModule {
     angleController.setI(angleKI);
     angleController.setD(angleKD);
     angleController.setFF(angleKFF);
+    angleController.setIMaxAccum(20, 0);
+    angleController.setIZone(2.0);
 
     angleController.setFeedbackDevice(integratedAngleEncoder);
     angleController.setPositionPIDWrappingEnabled(true);
@@ -176,10 +178,10 @@ public class SwerveModule {
     driveMotor.setIdleMode(driveNeutralMode);
     driveEncoder.setVelocityConversionFactor(driveConversionVelocityFactor);
     driveEncoder.setPositionConversionFactor(driveConversionPositionFactor);
-    driveController.setP(angleKP);
-    driveController.setI(angleKI);
-    driveController.setD(angleKD);
-    driveController.setFF(angleKFF);
+    driveController.setP(driveKP);
+    driveController.setI(driveKI);
+    driveController.setD(driveKD);
+    driveController.setFF(driveKFF);
     driveMotor.enableVoltageCompensation(voltageComp);
     driveMotor.burnFlash();
     driveEncoder.setPosition(0.0);

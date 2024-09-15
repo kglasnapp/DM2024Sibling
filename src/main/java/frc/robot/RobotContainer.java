@@ -78,7 +78,7 @@ public class RobotContainer {
   public final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem(this);
   public final CoralSubsystem coralSubsystem = new CoralSubsystem();
   public final TiltSubsystem tiltSubsystem = new TiltSubsystem();
-  public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight");
+  public final PoseSubsystem poseSubsystem = new PoseSubsystem(drivetrainSubsystem, "limelight-front");
   public final static CommandXboxController driveController = new CommandXboxController(2);
   public final static CommandXboxController operatorController = new CommandXboxController(3);
   public final static XboxController operatorHID = operatorController.getHID();
@@ -268,6 +268,12 @@ public class RobotContainer {
     // driverController.a().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
     driverController.b().onTrue(new AmpShotCommand(shooterSubsystem, indexerSubsystem));
+
+    driverController.povRight()
+        .whileTrue(Commands
+            .parallel(new AimTiltToSpeaker(tiltSubsystem, poseSubsystem, false),
+                new SpeakerAlligningCommand(poseSubsystem, drivetrainSubsystem))
+            .andThen(new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1.0)));
     // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
     // driveController.rightTrigger().onTrue(

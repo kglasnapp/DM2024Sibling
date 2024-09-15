@@ -101,7 +101,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
         // FIXME: Dont use megatag 2 when assumeNextVisionPose is true
         if (USE_VISION) {
             if (useMegaTag2) {
-                LimelightHelpers.SetRobotOrientation("limelight",
+                LimelightHelpers.SetRobotOrientation(cameraId,
                         poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0,
                         0);
                 LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
@@ -182,5 +182,9 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     @Override
     public Pose2d get() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public boolean hasGoodPose() {
+        return USE_VISION;
     }
 }

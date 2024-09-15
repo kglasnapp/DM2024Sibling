@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.381462574005127,
+      "x": 1.3814625740051265,
       "y": 5.562201976776123
     },
     "rotation": 179.90874767107852
@@ -22,21 +22,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "homeShooter"
+                  "pathName": "3 Note.1"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "intake"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Simple"
                 }
               }
             ]
@@ -45,7 +39,32 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "fancyShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3 Note.2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "fancyShoot"
           }
         }
       ]

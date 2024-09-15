@@ -27,18 +27,20 @@ public class TiltSetAngleCommand extends Command {
     @Override
     public void initialize() {
         logd("Initializing the tilt set angle:\n", true);
+        moving = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        if (moving && tiltSubsystem.state == State.IDLE) {
+            finished = true;
+            return;
+        }
         if (tiltSubsystem.state == State.IDLE) {
             tiltSubsystem.setTiltAngle(angle);
             moving = true;
             waitCount = 150;
-        }
-        if (moving && tiltSubsystem.state == State.IDLE) {
-            finished = true;
         }
         if (waitCount <= 0){
             finished = true;
