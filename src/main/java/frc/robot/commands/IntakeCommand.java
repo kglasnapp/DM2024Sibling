@@ -4,18 +4,22 @@ import static frc.robot.utilities.Util.logf;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 
 public class IntakeCommand extends Command {
     IntakeSubsystem intakeSubsystem;
     IndexerSubsystem indexerSubsystem;
     long startTime;
-    int count = 0;
+    int count;
+    LedSubsystem leds;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem) {
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, LedSubsystem leds) {
         this.intakeSubsystem = intakeSubsystem;
         addRequirements(intakeSubsystem);
+        this.leds = leds;
         // addRequirements(indexerSubsystem);
     }
 
@@ -23,12 +27,19 @@ public class IntakeCommand extends Command {
     public void initialize() {
         startTime = RobotController.getFPGATime();
         intakeSubsystem.intakeIn();
-        logf("Start Intake\n");
+        logf("Start Intake2\n");
+        count = 0;
+
     }
 
     @Override
     public void execute() {
         count++;
+        double current = intakeSubsystem.getMotorCurrent();
+        if (current > .01) {
+            logf("Intake current:%.2f count:%d\n", current, count);
+        }
+        leds.setLedsToWhite(current > 12);
     }
 
     @Override
@@ -40,8 +51,10 @@ public class IntakeCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        //boolean note = indexerSubsystem.isNotePresent();
-        return count == 250;
-    }
+        boolean note = indexerSubsystem.isNotePresent();
+        logf("Intake finished:%b count:%d\n", count > 500 || note, count);
+        // TODO Keith what does this do?
+        return count > 500 || note; // After 10 Seconds
+    } 
 
 }

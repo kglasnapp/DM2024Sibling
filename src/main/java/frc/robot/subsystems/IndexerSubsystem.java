@@ -63,8 +63,8 @@ public class IndexerSubsystem extends SubsystemBase {
             SmartDashboard.putBoolean("Note", isNotePresent());
         }
 
-        if (Robot.count % 5 == 0) {
+        //if (Robot.count % 5 == 0) {
             leds.setNoteState(isNotePresent());
-        }
+        //}
     }
 }

@@ -28,7 +28,7 @@ public class AutoIntakeNoteCommand extends Command {
         startTime = RobotController.getFPGATime();
         intakeSubsystem.intakeIn();
         indexerSubsystem.setSpeed(IndexerSubsystem.INTAKE_SPEED);
-        logf("Start Intake\n");
+        logf("Start Intake3\n");
         count = 0;
         timer = 0;
         startTimer = false;

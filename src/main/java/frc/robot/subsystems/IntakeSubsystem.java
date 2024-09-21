@@ -51,6 +51,10 @@ public class IntakeSubsystem extends SubsystemBase {
             return motor.getEncoder().getVelocity();
         }
 
+        public double getMotorCurrent() {
+            return motor.getOutputCurrent();
+        }
+
         double getPosition() {
             return motor.getEncoder().getPosition();
         }
@@ -75,6 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public double getMotorCurrent() {
-        return motor.motor.getOutputCurrent();
+       return motor.getMotorCurrent();
     }
+
 }

@@ -14,6 +14,7 @@ public class LedSubsystem extends SubsystemBase {
     boolean changed = false;
     private AddressableLED m_led;
     private AddressableLEDBuffer m_ledBuffer;
+    private boolean whiteActive = false;
 
     public LedSubsystem() {
         initNeoPixel();
@@ -81,10 +82,12 @@ public class LedSubsystem extends SubsystemBase {
     }
 
     public void setNoteState(boolean notePresent) {
+        if (whiteActive && !notePresent) {
+            return;
+        }
         Leds leds = Leds.ALLEDS;
         if (notePresent != lastNoteState) {
             lastNoteState = notePresent;
-
             if (notePresent) {
                 setColors(leds, 0, 80, 0);
             } else {
@@ -96,13 +99,30 @@ public class LedSubsystem extends SubsystemBase {
     public void setAllianceState(Alliance alliance) {
         Leds leds = Leds.ALLEDS;
         lastAlliance = alliance;
-
         if (alliance == Alliance.Blue) {
             setColors(leds, 0, 0, 80);
         } else if (alliance == Alliance.Red) {
             setColors(leds, 80, 0, 0);
         } else {
             setColors(leds, 0, 0, 0);
+        }
+    }
+
+    public void setLedsToWhite(boolean active) {
+        if (lastNoteState) {
+            whiteActive = false;
+            return;
+        }
+        whiteActive = active;
+        if (active) {
+            Leds leds = Leds.ALLEDS;
+            if (counter % 10 == 0) {
+                setAllianceState(lastAlliance);
+            } else {
+                setColors(leds, 128, 128, 128);
+            }
+        } else {
+            setAllianceState(lastAlliance);
         }
     }
 }
