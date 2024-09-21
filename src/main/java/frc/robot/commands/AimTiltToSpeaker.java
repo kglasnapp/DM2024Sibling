@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static frc.robot.utilities.Util.logf;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -24,6 +26,7 @@ public class AimTiltToSpeaker extends Command {
   private final boolean continuous;
   private Pose2d speakerPose;
   private double targetAngle;
+  private double distance;
 
   /** Creates a new AimTiltToSpeaker. */
   public AimTiltToSpeaker(TiltSubsystem tiltSybsystem, PoseSubsystem poseSubsystem, boolean continuous) {
@@ -46,7 +49,7 @@ public class AimTiltToSpeaker extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double distance = distance(poseSubsystem.get(), speakerPose);
+    distance = distance(poseSubsystem.get(), speakerPose);
     targetAngle = lookupAngle(distance);
 
     tiltSybsystem.setAngle(targetAngle);
@@ -55,6 +58,7 @@ public class AimTiltToSpeaker extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    logf("Aim Tilt finised: distance: %.2f, tilt: %.2f\n", distance, targetAngle);
   }
 
   // Returns true when the command should end.
