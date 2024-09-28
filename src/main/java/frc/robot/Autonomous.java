@@ -10,6 +10,8 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,8 +65,11 @@ public class Autonomous {
 
         FollowPathCommand.warmupCommand().schedule();
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-        SmartDashboard.putData(autoChooser);
+        autoChooser = AutoBuilder.buildAutoChooser("Basic 4 Note");
+        // SmartDashboard.putData(autoChooser);
+        
+        ShuffleboardTab tab = Shuffleboard.getTab("Odometry");
+        tab.add("chooser", autoChooser).withPosition(0, 1).withSize(2, 0);
     }
 
     public Command getAutonomousCommand() {

@@ -16,7 +16,7 @@ public class AmpShotCommand extends Command {
     STATE lastState = STATE.IDLE;
     double angle;
     double SPEED_PERCENTAGE = .1;
-    int MAX_SPEED = 5500;
+    int MAX_SPEED = 4500;
     boolean finished = false;
 
     public AmpShotCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
@@ -62,7 +62,7 @@ public class AmpShotCommand extends Command {
         if (state == STATE.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(MAX_SPEED * SPEED_PERCENTAGE)) {
                 state = STATE.WAIT_NOTE_OUT;
-                indexer.setSpeed(.5);
+                indexer.setSpeed(.4);
             }
         }
         if (state == STATE.WAIT_NOTE_OUT) {

@@ -290,7 +290,7 @@ public class RobotContainer {
     opController.back().onTrue(new TiltHomeCommand(tiltSubsystem));
     opController.povRight().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 30.5));
     opController.povDown().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 39.0));
-    opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 92.0));
+    opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 94.0));
     opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
     opController.x().whileTrue(new IndexCommand(indexerSubsystem));
     opController.y().whileTrue(new IntakeCommand(intakeSubsystem, leds));
