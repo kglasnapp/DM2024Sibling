@@ -38,7 +38,7 @@ public class IntakeNoteCommand extends Command {
         note = indexerSubsystem.isNotePresent();
         double current = intakeSubsystem.getMotorCurrent();
         if (current > 0.01) {
-            logf("Intake note current:%.2f \n", current);
+            // logf("Intake note current:%.2f \n", current);
         }
         leds.setLedsToWhite(current > 12);
         if (note) {

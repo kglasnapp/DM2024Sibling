@@ -90,7 +90,7 @@ public class TiltSubsystem extends SubsystemBase {
         pid = new PID_MAX();
         pid.PIDCoefficientsShooterTilt(pidControllerTiltMotor);
         pid.PIDToMax();
-        //logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
+        // logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
     }
 
     public void homeTilt() {
@@ -107,11 +107,10 @@ public class TiltSubsystem extends SubsystemBase {
         }
     }
 
-
     public void setAngle(double angle) {
         pidControllerTiltMotor.setReference(angle / DEGREES_PER_REV, ControlType.kSmartMotion);
     }
-    
+
     // rottions should be +1 or -1
     public void setRotations(double rotations) {
         if (state == State.IDLE && (lastRotations + rotations) * DEGREES_PER_REV <= maxAngle
@@ -192,8 +191,9 @@ public class TiltSubsystem extends SubsystemBase {
         }
 
         if (state == State.MOVING) {
-            logf("Tilt moving desired:%.2f actual:%.2f delta:%.2f\n", desiredAngle, getTiltAngle(),
-                    desiredAngle - getTiltAngle());
+            if (Robot.count % 15 == 3)
+                logf("Tilt moving desired:%.2f actual:%.2f delta:%.2f\n", desiredAngle, getTiltAngle(),
+                        desiredAngle - getTiltAngle());
             if (Math.abs(desiredAngle - getTiltAngle()) <= angleTolerance) {
                 state = State.IDLE;
             }

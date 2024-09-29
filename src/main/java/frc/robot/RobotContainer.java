@@ -259,6 +259,7 @@ public class RobotContainer {
         drivetrainSubsystem.zeroGyroscope();
       }
     }));
+    driverController.start().onTrue(new ResetOdometryWithCameraCommand(poseSubsystem));
     driverController.x().onTrue(
         new IntakeNoteCommand(intakeSubsystem, indexerSubsystem, leds));
     driverController.y().onTrue(
@@ -294,6 +295,7 @@ public class RobotContainer {
     opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
     opController.x().whileTrue(new IndexCommand(indexerSubsystem));
     opController.y().whileTrue(new IntakeCommand(intakeSubsystem, leds));
+    opController.a().whileTrue(new DriveToObjectCommand(drivetrainSubsystem, coralSubsystem, "Note"));
     opController.leftBumper().onTrue(new TiltManualCommand(tiltSubsystem, false)); // Send shooter down
     opController.rightBumper().onTrue(new TiltManualCommand(tiltSubsystem, true)); // Send shooter up
   }

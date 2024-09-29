@@ -50,8 +50,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private ShootMotor upperMotor;
     private PID_MAX pid = new PID_MAX();
     private final static int OVER_CURRENT = 30;
-    private int SHOOTER_MOTOR_ID1 = 26;
-    private int SHOOTER_MOTOR_ID3 = 27;
+    private int SHOOTER_MOTOR_ID1 = 9;
+    private int SHOOTER_MOTOR_ID3 = 10;
 
     public ShooterSubsystem() {
         this.upperMotor = new ShootMotor(SHOOTER_MOTOR_ID1, false);
@@ -112,6 +112,8 @@ public class ShooterSubsystem extends SubsystemBase {
         logf("speedPercentage: %.2f", power);
         upperMotor.setSpeed(power);
         lowerMotor.setSpeed(power);
+        // upperMotor.setShooterVelocity(power);
+        // lowerMotor.setShooterVelocity(power);
     }
 
     public void stop() {
@@ -122,19 +124,18 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean isShooterAtSpeed(double desired) {
         double upSpeed = Math.abs(upperMotor.getVelocity());
         double lowSpeed = Math.abs(lowerMotor.getVelocity());
-         logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
+        // logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
         if (upSpeed > desired && lowSpeed > desired) {
             return true;
         }
         if (Robot.count % 2 == 0) {
-            //logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
+            // logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
         }
         return false;
 
     }
 
-
-    //int lastPOV = -1;
+    // int lastPOV = -1;
 
     @Override
     public void periodic() {
@@ -145,24 +146,24 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Motor Pos", lowerMotor.getPosition());
         // }
 
-        //int pov = RobotContainer.operatorController.getHID().getPOV();
-        //double value = 0;
+        // int pov = RobotContainer.operatorController.getHID().getPOV();
+        // double value = 0;
         // if ((lastPOV != pov) && (pov >= 0)) {
-        //     if (pov == 0) {
-        //         value = 0.0;
-        //     }
-        //     if (pov == 90) {
-        //         value = 0.1;
-        //     }
-        //     if (pov == 180) {
-        //         value = 0.6;
-        //     }
-        //     if (pov == 270) {
-        //         value = 0.9;
-        //     }
-        //     upperMotor.setSpeed(value);
-        //     lowerMotor.setSpeed(value);
-        //     lastPOV = pov;
+        // if (pov == 0) {
+        // value = 0.0;
+        // }
+        // if (pov == 90) {
+        // value = 0.1;
+        // }
+        // if (pov == 180) {
+        // value = 0.6;
+        // }
+        // if (pov == 270) {
+        // value = 0.9;
+        // }
+        // upperMotor.setSpeed(value);
+        // lowerMotor.setSpeed(value);
+        // lastPOV = pov;
         // }
     }
 }

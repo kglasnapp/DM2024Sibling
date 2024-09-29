@@ -34,7 +34,6 @@ public class Robot extends TimedRobot {
   public static int count = 0;
   private final PDHData pdhData = new PDHData();
   public static Optional<Alliance> alliance;
-  
 
   Command cmd;
   public RobotContainer robotContainer;
@@ -101,16 +100,27 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    Command cmd = robotContainer.autonomous.getAutonomousCommand();
-    if (cmd != null) {
-      logf("Executing autonomous %s\n", cmd.getName());
-      cmd.schedule();
+    m_autonomousCommand = robotContainer.autonomous.getAutonomousCommand();
+    if (m_autonomousCommand != null) {
+      logf("Executing autonomous %s\n", m_autonomousCommand.getName());
+      m_autonomousCommand.schedule();
     }
+
+    alliance = DriverStation.getAlliance();
+    robotContainer.leds.setAllianceState(alliance.get());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+  }
+
+  @Override
+  public void autonomousExit() {
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+      m_autonomousCommand = null;
+    }
   }
 
   @Override
@@ -120,9 +130,10 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     Util.logf("TELEOP INIT %s\n", alliance.toString());
-    
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+      m_autonomousCommand = null;
     }
     alliance = DriverStation.getAlliance();
     robotContainer.leds.setAllianceState(alliance.get());

@@ -26,7 +26,7 @@ public class ShootCommand extends Command {
     State lastState = State.IDLE;
     double angle;
     double speedPercentage = 0;
-    int MAX_SPEED = 5500;
+    int MAX_SPEED = 6500;
     boolean finished = false;
 
     public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
@@ -85,7 +85,8 @@ public class ShootCommand extends Command {
     public void execute() {
         if (state != lastState) {
             long elapsedTime = RobotController.getFPGATime() - startTime;
-            logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime / 1000000.0);
+            // logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime /
+            // 1000000.0);
         }
         if (state == State.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {

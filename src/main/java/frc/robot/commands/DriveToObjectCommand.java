@@ -20,10 +20,11 @@ public class DriveToObjectCommand extends Command {
     // private String type;
     private double startTime;
     private double timeout;
+    private double speedAdjust = 50;
 
     /** Creates a new ReplaceMeCommand. */
     public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, CoralSubsystem coralSubsystem, String type) {
-        this(drivetrainSubsystem, coralSubsystem, type, 1000);
+        this(drivetrainSubsystem, coralSubsystem, type, 3000);
     }
 
     public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, CoralSubsystem coralSubsystem, String type,
@@ -67,7 +68,7 @@ public class DriveToObjectCommand extends Command {
                 if (coralSubsystem.percent == 1) {
                     state = State.START;
                 } else {
-                    drivetrainSubsystem.drive(new ChassisSpeeds(-0.0048, 0, Math.toRadians(0)));
+                    drivetrainSubsystem.drive(new ChassisSpeeds(-0.0048 * speedAdjust, 0, Math.toRadians(0)));
                 }
                 break;
             case START:
@@ -78,7 +79,7 @@ public class DriveToObjectCommand extends Command {
                         state = State.TIMER_START;
                         startTimeToGetTheNote = RobotController.getFPGATime() / 1000;
                     }
-                    drivetrainSubsystem.drive(new ChassisSpeeds(-0.012, 0, 0));
+                    drivetrainSubsystem.drive(new ChassisSpeeds(-0.012 * speedAdjust, 0, 0));
                     // drivetrainSubsystem.drive(new ChassisSpeeds(-0.3, 0, 0));
                     break;
                 } else {
@@ -93,11 +94,12 @@ public class DriveToObjectCommand extends Command {
                     }
                 }
                 xSpeed = -0.022;
-                drivetrainSubsystem.drive(new ChassisSpeeds(xSpeed, 0, Math.toRadians(omegaSpeed)));
+                drivetrainSubsystem.drive(new ChassisSpeeds(xSpeed * speedAdjust, 0, Math.toRadians(omegaSpeed)));
                 break;
             case TIMER_START:
                 if (startTimeToGetTheNote + 1500 < RobotController.getFPGATime() / 1000) {
                     state = State.FINISHED;
+                    logf("DriveToObjectTimedOut\n");
                 } else {
                     drivetrainSubsystem.drive(new ChassisSpeeds(-0.022, 0, Math.toRadians(0)));
                 }
@@ -118,7 +120,7 @@ public class DriveToObjectCommand extends Command {
     public boolean isFinished() {
         boolean value = (startTime + timeout < RobotController.getFPGATime() / 1000) || state == State.FINISHED;
         if (value) {
-            logf("Drive to object command area = " + area + " finish area = " + finishArea + "\n");
+            logf("Drive to object command area:%.2f finish area:%.2f state:%s\n", area, finishArea,state);
         }
         return value || finished;
         // if (!coral.type.equals(type)) {

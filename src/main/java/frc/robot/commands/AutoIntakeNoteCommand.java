@@ -59,6 +59,7 @@ public class AutoIntakeNoteCommand extends Command {
             finished = true;
         }
         if (count > 225) {
+            logf("timeout expired\n");
             finished = true;
         }
          count ++;

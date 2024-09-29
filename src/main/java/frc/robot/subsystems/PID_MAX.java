@@ -14,6 +14,7 @@ public class PID_MAX {
         kP = 7e-5;
         // kP = 5e-5;
         kI = 1e-6;
+        // kI = 0.0;
         kD = 0;
         kIz = 0;
         kFF = 0.000156;

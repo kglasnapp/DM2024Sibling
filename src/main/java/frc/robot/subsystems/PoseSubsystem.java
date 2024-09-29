@@ -30,7 +30,8 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
     // Defines the accuracy of the different position sources
     // Numbers are standard deviations in x, y, rot order
     private static final Vector<N3> ODOMETRY_ACCURACY = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-    private static final Vector<N3> VISION_ACCURACY = VecBuilder.fill(0.6, 0.6, Units.degreesToRadians(20));
+    private static final Vector<N3> VISION_ACCURACY_MT1 = VecBuilder.fill(2.0, 2.0, Units.degreesToRadians(20));
+    private static final Vector<N3> VISION_ACCURACY_MT2 = VecBuilder.fill(1.0, 1.0, 9999999);
 
     private DrivetrainSubsystem drivetrainSubsystem;
     private SwerveDrivePoseEstimator poseEstimator;
@@ -41,6 +42,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
 
     // TODO: Consider having this default to true
     private boolean assumeNextVisionPose = false;
+    private boolean useMegaTag2 = false;
 
     public PoseSubsystem(DrivetrainSubsystem drivetrainSubsystem, String cameraId) {
         this.drivetrainSubsystem = drivetrainSubsystem;
@@ -54,11 +56,11 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
             poseEstimator = new SwerveDrivePoseEstimator(
                     DrivetrainSubsystem.m_kinematics,
-                    Rotation2d.fromDegrees(drivetrainSubsystem.m_navx.getYaw()),
+                    drivetrainSubsystem.getGyroscopeRotation(),
                     drivetrainSubsystem.getModulePositions(),
                     STARTING_POSE_RED,
                     ODOMETRY_ACCURACY,
-                    VISION_ACCURACY);
+                    VISION_ACCURACY_MT1);
         } else {
             poseEstimator = new SwerveDrivePoseEstimator(
                     DrivetrainSubsystem.m_kinematics,
@@ -66,7 +68,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                     drivetrainSubsystem.getModulePositions(),
                     STARTING_POSE_BLUE,
                     ODOMETRY_ACCURACY,
-                    VISION_ACCURACY);
+                    VISION_ACCURACY_MT1);
         }
     }
 
@@ -76,6 +78,8 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
 
         poseEstimator.resetPosition(drivetrainSubsystem.getGyroscopeRotation(),
                 drivetrainSubsystem.getModulePositions(), pose);
+
+        // useMegaTag2 = true;
     }
 
     public void refreshGyroOffset() {
@@ -94,16 +98,13 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                 drivetrainSubsystem.getGyroscopeRotation(),
                 drivetrainSubsystem.getModulePositions());
 
-        // TODO: Switch to MegaTag 2 when we have reliable yaw calibration
-        boolean useMegaTag2 = false;
         boolean doRejectUpdate = false;
 
-        // FIXME: Dont use megatag 2 when assumeNextVisionPose is true
         if (USE_VISION) {
-            if (useMegaTag2) {
+            if (useMegaTag2 && !assumeNextVisionPose) {
                 LimelightHelpers.SetRobotOrientation(cameraId,
-                        poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0,
-                        0);
+                        poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
+                        drivetrainSubsystem.getGyroscopeRotationRate(), 0, 0, 0, 0);
                 LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraId);
 
                 if (mt2 != null) {
@@ -117,6 +118,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                     }
                     if (!doRejectUpdate) {
                         if (!assumeNextVisionPose) {
+                            poseEstimator.setVisionMeasurementStdDevs(VISION_ACCURACY_MT2);
                             poseEstimator.addVisionMeasurement(
                                     mt2.pose,
                                     mt2.timestampSeconds);
@@ -132,7 +134,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
                 if (mt1 != null) {
                     // More rigorous checks when only one april tag is seen
                     if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
-                        if (mt1.rawFiducials[0].ambiguity > .7) {
+                        if (mt1.rawFiducials[0].ambiguity > .6) {
                             doRejectUpdate = true;
                         }
                         if (mt1.rawFiducials[0].distToCamera > 3) {
@@ -147,6 +149,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
 
                     if (!doRejectUpdate) {
                         if (!assumeNextVisionPose) {
+                            poseEstimator.setVisionMeasurementStdDevs(VISION_ACCURACY_MT1);
                             poseEstimator.addVisionMeasurement(
                                     mt1.pose,
                                     mt1.timestampSeconds);

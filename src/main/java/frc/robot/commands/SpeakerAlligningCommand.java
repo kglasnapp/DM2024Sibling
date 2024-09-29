@@ -31,10 +31,9 @@ public class SpeakerAlligningCommand extends Command {
         logf("Robot aiming to speaker target\n");
         rotateCommand = new RotateCommand(drivetrainSubsystem, poseEstimatorSubsystem, () -> {
             Pose2d robotPose = poseEstimatorSubsystem.get();
-            return 180 + Math
-                    .toDegrees(
-                            Math.atan2(robotPose.getY() - speakerPose.getY(),
-                                    robotPose.getX() - speakerPose.getX()));
+            return 180 + Math.toDegrees(
+                    Math.atan2(robotPose.getY() - speakerPose.getY(),
+                            robotPose.getX() - speakerPose.getX()));
         }, false, false);
         rotateCommand.initialize();
     }
