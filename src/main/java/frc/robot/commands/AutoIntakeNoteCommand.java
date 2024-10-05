@@ -54,7 +54,7 @@ public class AutoIntakeNoteCommand extends Command {
             //logf("start timer\n");
             timer++;
         }
-        if (timer > 100) {
+        if (timer > 225) {
             logf("timer expired\n");
             finished = true;
         }

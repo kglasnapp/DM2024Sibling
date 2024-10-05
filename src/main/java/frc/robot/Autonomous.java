@@ -33,6 +33,8 @@ public class Autonomous {
                 new AutoIntakeNoteCommand(robotContainer.intakeSubsystem, robotContainer.indexerSubsystem));
         NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
                 robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 45));
+        NamedCommands.registerCommand("farSideFirstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
+                robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .80, 62));
         NamedCommands.registerCommand("homeShooter", new TiltSetAngleCommand(robotContainer.tiltSubsystem, 10.0));
         NamedCommands.registerCommand("shoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
                 robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 10));

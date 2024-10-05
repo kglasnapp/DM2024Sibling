@@ -109,6 +109,7 @@ public class TiltSubsystem extends SubsystemBase {
 
     public void setAngle(double angle) {
         pidControllerTiltMotor.setReference(angle / DEGREES_PER_REV, ControlType.kSmartMotion);
+        logf("Intended Angle: %.2f\n", angle);
     }
 
     // rottions should be +1 or -1

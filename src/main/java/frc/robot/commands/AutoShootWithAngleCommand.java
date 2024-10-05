@@ -45,6 +45,7 @@ public class AutoShootWithAngleCommand extends Command {
     public static enum STATE {
         IDLE,
         WAIT_SHOOT_ANGLE,
+        WAIT1,
         WAIT_SHOOT_SPEED,
         WAIT_NOTE_OUT,
         WAIT,
@@ -82,13 +83,21 @@ public class AutoShootWithAngleCommand extends Command {
             if(tiltSubsystem.getTiltAngle() <= angle+1 && tiltSubsystem.getTiltAngle() >= angle-1)
             {
                 state = STATE.WAIT_SHOOT_SPEED;
+                logf("Actual Angle: %.2f\n", tiltSubsystem.getTiltAngle());
             }
             if (RobotController.getFPGATime() - startTime > 2000000) {
                 finished = true;
             }
         }
         if (state == STATE.WAIT_SHOOT_SPEED) {
-            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage-.1))) {
+            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .1))) {
+                state = STATE.WAIT1;
+                waitCount = 25;
+            }
+        }
+        if (state == STATE.WAIT1) {
+            waitCount--;
+            if (waitCount < 0) {
                 state = STATE.WAIT_NOTE_OUT;
                 indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
             }
