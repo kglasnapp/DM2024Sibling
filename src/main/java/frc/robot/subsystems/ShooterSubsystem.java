@@ -124,8 +124,9 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean isShooterAtSpeed(double desired) {
         double upSpeed = Math.abs(upperMotor.getVelocity());
         double lowSpeed = Math.abs(lowerMotor.getVelocity());
-        // logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
-        if (upSpeed > desired && lowSpeed > desired) {
+       // logf("Shooter speed up: %.1f low:%.1f desired:%.2f\n", upSpeed, lowSpeed, desired);
+       if (upSpeed > desired && lowSpeed > desired) {
+            logf("Shooter speed up: %.1f low:%.1f\n", upSpeed, lowSpeed);
             return true;
         }
         if (Robot.count % 2 == 0) {
@@ -134,6 +135,8 @@ public class ShooterSubsystem extends SubsystemBase {
         return false;
 
     }
+
+
 
     // int lastPOV = -1;
 

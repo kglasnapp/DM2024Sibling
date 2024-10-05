@@ -47,7 +47,7 @@ public class ShootCommand extends Command {
         this.shooter = shooter;
         this.poseSubsystem = poseSubsystem;
         this.speedPercentage = speedPercentage;
-        addRequirements(shooter);
+        //addRequirements(shooter);
         addRequirements(indexer);
         addRequirements(shooter);
     }
@@ -85,8 +85,7 @@ public class ShootCommand extends Command {
     public void execute() {
         if (state != lastState) {
             long elapsedTime = RobotController.getFPGATime() - startTime;
-            // logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime /
-            // 1000000.0);
+            //logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime / 1000000.0);
         }
         if (state == State.WAIT_SHOOT_SPEED) {
             if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {

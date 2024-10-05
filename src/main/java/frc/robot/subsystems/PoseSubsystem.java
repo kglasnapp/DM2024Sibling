@@ -29,7 +29,7 @@ public class PoseSubsystem extends SubsystemBase implements Supplier<Pose2d> {
 
     // Defines the accuracy of the different position sources
     // Numbers are standard deviations in x, y, rot order
-    private static final Vector<N3> ODOMETRY_ACCURACY = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+    private static final Vector<N3> ODOMETRY_ACCURACY = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(1));
     private static final Vector<N3> VISION_ACCURACY_MT1 = VecBuilder.fill(2.0, 2.0, Units.degreesToRadians(20));
     private static final Vector<N3> VISION_ACCURACY_MT2 = VecBuilder.fill(1.0, 1.0, 9999999);
 

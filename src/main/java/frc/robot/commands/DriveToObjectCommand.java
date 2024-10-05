@@ -20,7 +20,7 @@ public class DriveToObjectCommand extends Command {
     // private String type;
     private double startTime;
     private double timeout;
-    private double speedAdjust = 50;
+    private double speedAdjust = 40;
 
     /** Creates a new ReplaceMeCommand. */
     public DriveToObjectCommand(DrivetrainSubsystem drivetrainSubsystem, CoralSubsystem coralSubsystem, String type) {
@@ -88,7 +88,7 @@ public class DriveToObjectCommand extends Command {
                 x = -coralSubsystem.x;
                 x += 2.5;
                 if (Math.abs(x) > finishX) {
-                    omegaSpeed = x * x * 0.003;
+                    omegaSpeed = -x * x * 0.003 * .5;
                     if (x < 0) {
                         omegaSpeed = -omegaSpeed;
                     }
