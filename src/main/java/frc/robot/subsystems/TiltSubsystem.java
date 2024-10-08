@@ -150,6 +150,7 @@ public class TiltSubsystem extends SubsystemBase {
         // tiltMotor.set(val * .15);
 
         // tiltMotor.set(val);
+             SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
         if (Robot.count % 10 == -1) {
             SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
             SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());

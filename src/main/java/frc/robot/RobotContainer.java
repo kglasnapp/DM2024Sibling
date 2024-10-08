@@ -294,7 +294,7 @@ public class RobotContainer {
     opController.povUp().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 94.0));
     opController.povLeft().whileTrue(new TiltSetAngleCommand(tiltSubsystem, 55.0));
     opController.x().whileTrue(new IndexCommand(indexerSubsystem));
-    opController.y().whileTrue(new IntakeCommand(intakeSubsystem, leds));
+    opController.y().whileTrue(new IntakeCommand(intakeSubsystem, indexerSubsystem, leds));
     opController.a().whileTrue(new DriveToObjectCommand(drivetrainSubsystem, coralSubsystem, "Note"));
     opController.leftBumper().onTrue(new TiltManualCommand(tiltSubsystem, false)); // Send shooter down
     opController.rightBumper().onTrue(new TiltManualCommand(tiltSubsystem, true)); // Send shooter up

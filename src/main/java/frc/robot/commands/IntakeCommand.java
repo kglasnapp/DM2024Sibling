@@ -16,11 +16,11 @@ public class IntakeCommand extends Command {
     int count;
     LedSubsystem leds;
 
-    public IntakeCommand(IntakeSubsystem intakeSubsystem, LedSubsystem leds) {
+    public IntakeCommand(IntakeSubsystem intakeSubsystem, IndexerSubsystem indexerSubsystem, LedSubsystem leds) {
         this.intakeSubsystem = intakeSubsystem;
-        addRequirements(intakeSubsystem);
+        this.indexerSubsystem = indexerSubsystem;
         this.leds = leds;
-        // addRequirements(indexerSubsystem);
+        addRequirements(intakeSubsystem, indexerSubsystem);
     }
 
     @Override
@@ -55,6 +55,6 @@ public class IntakeCommand extends Command {
         logf("Intake finished:%b count:%d\n", count > 500 || note, count);
         // TODO Keith what does this do?
         return count > 500 || note; // After 10 Seconds
-    } 
+    }
 
 }
