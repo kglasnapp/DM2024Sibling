@@ -4,6 +4,7 @@ import static frc.robot.utilities.Util.logd;
 import static frc.robot.utilities.Util.logf;
 import static frc.robot.utilities.Util.round2;
 
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -49,6 +50,8 @@ import frc.robot.utilities.RunningAverage;
  * effect of the GUI layout.
  */
 public class TiltSubsystem extends SubsystemBase {
+    private static int TILT_SHOOTER_CAN_CODER_ID = 9;
+
     private CANSparkFlex tiltMotor;
     private SparkLimitSwitch tiltReverseLimit;
     private SparkLimitSwitch tiltForwardLimit;
@@ -56,6 +59,7 @@ public class TiltSubsystem extends SubsystemBase {
     private PID_MAX pid = new PID_MAX();
     private int TILT_SHOOTER_MOTOR_ID = 20;
     private RelativeEncoder tiltEncoder;
+    private CANcoder angleEncoder;
     private double lastRotations = 0;
     private final static double DEGREES_PER_REV = 2.9;
     private int myCount = 0;
@@ -90,6 +94,8 @@ public class TiltSubsystem extends SubsystemBase {
         pid = new PID_MAX();
         pid.PIDCoefficientsShooterTilt(pidControllerTiltMotor);
         pid.PIDToMax();
+        
+        angleEncoder = new CANcoder(TILT_SHOOTER_CAN_CODER_ID);
         // logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
     }
 
@@ -130,6 +136,10 @@ public class TiltSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     @Override
     public void periodic() {
+        if (Robot.count % 5 == 0) {
+            tiltEncoder.setPosition(angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0 / DEGREES_PER_REV);
+        }
+
         if (lastState != state) {
             logd("New State:%s last State:%s\n", state, lastState);
             lastState = state;
@@ -150,7 +160,7 @@ public class TiltSubsystem extends SubsystemBase {
         // tiltMotor.set(val * .15);
 
         // tiltMotor.set(val);
-             SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
+        SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
         if (Robot.count % 10 == -1) {
             SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
             SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());
@@ -177,7 +187,7 @@ public class TiltSubsystem extends SubsystemBase {
         if (state == State.WAIT1) {
             myCount--;
             if (myCount < 0) {
-                tiltEncoder.setPosition(0);
+                // tiltEncoder.setPosition(0);
                 lastRotations = 0;
                 // setTiltAngle(0);
                 state = State.HOMED;

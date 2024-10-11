@@ -23,7 +23,7 @@ import frc.robot.RobotContainer;
 import frc.robot.utilities.SwerveModule;
 import frc.robot.utilities.SwerveModuleIds;
 import frc.robot.utilities.SwerveModuleType;
-
+import static frc.robot.utilities.Util.round2;
 public class DrivetrainSubsystem extends SubsystemBase {
 
   // The maximum voltage that will be delivered to the drive motors.
@@ -195,6 +195,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     double frP = m_frontRightModule.getPosition();
     double blP = m_backLeftModule.getPosition();
     double brP = m_backRightModule.getPosition();
+    if(Robot.count % 20 == -1){
+      SmartDashboard.putNumber("flP", round2(flP));
+      SmartDashboard.putNumber("frP", round2(frP));
+      SmartDashboard.putNumber("blP", round2(blP));
+      SmartDashboard.putNumber("brP", round2(brP));
+    }
 
     // The postition is in meters
     return new SwerveModulePosition[] {

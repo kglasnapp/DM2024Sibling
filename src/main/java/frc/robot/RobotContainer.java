@@ -274,7 +274,7 @@ public class RobotContainer {
         .whileTrue(Commands
             .parallel(new AimTiltToSpeaker(tiltSubsystem, poseSubsystem, false),
                 new SpeakerAlligningCommand(poseSubsystem, drivetrainSubsystem))
-            .andThen(new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 1.0)));
+            .andThen(new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 0.90)));
     // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
     // driveController.rightTrigger().onTrue(
@@ -283,7 +283,8 @@ public class RobotContainer {
     // driveController.leftTrigger().onTrue(
     // new ChangeTurboModeCommand());
 
-    // driverController.a().whileTrue(Commands.select(autonomous.getAllAutosByName(), autonomous::getSelectedAutoName));
+    // driverController.a().whileTrue(Commands.select(autonomous.getAllAutosByName(),
+    // autonomous::getSelectedAutoName));
   }
 
   // --------------------- Buttons for Operator -----------------

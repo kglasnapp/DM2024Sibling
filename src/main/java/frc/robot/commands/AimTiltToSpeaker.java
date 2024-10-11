@@ -17,6 +17,7 @@ import frc.robot.subsystems.TiltSubsystem;
 public class AimTiltToSpeaker extends Command {
   private static final double ANGLE_TABLE[][] = {
       { 0.91, 53.0 },
+      { 1.39, 49.2 },
       { 2.62, 36.0 },
       { 2.83, 35.0 },
       { 4.14, 29.0 },
