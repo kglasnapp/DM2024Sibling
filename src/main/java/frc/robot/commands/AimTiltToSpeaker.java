@@ -20,7 +20,7 @@ public class AimTiltToSpeaker extends Command {
       { 1.39, 49.2 },
       { 2.62, 36.0 },
       { 2.83, 35.0 },
-      { 3.80, 28.0 },
+      { 3.80, 28.5 },
       // { 4.14, 29.0 },
   };
 

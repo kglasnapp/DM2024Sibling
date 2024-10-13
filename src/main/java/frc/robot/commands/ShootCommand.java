@@ -21,7 +21,7 @@ public class ShootCommand extends Command {
     private static final double SPEED_TABLE[][] = {
             { 0.91, 0.7 },
             // { 1.39, 49.2 },
-            { 2.62, 0.9 },
+            { 2.62, 0.8 },
             // { 2.83, 35.0 },
             // { 4.14, 29.0 },
     };
