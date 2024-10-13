@@ -24,6 +24,7 @@ import frc.robot.utilities.SwerveModule;
 import frc.robot.utilities.SwerveModuleIds;
 import frc.robot.utilities.SwerveModuleType;
 import static frc.robot.utilities.Util.round2;
+
 public class DrivetrainSubsystem extends SubsystemBase {
 
   // The maximum voltage that will be delivered to the drive motors.
@@ -159,6 +160,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       }
     }
 
+    // ChassisSpeeds chassisSpeeds = ChassisSpeeds.discretize(m_chassisSpeeds, Robot.kDefaultPeriod);
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY_METERS_PER_SECOND);
 
@@ -195,7 +197,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     double frP = m_frontRightModule.getPosition();
     double blP = m_backLeftModule.getPosition();
     double brP = m_backRightModule.getPosition();
-    if(Robot.count % 20 == 15){
+    if (Robot.count % 20 == 15) {
       SmartDashboard.putNumber("flP", round2(flP));
       SmartDashboard.putNumber("frP", round2(frP));
       SmartDashboard.putNumber("blP", round2(blP));

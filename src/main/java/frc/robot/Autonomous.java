@@ -32,7 +32,7 @@ public class Autonomous {
         NamedCommands.registerCommand("intake",
                 new AutoIntakeNoteCommand(robotContainer.intakeSubsystem, robotContainer.indexerSubsystem));
         NamedCommands.registerCommand("firstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
-                robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .55, 45));
+                robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .7, 45));
         NamedCommands.registerCommand("farSideFirstShoot", new AutoShootWithAngleCommand(robotContainer.shooterSubsystem,
                 robotContainer.indexerSubsystem, robotContainer.tiltSubsystem, .80, 62));
         NamedCommands.registerCommand("homeShooter", new TiltSetAngleCommand(robotContainer.tiltSubsystem, 10.0));
@@ -42,7 +42,7 @@ public class Autonomous {
                 .parallel(new AimTiltToSpeaker(robotContainer.tiltSubsystem, robotContainer.poseSubsystem, false),
                         new SpeakerAlligningCommand(robotContainer.poseSubsystem, robotContainer.drivetrainSubsystem))
                 .andThen(new ShootCommand(robotContainer.shooterSubsystem, robotContainer.indexerSubsystem,
-                        robotContainer.poseSubsystem, 1.0)));
+                        robotContainer.poseSubsystem)));
 
         AutoBuilder.configureHolonomic(
                 robotContainer.poseSubsystem::get,
@@ -67,7 +67,7 @@ public class Autonomous {
 
         FollowPathCommand.warmupCommand().schedule();
 
-        autoChooser = AutoBuilder.buildAutoChooser("Basic 4 Note");
+        autoChooser = AutoBuilder.buildAutoChooser();
         // SmartDashboard.putData(autoChooser);
         
         ShuffleboardTab tab = Shuffleboard.getTab("Odometry");

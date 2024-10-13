@@ -137,6 +137,7 @@ public class TiltSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (Robot.count % 5 == 0) {
+            // TODO: expoential moving average filter on the difference between the two encoders
             tiltEncoder.setPosition(angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0 / DEGREES_PER_REV);
         }
 
