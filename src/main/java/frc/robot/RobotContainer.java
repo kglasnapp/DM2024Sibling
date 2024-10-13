@@ -274,7 +274,7 @@ public class RobotContainer {
         .whileTrue(Commands
             .parallel(new AimTiltToSpeaker(tiltSubsystem, poseSubsystem, false),
                 new SpeakerAlligningCommand(poseSubsystem, drivetrainSubsystem))
-            .andThen(new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem, 0.90)));
+            .andThen(new ShootCommand(shooterSubsystem, indexerSubsystem, poseSubsystem)));
     // driverController.povDown().onTrue(new StopAllCommand(shooterSubsystem,
     // indexerSubsystem, intakeSubsystem));
     // driveController.rightTrigger().onTrue(

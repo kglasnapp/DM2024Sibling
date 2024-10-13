@@ -195,7 +195,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     double frP = m_frontRightModule.getPosition();
     double blP = m_backLeftModule.getPosition();
     double brP = m_backRightModule.getPosition();
-    if(Robot.count % 20 == -1){
+    if(Robot.count % 20 == 15){
       SmartDashboard.putNumber("flP", round2(flP));
       SmartDashboard.putNumber("frP", round2(frP));
       SmartDashboard.putNumber("blP", round2(blP));
