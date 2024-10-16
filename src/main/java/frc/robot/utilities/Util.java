@@ -25,14 +25,7 @@ public class Util {
 
     public static void logd(String pattern, Object... arguments) {
         if (Robot.debug) {
-            try {
-                DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss-SSS ");
-                dateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-                System.out.printf((dateFormat.format(new Date()) + pattern), arguments);
-            } catch (Exception e) {
-                System.err.println("\nAn error occurred while logging! Pattern: " + pattern);
-                e.printStackTrace();
-            }
+            logf(pattern, arguments);
         }
     }
 
