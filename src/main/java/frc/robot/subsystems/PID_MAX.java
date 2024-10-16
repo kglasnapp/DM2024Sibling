@@ -66,9 +66,9 @@ public class PID_MAX {
 
 
     public void PIDCoefficientsShooterTilt(SparkPIDController pidController) {
-        kP = .00005; 
-        kI = .2e-6 ;
-        kD = .00005;
+        kP = .00015; 
+        kI = .2e-6;
+        kD = .000002;
         kIz = 0;
         kFF = 0;
 
@@ -78,8 +78,8 @@ public class PID_MAX {
         // Smart Motion Coefficients
         // maxRPM = 5700; // for velocity mode
 
-        maxVel = 15500; // for velocity mode
-        maxAcc = 15000;
+        maxVel = 5000; // for velocity mode
+        maxAcc = 10000;
         this.pidController =  pidController;
         pidName = "Tilt";
 

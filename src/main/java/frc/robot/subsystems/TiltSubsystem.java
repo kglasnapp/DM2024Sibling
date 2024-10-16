@@ -81,12 +81,14 @@ public class TiltSubsystem extends SubsystemBase {
     RunningAverage avgCurrent = new RunningAverage(5);
 
     public TiltSubsystem() {
+        angleEncoder = new CANcoder(TILT_SHOOTER_CAN_CODER_ID);
+
         tiltMotor = new CANSparkFlex(TILT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
         tiltMotor.restoreFactoryDefaults();
         tiltMotor.setIdleMode(IdleMode.kBrake);
         tiltMotor.setSmartCurrentLimit((int) 40);
         tiltEncoder = tiltMotor.getEncoder();
-        tiltEncoder.setPosition(0);
+        tiltEncoder.setPosition(getAbsoluteTilt());
         lastRotations = 0;
         tiltReverseLimit = tiltMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
         tiltForwardLimit = tiltMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
@@ -95,7 +97,6 @@ public class TiltSubsystem extends SubsystemBase {
         pid.PIDCoefficientsShooterTilt(pidControllerTiltMotor);
         pid.PIDToMax();
         
-        angleEncoder = new CANcoder(TILT_SHOOTER_CAN_CODER_ID);
         // logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
     }
 
@@ -118,7 +119,7 @@ public class TiltSubsystem extends SubsystemBase {
         logf("Intended Angle: %.2f\n", angle);
     }
 
-    // rottions should be +1 or -1
+    // rotations should be +1 or -1
     public void setRotations(double rotations) {
         if (state == State.IDLE && (lastRotations + rotations) * DEGREES_PER_REV <= maxAngle
                 && (lastRotations + rotations) * DEGREES_PER_REV >= minAngle) {
@@ -138,7 +139,15 @@ public class TiltSubsystem extends SubsystemBase {
     public void periodic() {
         if (Robot.count % 5 == 0) {
             // TODO: expoential moving average filter on the difference between the two encoders
-            tiltEncoder.setPosition(angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0 / DEGREES_PER_REV);
+            double absolutePosition = getAbsoluteTilt();
+            double relativePosition = tiltEncoder.getPosition();
+            double delta = absolutePosition - relativePosition;
+            if (delta < 5) {
+                // Nudge relative encoder towards correct position
+                tiltEncoder.setPosition(delta * 0.25 + relativePosition);
+            } else {
+                tiltEncoder.setPosition(absolutePosition);
+            }
         }
 
         if (lastState != state) {
@@ -162,7 +171,7 @@ public class TiltSubsystem extends SubsystemBase {
 
         // tiltMotor.set(val);
         SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
-        if (Robot.count % 10 == -1) {
+        if (Robot.count % 10 == 1) {
             SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
             SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());
             SmartDashboard.putString("TiltState", state.toString());
@@ -181,20 +190,20 @@ public class TiltSubsystem extends SubsystemBase {
             // if (tiltReverseLimit.isPressed()) {
             if (tiltReverseLimit.isPressed()) {
                 myCount = 5;
-                state = State.WAIT1;
+                state = State.HOMED;
                 tiltMotor.set(0);
             }
         }
-        if (state == State.WAIT1) {
-            myCount--;
-            if (myCount < 0) {
-                // tiltEncoder.setPosition(0);
-                lastRotations = 0;
-                // setTiltAngle(0);
-                state = State.HOMED;
-                setRotations(0);
-            }
-        }
+        // if (state == State.WAIT1) {
+        //     myCount--;
+        //     if (myCount < 0) {
+        //         // tiltEncoder.setPosition(0);
+        //         lastRotations = 0;
+        //         // setTiltAngle(0);
+        //         state = State.HOMED;
+        //         setRotations(0);
+        //     }
+        // }
         if (state == State.HOMED) {
             state = State.IDLE;
         }
@@ -211,5 +220,9 @@ public class TiltSubsystem extends SubsystemBase {
                 state = State.IDLE;
             }
         }
+    }
+
+    public double getAbsoluteTilt() {
+        return angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0 / DEGREES_PER_REV;
     }
 }
