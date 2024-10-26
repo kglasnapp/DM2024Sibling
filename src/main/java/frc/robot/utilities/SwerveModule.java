@@ -34,8 +34,8 @@ public class SwerveModule {
   public static final int driveContinuousCurrentLimit = 60;
 
   /* Angle Motor PID Values */
-  public static final double angleKP = 0.012;
-  public static final double angleKI = 0.0006;
+  public static final double angleKP = 0.05;
+  public static final double angleKI = 0.005;
   public static final double angleKD = 0.0;
   public static final double angleKFF = 0.0;
 
@@ -209,7 +209,7 @@ public class SwerveModule {
   private void setAngle(SwerveModuleState desiredState) {
     // Sync relative encoder with absolute encoder every 5 seconds
     if (integratedAngleEncoder.getVelocity() < 0.5) {
-      if (++resetIteration >= 250) {
+      if (++resetIteration >= 10) {
         resetIteration = 0;
 
         double absoluteAngle = getCanCoder().getDegrees();
@@ -233,6 +233,7 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getState() {
+    // FIXME: Should this use can coder angle?
     return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
   }
 

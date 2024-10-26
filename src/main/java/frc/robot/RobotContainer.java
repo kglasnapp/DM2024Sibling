@@ -34,6 +34,7 @@ import java.util.Set;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -299,6 +300,37 @@ public class RobotContainer {
     opController.a().whileTrue(new DriveToObjectCommand(drivetrainSubsystem, coralSubsystem, "Note"));
     opController.leftBumper().onTrue(new TiltManualCommand(tiltSubsystem, false)); // Send shooter down
     opController.rightBumper().onTrue(new TiltManualCommand(tiltSubsystem, true)); // Send shooter up
+
+
+    // Test command to rotate wheels 90 deg
+    var cmd = new Command() {
+      private double angle = 0.0;
+      private int shouldEnd = 0;
+
+      @Override
+      public void initialize() {
+        double x = Math.cos(Math.toRadians(angle));
+        double y = Math.sin(Math.toRadians(angle));
+
+        drivetrainSubsystem.drive(new ChassisSpeeds(x * 0.01, y * 0.01, 0.0));
+
+        shouldEnd = 0;
+        angle += 90;
+      }
+
+      @Override
+      public boolean isFinished() {
+        return shouldEnd++ == 1;
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        drivetrainSubsystem.stop();
+      }
+    };
+    cmd.addRequirements(drivetrainSubsystem);
+
+    opController.b().onTrue(cmd);
   }
 
   // public void testAutonomous() {
