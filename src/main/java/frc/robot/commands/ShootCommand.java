@@ -13,154 +13,179 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import static frc.robot.Util.logf;
 
 public class ShootCommand extends Command {
+    private static final double SPEED_TABLE[][] = {
+            { 0.91, 0.7 },
+            // { 1.39, 49.2 },
+            { 2.62, 0.8 },
+            // { 2.83, 35.0 },
+            // { 4.14, 29.0 },
+    };
+
     IndexerSubsystem indexer;
     ShooterSubsystem shooter;
-    LimeLightPoseSubsystem limeLightPoseSubsystem;
+    PoseSubsystem poseSubsystem;
     long startTime;
     int waitCount = 0;
-    STATE lastState = STATE.IDLE;
+    State lastState = State.IDLE;
     double angle;
+    double speedPercentage = 0;
+    int MAX_SPEED = 6500;
+    boolean finished = false;
+    boolean calculateSpeed = true;
 
     public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
-    LimeLightPoseSubsystem limeLightPoseSubsystem) {
+            PoseSubsystem poseSubsystem) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.indexer = indexer;
         this.shooter = shooter;
-        this.limeLightPoseSubsystem = limeLightPoseSubsystem;
+        this.poseSubsystem = poseSubsystem;
+        this.calculateSpeed = true;
+        addRequirements(shooter);
+        addRequirements(indexer);
+        // addRequirements(null);
     }
 
-    public static enum STATE {
+    public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer,
+            PoseSubsystem poseSubsystem, double speedPercentage) {
+        // Use addRequirements() here to declare subsystem dependencies.
+        this.indexer = indexer;
+        this.shooter = shooter;
+        this.poseSubsystem = poseSubsystem;
+        this.speedPercentage = speedPercentage;
+        this.calculateSpeed = false;
+        // addRequirements(shooter);
+        addRequirements(indexer);
+        addRequirements(shooter);
+    }
+
+    public static enum State {
         IDLE,
         WAIT_SHOOT_SPEED,
+        WAIT1,
         WAIT_NOTE_OUT,
-        WAIT,
+        WAIT2,
         FINISHED
     };
 
-    STATE state = STATE.IDLE;
+    State state = State.IDLE;
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         logf("Initializing the shooters\n");
-        state = STATE.IDLE;
+        state = State.IDLE;
         startTime = RobotController.getFPGATime();
         boolean note = indexer.isNotePresent();
-        logf("The note is present: %b\n", note);
+        finished = false;
+        if (calculateSpeed) {
+            Alliance alliance = DriverStation.getAlliance().get();
+            Pose2d speakerPose = alliance == Alliance.Blue ? RobotContainer.BLUE_SPEAKER : RobotContainer.RED_SPEAKER;
+            if (!poseSubsystem.hasGoodPose()) {
+                cancel();
+            }
+            speedPercentage = lookupSpeed(distance(poseSubsystem.get(), speakerPose));
+        }
+        logf("The note is present: %b, speed: %.2f\n", note, speedPercentage);
         if (note) {
-            shooter.setAllShooterPower(.95);
-            state = STATE.WAIT_SHOOT_SPEED;
+            shooter.setAllShooterPower(speedPercentage);
+            state = State.WAIT_SHOOT_SPEED;
         } else {
-            state = STATE.FINISHED;
+            state = State.FINISHED;
         }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        if (state != lastState) {
+            long elapsedTime = RobotController.getFPGATime() - startTime;
+            // logf("ShootCommand new state:%s elapsed:%.2f\n", state, elapsedTime /
+            // 1000000.0);
+        }
+        if (state == State.WAIT_SHOOT_SPEED) {
+            if (shooter.isShooterAtSpeed(MAX_SPEED * (speedPercentage - .02))) {
+                state = State.WAIT1;
+                waitCount = 25;
+            }
+        }
+        if (state == State.WAIT1) {
+            waitCount--;
+            if (waitCount < 0) {
+                state = State.WAIT_NOTE_OUT;
+                indexer.setSpeed(IndexerSubsystem.SHOOT_SPEED);
+            }
+        }
+        if (state == State.WAIT_NOTE_OUT) {
+            boolean note = indexer.isNotePresent();
+            logf("Shoot Command Note Out: %b\n", note);
+            if (!note) {
+
+                state = State.WAIT2;
+                waitCount = 25;
+            }
+        }
+        if (state == State.WAIT2) {
+            waitCount--;
+            if (waitCount < 0) {
+                logf("Shoot Command finished\n");
+                indexer.stop();
+                shooter.stop();
+                finished = true;
+            }
+
+        }
+        if (state == State.FINISHED) {
+            finished = true;
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        logf("shoot command end\n");
+        shooter.stop();
+        indexer.stop();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (state != lastState) {
-            long elapsedTime = RobotController.getFPGATime() - startTime;
-            logf("ShootCommand new state:%s elasped:%.2f\n", state, elapsedTime / 1000000.0);
-        }
-        if (state == STATE.WAIT_SHOOT_SPEED) {
-            if (shooter.isShooterAtSpeed(5500)) {
-                state = STATE.WAIT_NOTE_OUT;
-                indexer.setSpeed(.5);
-            }
-        }
-        if (state == STATE.WAIT_NOTE_OUT) {
-            boolean note = indexer.isNotePresent();
-            logf("Shoot Command Note Out: %b\n", note);
-            if (!note) {
-                
-                state = STATE.WAIT;
-                waitCount = 5;
-            }
-        }
-        if (state == STATE.WAIT) {
-            waitCount--;
-            if (waitCount < 0) {
-                logf("Shoot Command finished\n");
-                indexer.setSpeed(0);
-                shooter.setAllShooterPower(0);
-                return true;
-            }
-
-        }
-        if (state == STATE.FINISHED) {
-            return true;
-        }
-        return false;
-    }
-    
-    double angleTable[][] = {
-        { 1.31, -8.05 },
-        { 1.71, -13.39 },
-        { 2.06, -15.50 },
-        { 2.37, -21.0 },
-        { 2.67, -23 },
-        { 2.99, -24 },
-        { 3.25, -25.1 },
-        { 3.70, -26 }
-    };
-
-
-    public double calculateTiltAngle() {
-        Pose2d pose = limeLightPoseSubsystem.getPose();
-        Alliance alliance = DriverStation.getAlliance().get();
-        Pose2d speakerPose = alliance == Alliance.Blue ? RobotContainer.BLUE_SPEAKER : RobotContainer.RED_SPEAKER;
-        double distance = distance(speakerPose, pose);
-        logf("Distance to the target: %s\n", distance);
-
-        if (distance <= 1.31) {
-            return 0;
-        }
-        for (int i=1;i<angleTable.length;++i) {
-            if (distance <= angleTable[i][0]) {
-                double m = (angleTable[i][1] - angleTable[i-1][1])/(angleTable[i][0] - angleTable[i-1][0]);
-                double b = angleTable[i][1] - (m * angleTable[i][0]);
-                return m*distance + b;
-            }
-        }
-        double m = (angleTable[angleTable.length-1][1] - angleTable[angleTable.length-2][1])/(angleTable[angleTable.length-1][0] - angleTable[angleTable.length-2][0]);
-        double b = angleTable[angleTable.length-1][1] - (m * angleTable[angleTable.length-1][0]);
-        angle = m*distance + b;
-        // double dsqr = distance * distance;
-        // double angle = 4.4263 * dsqr * distance - 23.6759 * dsqr + 30.1972 * distance - 12.9287;
-        // // the robot physically cannot move more than 30 degress. We are adding a
-        // // software limit in here.
-        // if (distance > 3.488) {
-        //     angle = -3.284 * distance - 10.116;
-        // }
-        // // angle = -8 * distance + 7.63;
-
-        // // angle = -(60 - angle);
-        if (angle < -30) {
-            angle = -30;
-        }
-        if (angle > 0) {
-            angle = 0;
-        }
-
-        return angle;
+        return finished;
     }
 
-    public static double distance(Pose2d pose1, Pose2d pose2) {
+    private static double lookupSpeed(double distance) {
+        double[] min = SPEED_TABLE[0];
+        double[] max = SPEED_TABLE[SPEED_TABLE.length - 1];
+
+        // Clamp small distances to first angle
+        if (distance <= min[0]) {
+            return min[1];
+        }
+
+        for (int i = 1; i < SPEED_TABLE.length; i++) {
+            if (distance > SPEED_TABLE[i][0]) {
+                continue;
+            }
+
+            double[] a = SPEED_TABLE[i - 1];
+            double[] b = SPEED_TABLE[i];
+
+            double alpha = (distance - a[0]) / (b[0] - a[0]);
+            double angle = b[1] * alpha + a[1] * (1 - alpha);
+
+            return angle;
+        }
+
+        // Clamp large distances to last angle
+        return max[1];
+    }
+
+    private static double distance(Pose2d pose1, Pose2d pose2) {
         double dx = pose1.getX() - pose2.getX();
         double dy = pose1.getY() - pose2.getY();
 

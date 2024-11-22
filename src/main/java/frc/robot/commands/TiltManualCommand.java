@@ -29,7 +29,7 @@ public class TiltManualCommand extends Command {
     public void initialize() {
         logf("Perform manual tilt direction:%b current angle:%.2f\n", direction, tiltSubsystem.getTiltAngle());
         tiltSubsystem.state = TiltSubsystem.State.IDLE;
-        tiltSubsystem.setAngle(tiltSubsystem.getTiltAngle()+(direction ? 3 : -3));
+        tiltSubsystem.setAngle(tiltSubsystem.getTiltAngle()+(direction ? 1 : -1));
     }
 
     // Called every time the scheduler runs while the command is scheduled.

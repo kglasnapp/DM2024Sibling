@@ -4,6 +4,7 @@ import static frc.robot.utilities.Util.logd;
 import static frc.robot.utilities.Util.logf;
 import static frc.robot.utilities.Util.round2;
 
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -49,6 +50,8 @@ import frc.robot.utilities.RunningAverage;
  * effect of the GUI layout.
  */
 public class TiltSubsystem extends SubsystemBase {
+    private static int TILT_SHOOTER_CAN_CODER_ID = 9;
+
     private CANSparkFlex tiltMotor;
     private SparkLimitSwitch tiltReverseLimit;
     private SparkLimitSwitch tiltForwardLimit;
@@ -56,6 +59,7 @@ public class TiltSubsystem extends SubsystemBase {
     private PID_MAX pid = new PID_MAX();
     private int TILT_SHOOTER_MOTOR_ID = 20;
     private RelativeEncoder tiltEncoder;
+    private CANcoder angleEncoder;
     private double lastRotations = 0;
     private final static double DEGREES_PER_REV = 2.9;
     private int myCount = 0;
@@ -77,12 +81,14 @@ public class TiltSubsystem extends SubsystemBase {
     RunningAverage avgCurrent = new RunningAverage(5);
 
     public TiltSubsystem() {
+        angleEncoder = new CANcoder(TILT_SHOOTER_CAN_CODER_ID);
+
         tiltMotor = new CANSparkFlex(TILT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
         tiltMotor.restoreFactoryDefaults();
         tiltMotor.setIdleMode(IdleMode.kBrake);
         tiltMotor.setSmartCurrentLimit((int) 40);
         tiltEncoder = tiltMotor.getEncoder();
-        tiltEncoder.setPosition(0);
+        tiltEncoder.setPosition(getAbsoluteTilt());
         lastRotations = 0;
         tiltReverseLimit = tiltMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
         tiltForwardLimit = tiltMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
@@ -90,7 +96,8 @@ public class TiltSubsystem extends SubsystemBase {
         pid = new PID_MAX();
         pid.PIDCoefficientsShooterTilt(pidControllerTiltMotor);
         pid.PIDToMax();
-        logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
+        
+        // logf("Startup for the tilt subsystem id:%\n", TILT_SHOOTER_MOTOR_ID);
     }
 
     public void homeTilt() {
@@ -107,12 +114,12 @@ public class TiltSubsystem extends SubsystemBase {
         }
     }
 
-
     public void setAngle(double angle) {
         pidControllerTiltMotor.setReference(angle / DEGREES_PER_REV, ControlType.kSmartMotion);
+        logf("Intended Angle: %.2f\n", angle);
     }
-    
-    // rottions should be +1 or -1
+
+    // rotations should be +1 or -1
     public void setRotations(double rotations) {
         if (state == State.IDLE && (lastRotations + rotations) * DEGREES_PER_REV <= maxAngle
                 && (lastRotations + rotations) * DEGREES_PER_REV >= minAngle) {
@@ -130,6 +137,19 @@ public class TiltSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     @Override
     public void periodic() {
+        if (Robot.count % 5 == 0) {
+            // TODO: expoential moving average filter on the difference between the two encoders
+            double absolutePosition = getAbsoluteTilt();
+            double relativePosition = tiltEncoder.getPosition();
+            double delta = absolutePosition - relativePosition;
+            if (delta < 5) {
+                // Nudge relative encoder towards correct position
+                tiltEncoder.setPosition(delta * 0.25 + relativePosition);
+            } else {
+                tiltEncoder.setPosition(absolutePosition);
+            }
+        }
+
         if (lastState != state) {
             logd("New State:%s last State:%s\n", state, lastState);
             lastState = state;
@@ -150,7 +170,8 @@ public class TiltSubsystem extends SubsystemBase {
         // tiltMotor.set(val * .15);
 
         // tiltMotor.set(val);
-        if (Robot.count % 10 == -1) {
+        SmartDashboard.putNumber("TiltAngle", round2(getTiltAngle()));
+        if (Robot.count % 10 == 1) {
             SmartDashboard.putBoolean("TiltRev", tiltReverseLimit.isPressed());
             SmartDashboard.putBoolean("TiltFWD", tiltForwardLimit.isPressed());
             SmartDashboard.putString("TiltState", state.toString());
@@ -169,20 +190,20 @@ public class TiltSubsystem extends SubsystemBase {
             // if (tiltReverseLimit.isPressed()) {
             if (tiltReverseLimit.isPressed()) {
                 myCount = 5;
-                state = State.WAIT1;
+                state = State.HOMED;
                 tiltMotor.set(0);
             }
         }
-        if (state == State.WAIT1) {
-            myCount--;
-            if (myCount < 0) {
-                tiltEncoder.setPosition(0);
-                lastRotations = 0;
-                // setTiltAngle(0);
-                state = State.HOMED;
-                setRotations(0);
-            }
-        }
+        // if (state == State.WAIT1) {
+        //     myCount--;
+        //     if (myCount < 0) {
+        //         // tiltEncoder.setPosition(0);
+        //         lastRotations = 0;
+        //         // setTiltAngle(0);
+        //         state = State.HOMED;
+        //         setRotations(0);
+        //     }
+        // }
         if (state == State.HOMED) {
             state = State.IDLE;
         }
@@ -192,11 +213,16 @@ public class TiltSubsystem extends SubsystemBase {
         }
 
         if (state == State.MOVING) {
-            logf("Tilt moving desired:%.2f actual:%.2f delta:%.2f\n", desiredAngle, getTiltAngle(),
-                    desiredAngle - getTiltAngle());
+            if (Robot.count % 15 == 3)
+                logf("Tilt moving desired:%.2f actual:%.2f delta:%.2f\n", desiredAngle, getTiltAngle(),
+                        desiredAngle - getTiltAngle());
             if (Math.abs(desiredAngle - getTiltAngle()) <= angleTolerance) {
                 state = State.IDLE;
             }
         }
+    }
+
+    public double getAbsoluteTilt() {
+        return angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0 / DEGREES_PER_REV;
     }
 }

@@ -25,9 +25,5 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests",
-  "editor.suggest.showTypeParameters": false,
-  "breadcrumbs.showTypeParameters": false,
-  "outline.showTypeParameters": false,
-  "editor.parameterHints.enabled": false
+  "java.test.defaultConfig": "WPIlibUnitTests"
 }

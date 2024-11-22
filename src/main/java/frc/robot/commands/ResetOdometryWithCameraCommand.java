@@ -4,27 +4,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.LimeLightPoseSubsystem;
+import frc.robot.subsystems.PoseSubsystem;
 import static frc.robot.Util.logf;
 
 public class ResetOdometryWithCameraCommand extends Command {
 
-    LimeLightPoseSubsystem limeLightPoseSubsystem;
+    PoseSubsystem poseSubsystem;
 
-    public ResetOdometryWithCameraCommand(LimeLightPoseSubsystem lightPoseSubsystem) {
-        this.limeLightPoseSubsystem = lightPoseSubsystem;
+    public ResetOdometryWithCameraCommand(PoseSubsystem poseSubsystem) {
+        this.poseSubsystem = poseSubsystem;
     }
 
     @Override
     public void initialize() {
         logf("*************************Starting the reset odometry\n");
-        String pipeLine = "botpose_wpiblue";//(Robot.alliance == Alliance.Red) ? "botpose_wpired" : "botpose_wpiblue";
-        double llPose[] = NetworkTableInstance.getDefault().getTable(limeLightPoseSubsystem.cameraId).getEntry(pipeLine)
-                .getDoubleArray(new double[6]);
-        double cameraAngle = Math.toRadians(llPose[5]);
-        Pose2d visionPose = new Pose2d(llPose[0], llPose[1], new Rotation2d(cameraAngle));
-        limeLightPoseSubsystem.setCurrentPose(visionPose);
-        // limeLightPoseSubsystem.setCurrentPose(new Pose2d(1.89, 0.5, new Rotation2d(Math.toRadians(180))));
+        poseSubsystem.assumeNextVisionPose();
     }
 
     @Override

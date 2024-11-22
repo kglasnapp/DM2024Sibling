@@ -13,17 +13,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-public class IndexerSubsystem  extends SubsystemBase {
+public class IndexerSubsystem extends SubsystemBase {
+    public static double SHOOT_SPEED = 0.9;
+    public static double INTAKE_SPEED = 0.7;
 
     public static int INDEXER_MOTOR_ID = 11;
 
     private TalonFX indexerMotor = new TalonFX(INDEXER_MOTOR_ID);
     private final double CURRENT_LIMIT = 60;
+    private final LedSubsystem leds;
 
     private DigitalInput notePresent = new DigitalInput(2);
 
-    public IndexerSubsystem() {
+    public IndexerSubsystem(LedSubsystem leds) {
         setConfig(indexerMotor);
+        this.leds = leds;
     }
 
     private void setConfig(TalonFX talon) {
@@ -46,7 +50,11 @@ public class IndexerSubsystem  extends SubsystemBase {
     }
 
     public void setSpeed(double speed) {
-       indexerMotor.set(speed); 
+        indexerMotor.set(speed);
+    }
+
+    public void stop() {
+        indexerMotor.set(0);
     }
 
     @Override
@@ -54,17 +62,9 @@ public class IndexerSubsystem  extends SubsystemBase {
         if (Robot.count % 10 == 4) {
             SmartDashboard.putBoolean("Note", isNotePresent());
         }
-        if (RobotContainer.operatorController.getHID().getAButtonPressed()) {
-            indexerMotor.set(0.3);
-        } 
-        if (RobotContainer.operatorController.getHID().getBButtonReleased()) {
-            indexerMotor.set(0);
-        }
-        if (RobotContainer.operatorController.getHID().getBButtonPressed()) {
-            indexerMotor.set(-0.3);
-        } 
-        if (RobotContainer.operatorController.getHID().getAButtonReleased()) {
-            indexerMotor.set(0);
-        }
+
+        //if (Robot.count % 5 == 0) {
+            leds.setNoteState(isNotePresent());
+        //}
     }
 }

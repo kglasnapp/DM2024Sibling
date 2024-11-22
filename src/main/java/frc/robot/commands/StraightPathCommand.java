@@ -62,7 +62,7 @@ public class StraightPathCommand extends Command {
         if (poseProvider != null) {
             initialPose = poseProvider.get();
         } else {
-            initialPose = RobotContainer.instance.limeLightPoseSubsystem.get();
+            initialPose = RobotContainer.instance.poseSubsystem.get();
         }
         omegaController.reset(initialPose.getRotation().getRadians());
         xController.reset(initialPose.getX());
@@ -88,27 +88,29 @@ public class StraightPathCommand extends Command {
             destination = destinationProvider.get();
         }
 
-        // double goalX = getIntermediateGoal(destination.getX(), initialPose.getX(), 1000, currentTime);
-        // double goalY = getIntermediateGoal(destination.getY(), initialPose.getY(), 1000, currentTime);
-        // double goalAngle = getIntermediateGoal(destination.getRotation().getDegrees(),
-        //         initialPose.getRotation().getDegrees(), 2, currentTime);
+        // double goalX = getIntermediateGoal(destination.getX(), initialPose.getX(),
+        // 1000, currentTime);
+        // double goalY = getIntermediateGoal(destination.getY(), initialPose.getY(),
+        // 1000, currentTime);
+        // double goalAngle =
+        // getIntermediateGoal(destination.getRotation().getDegrees(),
+        // initialPose.getRotation().getDegrees(), 2, currentTime);
         xController.setGoal(destination.getX());
         yController.setGoal(destination.getY());
         omegaController.setGoal(destination.getRotation().getRadians());
         var robotPose = poseProvider.get();
 
         // if (Robot.count % 10 == 8) {
-        //     SmartDashboard.putNumber("goal X", goalX);
-        //     SmartDashboard.putNumber("goal Y", goalY);
-        //     SmartDashboard.putNumber("goal A", goalAngle);
+        // SmartDashboard.putNumber("goal X", goalX);
+        // SmartDashboard.putNumber("goal Y", goalY);
+        // SmartDashboard.putNumber("goal A", goalAngle);
         // }
 
         if (Robot.count % 5 == 3) {
             logf("Path goal:<%.2f,%.2f,%.2f> robot pose:<%.2f,%.2f,%.2f>\n",
-           
-            destination.getX(), destination.getY(),
-            destination.getRotation().getDegrees(),
-            robotPose.getX(), robotPose.getY(), robotPose.getRotation().getDegrees());
+                    destination.getX(), destination.getY(),
+                    destination.getRotation().getDegrees(),
+                    robotPose.getX(), robotPose.getY(), robotPose.getRotation().getDegrees());
         }
         var xSpeed = xController.calculate(robotPose.getX());
         if (xController.atGoal()) {
@@ -119,7 +121,6 @@ public class StraightPathCommand extends Command {
         if (yController.atGoal()) {
             ySpeed = 0;
         }
-    
 
         var omegaSpeed = omegaController.calculate(robotPose.getRotation().getRadians());
         if (omegaController.atGoal()) {
@@ -132,7 +133,7 @@ public class StraightPathCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        //double currentTime = RobotController.getFPGATime();
+        // double currentTime = RobotController.getFPGATime();
         if (destinationProvider != null) {
             destination = destinationProvider.get();
         }

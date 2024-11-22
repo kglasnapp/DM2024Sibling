@@ -22,7 +22,6 @@ public class DriveCommand extends Command {
 
     @Override
     public void initialize() {
-        
     }
 
     @Override
@@ -42,7 +41,7 @@ public class DriveCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        
+
     }
-    
+
 }
